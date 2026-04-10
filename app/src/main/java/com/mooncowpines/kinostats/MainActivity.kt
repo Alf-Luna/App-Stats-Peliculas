@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.mooncowpines.kinostats.ui.screens.login.LoginScreen
 import com.mooncowpines.kinostats.ui.screens.login.LoginScreenViewModel
+import com.mooncowpines.kinostats.ui.screens.register.RegisterScreen
 import com.mooncowpines.kinostats.ui.theme.KinoStatsTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,7 +23,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             KinoStatsTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    LoginScreen(modifier = Modifier.padding(innerPadding))
+                    RegisterScreen(modifier = Modifier.padding(innerPadding))
                 }
             }
         }

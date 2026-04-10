@@ -1,5 +1,6 @@
-package com.mooncowpines.kinostats.ui.screens.login
+package com.mooncowpines.kinostats.ui.screens.register
 
+import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -25,7 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
+import androidx.compose.ui.text.font.FontStyle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 import com.mooncowpines.kinostats.R
@@ -34,7 +35,7 @@ import com.mooncowpines.kinostats.ui.components.KinoButton
 import com.mooncowpines.kinostats.ui.components.KinoTextField
 
 @Composable
-fun LoginScreen(viewModel: LoginScreenViewModel = viewModel(), modifier: Modifier = Modifier){
+fun RegisterScreen(viewModel: RegisterScreenViewModel = viewModel(), modifier: Modifier = Modifier){
 
     val state by viewModel.state.collectAsState()
 
@@ -46,36 +47,49 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel(), modifier: Modifie
     }
 
     Box(Modifier.fillMaxSize().padding(30.dp)) {
-        Login(
+        Register(
             modifier = Modifier.align(Alignment.Center),
+            userNameValue = state.userName,
             emailValue = state.email,
             passValue = state.pass,
+            passCheckValue = state.passCheck,
             isSubmitting = state.isSubmitting,
             errorMsg = state.errorMsg,
+            onUserNameChange = { viewModel.onUserNameChange(it) },
             onEmailChange = { viewModel.onEmailChange(it) },
             onPassChange = { viewModel.onPassChange(it) },
-            onLoginClick = { viewModel.login() }
+            onPassCheckChange = { viewModel.onPassCheckChange(it) },
+            onLoginClick = { viewModel.register() }
             )
     }
 }
 
 @Composable
-fun Login(
+fun Register(
     modifier: Modifier,
+    userNameValue: String,
     emailValue: String,
     passValue: String,
+    passCheckValue: String,
     isSubmitting: Boolean,
     errorMsg: String?,
+    onUserNameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onPassChange: (String) -> Unit,
+    onPassCheckChange: (String) -> Unit,
     onLoginClick: () -> Unit
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        //Top Banner
-        HeaderImage()
 
-        Spacer(modifier = Modifier.height(100.dp))
+        Text(
+            text = "Create your account",
+            color = KinoYellow,
+            fontSize = 30.sp,
+            fontStyle = FontStyle.Italic,
+            fontWeight = FontWeight.Bold
+        )
 
+        Spacer(modifier = Modifier.height(40.dp))
         //Column that wraps the text fields and buttons
         Column(
             modifier = Modifier
@@ -85,6 +99,26 @@ fun Login(
                     shape = CutCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 16.dp, bottomEnd = 16.dp))
                 .padding(24.dp),
         ) {
+
+            Column{
+                Text(
+                    text = "User Name:",
+                    color = KinoYellow,
+                )
+                HorizontalDivider(
+                    color = KinoYellow,
+                    thickness = 1.dp,
+                    modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+                )
+                KinoTextField(
+                    textValue = userNameValue,
+                    onTextChange = onUserNameChange,
+                    placeholderText = "Alfonso qlo por qué no viniste hoy",
+                    modifier = Modifier.fillMaxWidth())
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             //Email text and text field
             Column{
                 Text(
@@ -122,7 +156,29 @@ fun Login(
                     placeholderText = "password",
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth())
-                ForgotPassword(Modifier.align(Alignment.End))
+
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            //Password text and text field
+            Column{
+                Text(
+                    text = "Check Password:",
+                    color = KinoYellow
+                )
+                HorizontalDivider(
+                    color = KinoYellow,
+                    thickness = 1.dp,
+                    modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+                )
+                KinoTextField(
+                    textValue = passCheckValue,
+                    onTextChange = onPassCheckChange,
+                    placeholderText = "check password",
+                    isPassword = true,
+                    modifier = Modifier.fillMaxWidth())
+
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -162,28 +218,10 @@ fun Login(
 
             Column{
                 KinoButton(
-                    text = "Create Account",
+                    text = "Confirm",
                     onClick = { },
                     modifier = Modifier.fillMaxWidth())
             }
         }
     }
-}
-
-@Composable
-fun ForgotPassword(modifier: Modifier) {
-    Text(
-        text = "forgot your password?",
-        modifier = modifier.clickable {},
-        fontSize = 12.sp,
-        fontWeight = FontWeight.Bold,
-        color = Color(0xFFFB9600)
-    )
-}
-
-@Composable
-fun HeaderImage() {
-    Image(painter = painterResource(id = R.drawable.kinostats_banner),
-        contentDescription = "Banner de KinoStats",
-        modifier = Modifier.fillMaxWidth())
 }
