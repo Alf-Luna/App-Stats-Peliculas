@@ -28,7 +28,7 @@ class RegisterScreenViewModel : ViewModel(){
     }
 
     fun onPassCheckChange(newPassCheck: String) {
-        _state.update { it.copy(pass = newPassCheck, errorMsg = null) }
+        _state.update { it.copy(passCheck = newPassCheck, errorMsg = null) }
         validateFields()
     }
 
@@ -47,7 +47,7 @@ class RegisterScreenViewModel : ViewModel(){
 
             delay(1500)
 
-            if (currentState.userName == "Alfonso" && currentState.email == "test@kinostats.com" && currentState.pass == "123456" && currentState.passCheck == currentState.pass) {
+            if (currentState.userName == "Alfonso" && currentState.email == "test@kinostats.com" && currentState.pass == "a!123456" && currentState.passCheck == currentState.pass) {
                 _state.update { it.copy(isSubmitting = false, success = true) }
             } else {
                 _state.update { it.copy(isSubmitting = false, errorMsg = "Incorrect email or password") }

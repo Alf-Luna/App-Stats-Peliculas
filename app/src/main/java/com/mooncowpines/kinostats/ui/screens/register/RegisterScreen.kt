@@ -7,11 +7,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.CircularProgressIndicator
@@ -41,7 +44,7 @@ fun RegisterScreen(viewModel: RegisterScreenViewModel = viewModel(), modifier: M
 
     if (state.success) {
         Box(Modifier.fillMaxSize().padding(30.dp), contentAlignment = Alignment.Center) {
-            Text("FUNCIONA EL VIEWMODEL", color = KinoYellow, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text("FUNCIONA EL REGISTER VIEWMODEL", color = KinoYellow, fontSize = 24.sp, fontWeight = FontWeight.Bold)
         }
         return
     }
@@ -59,7 +62,7 @@ fun RegisterScreen(viewModel: RegisterScreenViewModel = viewModel(), modifier: M
             onEmailChange = { viewModel.onEmailChange(it) },
             onPassChange = { viewModel.onPassChange(it) },
             onPassCheckChange = { viewModel.onPassCheckChange(it) },
-            onLoginClick = { viewModel.register() }
+            onRegisterClick = { viewModel.register() }
             )
     }
 }
@@ -77,7 +80,7 @@ fun Register(
     onEmailChange: (String) -> Unit,
     onPassChange: (String) -> Unit,
     onPassCheckChange: (String) -> Unit,
-    onLoginClick: () -> Unit
+    onRegisterClick: () -> Unit
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -113,7 +116,7 @@ fun Register(
                 KinoTextField(
                     textValue = userNameValue,
                     onTextChange = onUserNameChange,
-                    placeholderText = "Alfonso qlo por qué no viniste hoy",
+                    placeholderText = "User Name",
                     modifier = Modifier.fillMaxWidth())
             }
 
@@ -153,10 +156,25 @@ fun Register(
                 KinoTextField(
                     textValue = passValue,
                     onTextChange = onPassChange,
-                    placeholderText = "password",
+                    placeholderText = "Password",
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth())
 
+                val requirements = listOf(
+                    "7 characters min" to (passValue.length >= 7),
+                    "Includes a number" to passValue.any { it.isDigit() },
+                    "Special Character (@, #, $)" to passValue.any { !it.isLetterOrDigit() }
+                )
+
+                Column(modifier = Modifier.padding(top = 8.dp)) {
+                    requirements.forEach { (text, isMet) ->
+                        Text(
+                            text = if (isMet) "✓ $text" else "• $text",
+                            color = if (isMet) KinoYellow else Color.Gray.copy(alpha = 0.6f),
+                            fontSize = 13.sp
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -175,11 +193,18 @@ fun Register(
                 KinoTextField(
                     textValue = passCheckValue,
                     onTextChange = onPassCheckChange,
-                    placeholderText = "check password",
+                    placeholderText = "Confirm Password",
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth())
-
+                Column(modifier = Modifier.padding(top = 8.dp)) {
+                    Text(
+                        text = if (passCheckValue == passValue && passCheckValue.isNotBlank()) "✓ Passwords Match" else "• Passwords Match",
+                        color =  if (passCheckValue == passValue && passCheckValue.isNotBlank()) KinoYellow else Color.Gray.copy(alpha = 0.6f),
+                        fontSize = 13.sp
+                    )
+                }
             }
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -195,32 +220,34 @@ fun Register(
                 }
 
                 Text(
-                    text = "Create your account or log in:",
+                    text = "Create your account or get out",
                     color = KinoYellow,
                     textDecoration = TextDecoration.Underline,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-                if (isSubmitting) {
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                        contentAlignment = Alignment.Center)
-                    { CircularProgressIndicator(color = KinoYellow) }
-                } else {
+
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+
+                    if (isSubmitting) {
+                        Box(modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                            contentAlignment = Alignment.Center)
+                        { CircularProgressIndicator(color = KinoYellow) }
+                    } else {
+                        KinoButton(
+                            text = "Create Account",
+                            onClick = onRegisterClick,
+                            modifier = Modifier.width(180.dp))
+                    }
+
                     KinoButton(
-                        text = "Log In...",
-                        onClick = onLoginClick,
-                        modifier = Modifier.fillMaxWidth())
+                        text = "Cancel",
+                        onClick = { },
+                        modifier = Modifier.width(150.dp))
+
+
                 }
-            }
-
-            Spacer(modifier = Modifier.padding(2.dp))
-
-            Column{
-                KinoButton(
-                    text = "Confirm",
-                    onClick = { },
-                    modifier = Modifier.fillMaxWidth())
             }
         }
     }
