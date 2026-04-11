@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.painterResource
@@ -25,8 +26,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 
 import com.mooncowpines.kinostats.R
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
@@ -34,15 +35,18 @@ import com.mooncowpines.kinostats.ui.components.KinoButton
 import com.mooncowpines.kinostats.ui.components.KinoTextField
 
 @Composable
-fun LoginScreen(viewModel: LoginScreenViewModel = viewModel(), modifier: Modifier = Modifier){
-
+fun LoginScreen(
+    viewModel: LoginScreenViewModel = viewModel(),
+    modifier: Modifier = Modifier,
+    onNavigateToRegister: () -> Unit,
+    onNavigateToHome: () -> Unit
+) {
     val state by viewModel.state.collectAsState()
 
-    if (state.success) {
-        Box(Modifier.fillMaxSize().padding(30.dp), contentAlignment = Alignment.Center) {
-            Text("FUNCIONA EL VIEWMODEL", color = KinoYellow, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+    LaunchedEffect(state.success) {
+        if (state.success) {
+            onNavigateToHome()
         }
-        return
     }
 
     Box(Modifier.fillMaxSize().padding(30.dp)) {
@@ -54,7 +58,8 @@ fun LoginScreen(viewModel: LoginScreenViewModel = viewModel(), modifier: Modifie
             errorMsg = state.errorMsg,
             onEmailChange = { viewModel.onEmailChange(it) },
             onPassChange = { viewModel.onPassChange(it) },
-            onLoginClick = { viewModel.login() }
+            onLoginClick = { viewModel.login() },
+            onRegisterClick = onNavigateToRegister
             )
     }
 }
@@ -68,7 +73,8 @@ fun Login(
     errorMsg: String?,
     onEmailChange: (String) -> Unit,
     onPassChange: (String) -> Unit,
-    onLoginClick: () -> Unit
+    onLoginClick: () -> Unit,
+    onRegisterClick: () -> Unit
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         //Top Banner
@@ -119,7 +125,7 @@ fun Login(
                 KinoTextField(
                     textValue = passValue,
                     onTextChange = onPassChange,
-                    placeholderText = "password",
+                    placeholderText = "Password",
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth())
                 ForgotPassword(Modifier.align(Alignment.End))
@@ -163,7 +169,7 @@ fun Login(
             Column{
                 KinoButton(
                     text = "Create Account",
-                    onClick = { },
+                    onClick = onRegisterClick,
                     modifier = Modifier.fillMaxWidth())
             }
         }
