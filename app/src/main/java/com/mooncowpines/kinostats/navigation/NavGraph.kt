@@ -6,10 +6,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.mooncowpines.kinostats.ui.screens.home.HomeScreen
 
+import com.mooncowpines.kinostats.ui.screens.home.HomeScreen
 import com.mooncowpines.kinostats.ui.screens.login.LoginScreen
 import com.mooncowpines.kinostats.ui.screens.register.RegisterScreen
+import com.mooncowpines.kinostats.ui.screens.recovery.RecoveryScreen
 
 @Composable
 fun NavGraph(modifier: Modifier = Modifier) {
@@ -35,6 +36,10 @@ fun NavGraph(modifier: Modifier = Modifier) {
                 onNavigateHome = { navController.navigate(Route.Home.path)
                 }
             )
+        }
+
+        composable(Route.Recovery.path) {
+            RecoveryScreen()
         }
 
         composable(Route.Home.path) {
