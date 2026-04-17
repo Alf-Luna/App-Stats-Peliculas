@@ -38,7 +38,12 @@ import com.mooncowpines.kinostats.ui.components.KinoButton
 import com.mooncowpines.kinostats.ui.components.KinoTextField
 
 @Composable
-fun RegisterScreen(viewModel: RegisterScreenViewModel = viewModel(), modifier: Modifier = Modifier){
+fun RegisterScreen(
+    viewModel: RegisterScreenViewModel = viewModel(),
+    modifier: Modifier = Modifier,
+    onNavigateHome: () -> Unit,
+    onNavigateBack: () -> Unit
+){
 
     val state by viewModel.state.collectAsState()
 
@@ -62,7 +67,8 @@ fun RegisterScreen(viewModel: RegisterScreenViewModel = viewModel(), modifier: M
             onEmailChange = { viewModel.onEmailChange(it) },
             onPassChange = { viewModel.onPassChange(it) },
             onPassCheckChange = { viewModel.onPassCheckChange(it) },
-            onRegisterClick = { viewModel.register() }
+            onRegisterClick = { viewModel.register() },
+            onCancelClick = onNavigateBack
             )
     }
 }
@@ -80,7 +86,8 @@ fun Register(
     onEmailChange: (String) -> Unit,
     onPassChange: (String) -> Unit,
     onPassCheckChange: (String) -> Unit,
-    onRegisterClick: () -> Unit
+    onRegisterClick: () -> Unit,
+    onCancelClick: () -> Unit
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -220,7 +227,7 @@ fun Register(
                 }
 
                 Text(
-                    text = "Create your account or get out",
+                    text = "ALL FIELDS ARE MANDATORY",
                     color = KinoYellow,
                     textDecoration = TextDecoration.Underline,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -243,7 +250,7 @@ fun Register(
 
                     KinoButton(
                         text = "Cancel",
-                        onClick = { },
+                        onClick = onCancelClick,
                         modifier = Modifier.width(150.dp))
 
 
