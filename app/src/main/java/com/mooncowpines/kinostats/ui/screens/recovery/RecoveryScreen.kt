@@ -126,22 +126,6 @@ fun Recovery(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            //Password text and text field
-            Column {
-                Text(
-                    text = "Password:",
-                    color = KinoYellow
-                )
-                HorizontalDivider(
-                    color = KinoYellow,
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
-                )
-
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             //Buttons text and buttons
             Column {
                 if (errorMsg != null) {
@@ -154,7 +138,7 @@ fun Recovery(
                 }
 
                 Text(
-                    text = "ALL FIELDS ARE MANDATORY",
+                    text = "If your email is associated with an account you will receive a link to change your password ",
                     color = KinoYellow,
                     textDecoration = TextDecoration.Underline,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -172,7 +156,7 @@ fun Recovery(
                         { CircularProgressIndicator(color = KinoYellow) }
                     } else {
                         KinoButton(
-                            text = "Create Account",
+                            text = "Send",
                             onClick = onRecoveryClick,
                             modifier = Modifier.width(180.dp)
                         )

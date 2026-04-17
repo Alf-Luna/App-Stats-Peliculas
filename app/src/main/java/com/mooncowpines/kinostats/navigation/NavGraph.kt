@@ -26,7 +26,8 @@ fun NavGraph(modifier: Modifier = Modifier) {
                     navController.navigate(Route.Home.path) {
                         popUpTo(Route.Login.path) { inclusive = true }
                     }
-                }
+                },
+                onNavigateRecover = { navController.navigate((Route.Recovery.path))}
             )
         }
 
@@ -39,7 +40,9 @@ fun NavGraph(modifier: Modifier = Modifier) {
         }
 
         composable(Route.Recovery.path) {
-            RecoveryScreen()
+            RecoveryScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
 
         composable(Route.Home.path) {

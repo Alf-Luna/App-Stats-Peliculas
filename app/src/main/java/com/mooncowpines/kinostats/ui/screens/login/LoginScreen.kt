@@ -39,7 +39,8 @@ fun LoginScreen(
     viewModel: LoginScreenViewModel = viewModel(),
     modifier: Modifier = Modifier,
     onNavigateToRegister: () -> Unit,
-    onNavigateToHome: () -> Unit
+    onNavigateToHome: () -> Unit,
+    onNavigateRecover: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -59,6 +60,7 @@ fun LoginScreen(
             onEmailChange = { viewModel.onEmailChange(it) },
             onPassChange = { viewModel.onPassChange(it) },
             onLoginClick = { viewModel.login() },
+            onRecoveryClick = onNavigateRecover,
             onRegisterClick = onNavigateToRegister
             )
     }
@@ -74,6 +76,7 @@ fun Login(
     onEmailChange: (String) -> Unit,
     onPassChange: (String) -> Unit,
     onLoginClick: () -> Unit,
+    onRecoveryClick: () -> Unit,
     onRegisterClick: () -> Unit
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -128,7 +131,7 @@ fun Login(
                     placeholderText = "Password",
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth())
-                ForgotPassword(Modifier.align(Alignment.End))
+                ForgotPassword(Modifier.align(Alignment.End), onClick = onRecoveryClick)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -177,10 +180,10 @@ fun Login(
 }
 
 @Composable
-fun ForgotPassword(modifier: Modifier) {
+fun ForgotPassword(modifier: Modifier, onClick:() -> Unit ) {
     Text(
         text = "forgot your password?",
-        modifier = modifier.clickable {},
+        modifier = modifier.clickable { onClick()},
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
         color = Color(0xFFFB9600)
