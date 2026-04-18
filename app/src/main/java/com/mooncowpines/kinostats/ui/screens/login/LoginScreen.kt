@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.CircularProgressIndicator
@@ -40,7 +41,8 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     onNavigateToRegister: () -> Unit,
     onNavigateToHome: () -> Unit,
-    onNavigateRecover: () -> Unit
+    onNavigateToChange: () -> Unit,
+    onNavigateToRecover: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -60,7 +62,8 @@ fun LoginScreen(
             onEmailChange = { viewModel.onEmailChange(it) },
             onPassChange = { viewModel.onPassChange(it) },
             onLoginClick = { viewModel.login() },
-            onRecoveryClick = onNavigateRecover,
+            onRecoveryClick = onNavigateToRecover,
+            onChangeClick = onNavigateToChange,
             onRegisterClick = onNavigateToRegister
             )
     }
@@ -77,6 +80,7 @@ fun Login(
     onPassChange: (String) -> Unit,
     onLoginClick: () -> Unit,
     onRecoveryClick: () -> Unit,
+    onChangeClick: () -> Unit,
     onRegisterClick: () -> Unit
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -173,6 +177,13 @@ fun Login(
                 KinoButton(
                     text = "Create Account",
                     onClick = onRegisterClick,
+                    modifier = Modifier.fillMaxWidth())
+            }
+
+            Column{
+                KinoButton(
+                    text = "Test",
+                    onClick = onChangeClick,
                     modifier = Modifier.fillMaxWidth())
             }
         }

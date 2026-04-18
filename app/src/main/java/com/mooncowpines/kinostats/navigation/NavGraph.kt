@@ -11,6 +11,7 @@ import com.mooncowpines.kinostats.ui.screens.home.HomeScreen
 import com.mooncowpines.kinostats.ui.screens.login.LoginScreen
 import com.mooncowpines.kinostats.ui.screens.register.RegisterScreen
 import com.mooncowpines.kinostats.ui.screens.recovery.RecoveryScreen
+import com.mooncowpines.kinostats.ui.screens.change.ChangeScreen
 
 @Composable
 fun NavGraph(modifier: Modifier = Modifier) {
@@ -27,20 +28,29 @@ fun NavGraph(modifier: Modifier = Modifier) {
                         popUpTo(Route.Login.path) { inclusive = true }
                     }
                 },
-                onNavigateRecover = { navController.navigate((Route.Recovery.path))}
+                onNavigateToRecover = { navController.navigate(Route.Recovery.path)},
+                onNavigateToChange = { navController.navigate(Route.Change.path)}
             )
         }
 
         composable(Route.Register.path) {
             RegisterScreen(
                 onNavigateBack = { navController.popBackStack() },
-                onNavigateHome = { navController.navigate(Route.Home.path)
+                onNavigateToHome = { navController.navigate(Route.Home.path) {
+                    popUpTo(Route.Login.path) { inclusive = true }
+                }
                 }
             )
         }
 
         composable(Route.Recovery.path) {
             RecoveryScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Route.Change.path) {
+            ChangeScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }
