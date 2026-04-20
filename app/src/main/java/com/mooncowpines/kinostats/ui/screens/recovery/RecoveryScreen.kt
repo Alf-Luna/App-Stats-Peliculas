@@ -35,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoButton
 import com.mooncowpines.kinostats.ui.components.KinoTextField
+import com.mooncowpines.kinostats.ui.components.KinoFrame
 
 @Composable
 fun RecoveryScreen(
@@ -87,24 +88,8 @@ fun Recovery(
         )
 
         Spacer(modifier = Modifier.height(40.dp))
-        //Column that wraps the text fields and buttons
-        Column(
-            modifier = Modifier
-                .border(
-                    width = 1.dp,
-                    color = KinoYellow,
-                    shape = CutCornerShape(
-                        topStart = 16.dp,
-                        topEnd = 16.dp,
-                        bottomStart = 16.dp,
-                        bottomEnd = 16.dp
-                    )
-                )
-                .padding(24.dp),
-        ) {
 
-            Spacer(modifier = Modifier.height(16.dp))
-
+        KinoFrame {
             //Email text and text field
             Column {
                 Text(
