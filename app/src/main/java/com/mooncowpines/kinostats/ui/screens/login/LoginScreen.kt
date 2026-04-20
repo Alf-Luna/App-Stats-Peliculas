@@ -177,14 +177,16 @@ fun Login(
                 KinoButton(
                     text = "Create Account",
                     onClick = onRegisterClick,
-                    modifier = Modifier.fillMaxWidth())
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isSubmitting)
             }
 
             Column{
                 KinoButton(
                     text = "Test",
                     onClick = onChangeClick,
-                    modifier = Modifier.fillMaxWidth())
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isSubmitting)
             }
         }
     }

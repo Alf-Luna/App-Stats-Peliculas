@@ -51,7 +51,11 @@ fun NavGraph(modifier: Modifier = Modifier) {
 
         composable(Route.Change.path) {
             ChangeScreen(
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToLogin = { navController.navigate(Route.Login.path) {
+                    popUpTo(Route.Login.path) {inclusive = true}
+                }
+                }
             )
         }
 

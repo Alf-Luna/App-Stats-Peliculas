@@ -1,5 +1,7 @@
 package com.mooncowpines.kinostats.data
 
+import com.mooncowpines.kinostats.utils.isPassMatch
+import com.mooncowpines.kinostats.utils.isPassValid
 import kotlinx.coroutines.delay
 
 data class User(val userName: String, val email: String)
@@ -36,6 +38,23 @@ object FakeAuthApi {
         mockDatabase.add(newUser)
 
         return true
+    }
+
+    suspend fun sendRecoveryEmail(email: String): Boolean {
+        delay(1500)
+
+        return mockDatabase.any {it["email"] == email}
+
+    }
+
+    suspend fun changePassword(pass: String, passCheck: String): Boolean {
+        delay(1500)
+
+        val validPass = isPassValid(pass)
+
+        val matchPass = isPassMatch(pass, passCheck)
+
+        return validPass && matchPass
     }
 
 }

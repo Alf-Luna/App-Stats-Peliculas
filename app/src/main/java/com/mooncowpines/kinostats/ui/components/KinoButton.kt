@@ -17,14 +17,21 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun KinoButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun KinoButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true) {
     //Standard button for KinoStats
     Button(
         onClick = onClick,
         modifier = modifier,
+        enabled = enabled,
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFFFFC040),
-            contentColor = Color.White
+            contentColor = Color.White,
+            disabledContainerColor = Color.DarkGray,
+            disabledContentColor = Color.LightGray
         ),
         shape = RoundedCornerShape(8.dp)
     ) {

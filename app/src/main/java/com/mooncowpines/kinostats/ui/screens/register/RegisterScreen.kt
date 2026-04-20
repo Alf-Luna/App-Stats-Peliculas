@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.Text
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.CircularProgressIndicator
@@ -95,7 +98,11 @@ fun Register(
     onRegisterClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = modifier
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
 
         Text(
             text = "Create your account",
@@ -241,7 +248,7 @@ fun Register(
 
                     if (isSubmitting) {
                         Box(modifier = Modifier
-                            .fillMaxWidth()
+                            .width(150.dp)
                             .height(48.dp),
                             contentAlignment = Alignment.Center)
                         { CircularProgressIndicator(color = KinoYellow) }
@@ -255,10 +262,10 @@ fun Register(
                     KinoButton(
                         text = "Cancel",
                         onClick = onCancelClick,
+                        enabled = !isSubmitting,
                         modifier = Modifier.width(150.dp))
-
-
                 }
+
             }
         }
     }

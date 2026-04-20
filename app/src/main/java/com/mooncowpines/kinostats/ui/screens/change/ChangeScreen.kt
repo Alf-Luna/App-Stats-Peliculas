@@ -1,5 +1,6 @@
 package com.mooncowpines.kinostats.ui.screens.change
 
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.layout.Box
@@ -19,11 +20,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -37,21 +40,18 @@ import com.mooncowpines.kinostats.ui.components.PasswordMatchFeedback
 fun ChangeScreen(
     modifier: Modifier = Modifier,
     viewModel: ChangeScreenViewModel = viewModel(),
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToLogin: () -> Unit
 ) {
 
     val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
 
-    if (state.success) {
-        Box(Modifier.fillMaxSize().padding(30.dp), contentAlignment = Alignment.Center) {
-            Text(
-                "FUNCIONA EL CHANGE VIEWMODEL",
-                color = KinoYellow,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
+    LaunchedEffect(state.success) {
+        if (state.success) {
+            Toast.makeText(context, "Password changed successfully!", Toast.LENGTH_LONG).show()
+            onNavigateToLogin()
         }
-        return
     }
 
     Box(Modifier.fillMaxSize().padding(30.dp)) {
@@ -64,7 +64,8 @@ fun ChangeScreen(
             onPassChange = { viewModel.onPassChange(it) },
             onPassCheckChange = { viewModel.onPassCheckChange(it) },
             onChangeClick = { viewModel.change() },
-            onCancelClick = onNavigateBack
+            onCancelClick = onNavigateBack,
+            onNavigateToLogin = {}
         )
     }
 }
@@ -79,7 +80,8 @@ fun Change(
     onPassChange: (String) -> Unit,
     onPassCheckChange: (String) -> Unit,
     onChangeClick: () -> Unit,
-    onCancelClick: () -> Unit
+    onCancelClick: () -> Unit,
+    onNavigateToLogin: () -> Unit
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -172,7 +174,7 @@ fun Change(
                     if (isSubmitting) {
                         Box(
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .width(160.dp)
                                 .height(48.dp),
                             contentAlignment = Alignment.Center
                         )
@@ -188,7 +190,8 @@ fun Change(
                     KinoButton(
                         text = "Go to Log in",
                         onClick = onCancelClick,
-                        modifier = Modifier.width(160.dp)
+                        modifier = Modifier.width(160.dp),
+                        enabled = !isSubmitting
                     )
 
 

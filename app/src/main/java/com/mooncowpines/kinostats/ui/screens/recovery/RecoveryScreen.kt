@@ -1,5 +1,6 @@
 package com.mooncowpines.kinostats.ui.screens.recovery
 
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.layout.Box
@@ -25,8 +26,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
+
 
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoButton
@@ -40,23 +44,18 @@ fun RecoveryScreen(
 ) {
 
     val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
 
     if (state.success) {
-        Box(Modifier.fillMaxSize().padding(30.dp), contentAlignment = Alignment.Center) {
-            Text(
-                "FUNCIONA EL RECOVERY VIEWMODEL",
-                color = KinoYellow,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-        return
+        Toast.makeText(context, "Recovery email sent!", Toast.LENGTH_LONG).show()
+        onNavigateBack()
     }
 
     Box(Modifier.fillMaxSize().padding(30.dp)) {
         Recovery(
             modifier = Modifier.align(Alignment.Center),
             emailValue = state.email,
+            emailError = state.emailError,
             isSubmitting = state.isSubmitting,
             errorMsg = state.errorMsg,
             onEmailChange = { viewModel.onEmailChange(it) },
@@ -70,6 +69,7 @@ fun RecoveryScreen(
 fun Recovery(
     modifier: Modifier,
     emailValue: String,
+    emailError: String?,
     isSubmitting: Boolean,
     errorMsg: String?,
     onEmailChange: (String) -> Unit,
@@ -122,6 +122,14 @@ fun Recovery(
                     placeholderText = "example@gmail.com",
                     modifier = Modifier.fillMaxWidth()
                 )
+                if (emailError != null) {
+                    Text(
+                        text = emailError,
+                        color = Color.Red,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -137,19 +145,12 @@ fun Recovery(
                     )
                 }
 
-                Text(
-                    text = "If your email is associated with an account you will receive a link to change your password ",
-                    color = KinoYellow,
-                    textDecoration = TextDecoration.Underline,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
 
                     if (isSubmitting) {
                         Box(
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .width(180.dp)
                                 .height(48.dp),
                             contentAlignment = Alignment.Center
                         )
@@ -165,12 +166,24 @@ fun Recovery(
                     KinoButton(
                         text = "Cancel",
                         onClick = onCancelClick,
-                        modifier = Modifier.width(150.dp)
+                        modifier = Modifier.width(150.dp),
+                        enabled = !isSubmitting
                     )
 
 
                     }
                 }
             }
+
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "If your email is associated with an account you will receive a link to change your password ",
+            color = KinoYellow,
+            textDecoration = TextDecoration.Underline,
+            textAlign = TextAlign.Justify,
+            modifier = Modifier
+                .width(400.dp)
+                .padding(bottom = 8.dp)
+        )
         }
     }

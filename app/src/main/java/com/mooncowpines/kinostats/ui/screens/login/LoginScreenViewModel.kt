@@ -31,9 +31,9 @@ class LoginScreenViewModel : ViewModel(){
         val emailErrorResult = getEmailError(currentState.email)
         val isPassBlank = currentState.pass.isBlank()
 
-
         if (emailErrorResult != null || isPassBlank) {
             _state.update { it.copy(errorMsg = "Invalid email or password") }
+            return
         }
 
         viewModelScope.launch {
