@@ -3,7 +3,6 @@ package com.mooncowpines.kinostats.ui.screens.recovery
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mooncowpines.kinostats.utils.getEmailError
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,15 +15,17 @@ class RecoveryScreenViewModel : ViewModel(){
     private val _state = MutableStateFlow(RecoveryScreenState())
     val state: StateFlow<RecoveryScreenState> = _state.asStateFlow()
 
+    //Functions to track text field value
     fun onEmailChange(newEmail: String) {
         _state.update { it.copy(email = newEmail, emailError = null, errorMsg = null) }
     }
 
+    //Triggers an email recovery attempt
     fun recovery() {
         val currentState = _state.value
-
         if (currentState.isSubmitting) return
 
+        //Local validation for the text field
         val emailErrorResult = getEmailError(currentState.email)
 
         if (emailErrorResult != null) {
@@ -34,6 +35,7 @@ class RecoveryScreenViewModel : ViewModel(){
             return
         }
 
+        //Tries an email recovery attempt
         viewModelScope.launch {
             _state.update { it.copy(isSubmitting = true, errorMsg = null) }
 

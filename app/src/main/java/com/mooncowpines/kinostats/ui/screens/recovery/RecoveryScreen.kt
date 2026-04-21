@@ -1,8 +1,6 @@
 package com.mooncowpines.kinostats.ui.screens.recovery
 
 import android.widget.Toast
-import androidx.compose.foundation.border
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -79,6 +77,7 @@ fun Recovery(
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
 
+        //Header banner
         Text(
             text = "Forgot Your Password?",
             color = KinoYellow,
@@ -89,8 +88,9 @@ fun Recovery(
 
         Spacer(modifier = Modifier.height(40.dp))
 
+        //Frame to wrap the form
         KinoFrame {
-            //Email text and text field
+            //Email field
             Column {
                 Text(
                     text = "Email:",
@@ -119,8 +119,9 @@ fun Recovery(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            //Buttons text and buttons
+
             Column {
+                //General error message
                 if (errorMsg != null) {
                     Text(
                         text = errorMsg,
@@ -130,8 +131,8 @@ fun Recovery(
                     )
                 }
 
+                //Buttons section
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-
                     if (isSubmitting) {
                         Box(
                             modifier = Modifier

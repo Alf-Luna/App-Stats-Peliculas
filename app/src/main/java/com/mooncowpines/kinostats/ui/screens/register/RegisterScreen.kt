@@ -1,10 +1,5 @@
 package com.mooncowpines.kinostats.ui.screens.register
 
-import android.widget.Space
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.Text
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
@@ -36,7 +29,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
-import com.mooncowpines.kinostats.R
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoButton
 import com.mooncowpines.kinostats.ui.components.KinoFrame
@@ -77,7 +69,7 @@ fun RegisterScreen(
             onPassCheckChange = { viewModel.onPassCheckChange(it) },
             onRegisterClick = { viewModel.register() },
             onCancelClick = onNavigateBack
-            )
+        )
     }
 }
 
@@ -100,11 +92,10 @@ fun Register(
     onCancelClick: () -> Unit
 ) {
     Column(
-        modifier = modifier
-            .verticalScroll(rememberScrollState()),
+        modifier = modifier.verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-
+        //Header banner
         Text(
             text = "Create your account",
             color = KinoYellow,
@@ -114,9 +105,10 @@ fun Register(
         )
 
         Spacer(modifier = Modifier.height(40.dp))
-        //Column that wraps the text fields and buttons
-        KinoFrame {
 
+        //Frame to wrap the form
+        KinoFrame {
+            //Username field
             Column{
                 Text(
                     text = "User Name:",
@@ -145,7 +137,7 @@ fun Register(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            //Email text and text field
+            //Email field
             Column{
                 Text(
                     text = "Email:",
@@ -174,7 +166,7 @@ fun Register(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            //Password text and text field
+            //Password field
             Column{
                 Text(
                     text = "Password:",
@@ -192,12 +184,13 @@ fun Register(
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth())
 
+                //Visual feedback to password requirements
                 PasswordRequirementsFeedback(passValue)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            //Password text and text field
+            //Password check field
             Column{
                 Text(
                     text = "Check Password:",
@@ -214,14 +207,15 @@ fun Register(
                     placeholderText = "Confirm Password",
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth())
+
+                //Visual feedback for password match
                 PasswordMatchFeedback(passValue, passCheckValue)
             }
 
-
             Spacer(modifier = Modifier.height(16.dp))
 
-            //Buttons text and buttons
             Column{
+                //General error message
                 if (errorMsg != null) {
                     Text(
                         text = errorMsg,
@@ -231,6 +225,7 @@ fun Register(
                     )
                 }
 
+                //Buttons section
                 Text(
                     text = "ALL FIELDS ARE MANDATORY",
                     color = KinoYellow,

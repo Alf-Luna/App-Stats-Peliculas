@@ -15,6 +15,7 @@ class ChangeScreenViewModel : ViewModel(){
     private val _state = MutableStateFlow(ChangeScreenState())
     val state: StateFlow<ChangeScreenState> = _state.asStateFlow()
 
+    //Functions to track text field value
     fun onPassChange(newPass: String) {
         _state.update { it.copy(pass = newPass, errorMsg = null) }
     }
@@ -23,10 +24,12 @@ class ChangeScreenViewModel : ViewModel(){
         _state.update { it.copy(passCheck = newPassCheck, errorMsg = null) }
     }
 
+    //Triggers a password change attempt
     fun change() {
         val currentState = _state.value
         if (currentState.isSubmitting) return
 
+        //Local validation for the text field
         val isPassValid = isPassValid(currentState.pass)
         val isPassCheckValid = isPassMatch(currentState.pass, currentState.passCheck)
 
@@ -35,6 +38,7 @@ class ChangeScreenViewModel : ViewModel(){
             return
         }
 
+        //Tries a password change attempt
         viewModelScope.launch {
             _state.update { it.copy(isSubmitting = true, errorMsg = null) }
 
