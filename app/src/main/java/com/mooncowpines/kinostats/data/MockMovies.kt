@@ -57,7 +57,6 @@ object FakeMovieApi {
         )
     )
 
-
     suspend fun getMovies(): List<Movie> {
         delay(1500)
         return mockMovieDatabase

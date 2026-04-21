@@ -72,7 +72,7 @@ fun NavGraph(modifier: Modifier = Modifier) {
         }
         composable(
             route = Route.MovieDetail.path,
-            arguments = listOf(navArgument("movieId") { type = NavType.IntType }) // Definimos que espera un Int
+            arguments = listOf(navArgument("movieId") { type = NavType.IntType }) //Check if using a list is necessary
         ) { backStackEntry ->
 
             val movieId = backStackEntry.arguments?.getInt("movieId") ?: 1
