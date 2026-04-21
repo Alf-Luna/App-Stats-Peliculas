@@ -1,4 +1,4 @@
-package com.mooncowpines.kinostats.ui.screens.recovery
+package com.mooncowpines.kinostats.ui.screens.change
 
 import android.widget.Toast
 import androidx.compose.foundation.border
@@ -20,66 +20,73 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
-
 
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoButton
 import com.mooncowpines.kinostats.ui.components.KinoTextField
+import com.mooncowpines.kinostats.ui.components.PasswordRequirementsFeedback
+import com.mooncowpines.kinostats.ui.components.PasswordMatchFeedback
 
 @Composable
-fun RecoveryScreen(
+fun ChangeScreen(
     modifier: Modifier = Modifier,
-    viewModel: RecoveryScreenViewModel = viewModel(),
-    onNavigateBack: () -> Unit
+    viewModel: ChangeScreenViewModel = viewModel(),
+    onNavigateBack: () -> Unit,
+    onNavigateToLogin: () -> Unit
 ) {
 
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
 
-    if (state.success) {
-        Toast.makeText(context, "Recovery email sent!", Toast.LENGTH_LONG).show()
-        onNavigateBack()
+    LaunchedEffect(state.success) {
+        if (state.success) {
+            Toast.makeText(context, "Password changed successfully!", Toast.LENGTH_LONG).show()
+            onNavigateToLogin()
+        }
     }
 
     Box(Modifier.fillMaxSize().padding(30.dp)) {
-        Recovery(
+        Change(
             modifier = Modifier.align(Alignment.Center),
-            emailValue = state.email,
-            emailError = state.emailError,
+            passValue = state.pass,
+            passCheckValue = state.passCheck,
             isSubmitting = state.isSubmitting,
             errorMsg = state.errorMsg,
-            onEmailChange = { viewModel.onEmailChange(it) },
-            onRecoveryClick = { viewModel.recovery() },
-            onCancelClick = onNavigateBack
+            onPassChange = { viewModel.onPassChange(it) },
+            onPassCheckChange = { viewModel.onPassCheckChange(it) },
+            onChangeClick = { viewModel.change() },
+            onCancelClick = onNavigateBack,
+            onNavigateToLogin = {}
         )
     }
 }
 
 @Composable
-fun Recovery(
+fun Change(
     modifier: Modifier,
-    emailValue: String,
-    emailError: String?,
+    passValue: String,
+    passCheckValue: String,
     isSubmitting: Boolean,
     errorMsg: String?,
-    onEmailChange: (String) -> Unit,
-    onRecoveryClick: () -> Unit,
-    onCancelClick: () -> Unit
+    onPassChange: (String) -> Unit,
+    onPassCheckChange: (String) -> Unit,
+    onChangeClick: () -> Unit,
+    onCancelClick: () -> Unit,
+    onNavigateToLogin: () -> Unit
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
 
         Text(
-            text = "Forgot Your Password?",
+            text = "Please Enter Your New Password",
             color = KinoYellow,
             fontSize = 30.sp,
             fontStyle = FontStyle.Italic,
@@ -108,7 +115,7 @@ fun Recovery(
             //Email text and text field
             Column {
                 Text(
-                    text = "Email:",
+                    text = "New Password:",
                     color = KinoYellow,
                 )
                 HorizontalDivider(
@@ -117,19 +124,34 @@ fun Recovery(
                     modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
                 )
                 KinoTextField(
-                    textValue = emailValue,
-                    onTextChange = onEmailChange,
-                    placeholderText = "example@gmail.com",
-                    modifier = Modifier.fillMaxWidth()
+                    textValue = passValue,
+                    onTextChange = onPassChange,
+                    placeholderText = "Password",
+                    isPassword = true,
+                    modifier = Modifier.fillMaxWidth())
+                PasswordRequirementsFeedback(passValue)
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Column {
+                Text(
+                    text = "Confirm New Password:",
+                    color = KinoYellow,
                 )
-                if (emailError != null) {
-                    Text(
-                        text = emailError,
-                        color = Color.Red,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                }
+                HorizontalDivider(
+                    color = KinoYellow,
+                    thickness = 1.dp,
+                    modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+                )
+                KinoTextField(
+                    textValue = passCheckValue,
+                    onTextChange = onPassCheckChange,
+                    placeholderText = "Confirm Password",
+                    isPassword = true,
+                    modifier = Modifier.fillMaxWidth())
+
+                PasswordMatchFeedback(passValue, passCheckValue)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -145,28 +167,30 @@ fun Recovery(
                     )
                 }
 
+
+
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
 
                     if (isSubmitting) {
                         Box(
                             modifier = Modifier
-                                .width(180.dp)
+                                .width(160.dp)
                                 .height(48.dp),
                             contentAlignment = Alignment.Center
                         )
                         { CircularProgressIndicator(color = KinoYellow) }
                     } else {
                         KinoButton(
-                            text = "Send",
-                            onClick = onRecoveryClick,
-                            modifier = Modifier.width(180.dp)
+                            text = "Change",
+                            onClick = onChangeClick,
+                            modifier = Modifier.width(160.dp)
                         )
                     }
 
                     KinoButton(
-                        text = "Cancel",
+                        text = "Go to Log in",
                         onClick = onCancelClick,
-                        modifier = Modifier.width(150.dp),
+                        modifier = Modifier.width(160.dp),
                         enabled = !isSubmitting
                     )
 
@@ -174,16 +198,5 @@ fun Recovery(
                     }
                 }
             }
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "If your email is associated with an account you will receive a link to change your password ",
-            color = KinoYellow,
-            textDecoration = TextDecoration.Underline,
-            textAlign = TextAlign.Justify,
-            modifier = Modifier
-                .width(400.dp)
-                .padding(bottom = 8.dp)
-        )
         }
     }

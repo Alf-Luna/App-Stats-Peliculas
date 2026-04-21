@@ -2,7 +2,6 @@ package com.mooncowpines.kinostats.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -11,7 +10,12 @@ import com.mooncowpines.kinostats.ui.screens.home.HomeScreen
 import com.mooncowpines.kinostats.ui.screens.login.LoginScreen
 import com.mooncowpines.kinostats.ui.screens.register.RegisterScreen
 import com.mooncowpines.kinostats.ui.screens.recovery.RecoveryScreen
+import com.mooncowpines.kinostats.ui.screens.change.ChangeScreen
 
+import com.mooncowpines.kinostats.ui.screens.MovieDetail.MovieDetailScreen
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.mooncowpines.kinostats.data.FakeMovieApi
 @Composable
 fun NavGraph(modifier: Modifier = Modifier) {
 
@@ -27,14 +31,17 @@ fun NavGraph(modifier: Modifier = Modifier) {
                         popUpTo(Route.Login.path) { inclusive = true }
                     }
                 },
-                onNavigateRecover = { navController.navigate((Route.Recovery.path))}
+                onNavigateToRecover = { navController.navigate(Route.Recovery.path)},
+                onNavigateToChange = { navController.navigate(Route.Change.path)}
             )
         }
 
         composable(Route.Register.path) {
             RegisterScreen(
                 onNavigateBack = { navController.popBackStack() },
-                onNavigateHome = { navController.navigate(Route.Home.path)
+                onNavigateToHome = { navController.navigate(Route.Home.path) {
+                    popUpTo(Route.Login.path) { inclusive = true }
+                }
                 }
             )
         }
@@ -45,8 +52,38 @@ fun NavGraph(modifier: Modifier = Modifier) {
             )
         }
 
+        composable(Route.Change.path) {
+            ChangeScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToLogin = { navController.navigate(Route.Login.path) {
+                    popUpTo(Route.Login.path) {inclusive = true}
+                }
+                }
+            )
+        }
+
         composable(Route.Home.path) {
-            HomeScreen()
+            HomeScreen(
+                movies = FakeMovieApi.allMoviesSync,
+                onMovieClick = { movieId ->
+                    navController.navigate(Route.MovieDetail.createRoute(movieId))
+                }
+            )
+        }
+        composable(
+            route = Route.MovieDetail.path,
+            arguments = listOf(navArgument("movieId") { type = NavType.IntType }) // Definimos que espera un Int
+        ) { backStackEntry ->
+
+            val movieId = backStackEntry.arguments?.getInt("movieId") ?: 1
+            val movie = FakeMovieApi.getMovieByIdSync(movieId)
+
+            if (movie != null) {
+                MovieDetailScreen(
+                    movie = movie,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
         }
     }
 }

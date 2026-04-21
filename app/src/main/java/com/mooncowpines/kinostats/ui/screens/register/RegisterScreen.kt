@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.Text
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.CircularProgressIndicator
@@ -22,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.painterResource
@@ -36,29 +40,32 @@ import com.mooncowpines.kinostats.R
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoButton
 import com.mooncowpines.kinostats.ui.components.KinoTextField
+import com.mooncowpines.kinostats.ui.components.PasswordRequirementsFeedback
+import com.mooncowpines.kinostats.ui.components.PasswordMatchFeedback
 
 @Composable
 fun RegisterScreen(
     viewModel: RegisterScreenViewModel = viewModel(),
     modifier: Modifier = Modifier,
-    onNavigateHome: () -> Unit,
+    onNavigateToHome: () -> Unit,
     onNavigateBack: () -> Unit
 ){
 
     val state by viewModel.state.collectAsState()
 
-    if (state.success) {
-        Box(Modifier.fillMaxSize().padding(30.dp), contentAlignment = Alignment.Center) {
-            Text("FUNCIONA EL REGISTER VIEWMODEL", color = KinoYellow, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+    LaunchedEffect(state.success) {
+        if (state.success) {
+            onNavigateToHome()
         }
-        return
     }
 
     Box(Modifier.fillMaxSize().padding(30.dp)) {
         Register(
             modifier = Modifier.align(Alignment.Center),
             userNameValue = state.userName,
+            userNameError= state.userNameError,
             emailValue = state.email,
+            emailError = state.emailError,
             passValue = state.pass,
             passCheckValue = state.passCheck,
             isSubmitting = state.isSubmitting,
@@ -77,7 +84,9 @@ fun RegisterScreen(
 fun Register(
     modifier: Modifier,
     userNameValue: String,
+    userNameError: String?,
     emailValue: String,
+    emailError: String?,
     passValue: String,
     passCheckValue: String,
     isSubmitting: Boolean,
@@ -89,7 +98,11 @@ fun Register(
     onRegisterClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = modifier
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
 
         Text(
             text = "Create your account",
@@ -125,6 +138,15 @@ fun Register(
                     onTextChange = onUserNameChange,
                     placeholderText = "User Name",
                     modifier = Modifier.fillMaxWidth())
+
+                if (userNameError != null) {
+                    Text(
+                        text = userNameError,
+                        color = Color.Red,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -145,6 +167,15 @@ fun Register(
                     onTextChange = onEmailChange,
                     placeholderText = "example@gmail.com",
                     modifier = Modifier.fillMaxWidth())
+
+                if (emailError != null) {
+                    Text(
+                        text = emailError,
+                        color = Color.Red,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -167,21 +198,7 @@ fun Register(
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth())
 
-                val requirements = listOf(
-                    "7 characters min" to (passValue.length >= 7),
-                    "Includes a number" to passValue.any { it.isDigit() },
-                    "Special Character (@, #, $)" to passValue.any { !it.isLetterOrDigit() }
-                )
-
-                Column(modifier = Modifier.padding(top = 8.dp)) {
-                    requirements.forEach { (text, isMet) ->
-                        Text(
-                            text = if (isMet) "✓ $text" else "• $text",
-                            color = if (isMet) KinoYellow else Color.Gray.copy(alpha = 0.6f),
-                            fontSize = 13.sp
-                        )
-                    }
-                }
+                PasswordRequirementsFeedback(passValue)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -203,13 +220,7 @@ fun Register(
                     placeholderText = "Confirm Password",
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth())
-                Column(modifier = Modifier.padding(top = 8.dp)) {
-                    Text(
-                        text = if (passCheckValue == passValue && passCheckValue.isNotBlank()) "✓ Passwords Match" else "• Passwords Match",
-                        color =  if (passCheckValue == passValue && passCheckValue.isNotBlank()) KinoYellow else Color.Gray.copy(alpha = 0.6f),
-                        fontSize = 13.sp
-                    )
-                }
+                PasswordMatchFeedback(passValue, passCheckValue)
             }
 
 
@@ -237,7 +248,7 @@ fun Register(
 
                     if (isSubmitting) {
                         Box(modifier = Modifier
-                            .fillMaxWidth()
+                            .width(150.dp)
                             .height(48.dp),
                             contentAlignment = Alignment.Center)
                         { CircularProgressIndicator(color = KinoYellow) }
@@ -251,10 +262,10 @@ fun Register(
                     KinoButton(
                         text = "Cancel",
                         onClick = onCancelClick,
+                        enabled = !isSubmitting,
                         modifier = Modifier.width(150.dp))
-
-
                 }
+
             }
         }
     }
