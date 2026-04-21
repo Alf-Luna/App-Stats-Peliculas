@@ -1,9 +1,7 @@
 package com.mooncowpines.kinostats.ui.screens.login
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,11 +25,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 
 import com.mooncowpines.kinostats.R
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoButton
+import com.mooncowpines.kinostats.ui.components.KinoFrame
 import com.mooncowpines.kinostats.ui.components.KinoTextField
 
 @Composable
@@ -65,7 +62,7 @@ fun LoginScreen(
             onRecoveryClick = onNavigateToRecover,
             onChangeClick = onNavigateToChange,
             onRegisterClick = onNavigateToRegister
-            )
+        )
     }
 }
 
@@ -84,21 +81,14 @@ fun Login(
     onRegisterClick: () -> Unit
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        //Top Banner
+        //Header banner
         HeaderImage()
 
         Spacer(modifier = Modifier.height(100.dp))
 
-        //Column that wraps the text fields and buttons
-        Column(
-            modifier = Modifier
-                .border(
-                    width = 1.dp,
-                    color = KinoYellow,
-                    shape = CutCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 16.dp, bottomEnd = 16.dp))
-                .padding(24.dp),
-        ) {
-            //Email text and text field
+        //Frame to wrap the form
+        KinoFrame {
+            //Email field
             Column{
                 Text(
                     text = "Email:",
@@ -118,7 +108,7 @@ fun Login(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            //Password text and text field
+            //Password Field
             Column{
                 Text(
                     text = "Password:",
@@ -135,13 +125,15 @@ fun Login(
                     placeholderText = "Password",
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth())
+
+                //Text to navigate to Recovery Screen
                 ForgotPassword(Modifier.align(Alignment.End), onClick = onRecoveryClick)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            //Buttons text and buttons
             Column{
+                //General error message
                 if (errorMsg != null) {
                     Text(
                         text = errorMsg,
@@ -151,6 +143,7 @@ fun Login(
                     )
                 }
 
+                //Buttons section
                 Text(
                     text = "Create your account or log in:",
                     color = KinoYellow,

@@ -12,16 +12,14 @@ import com.mooncowpines.kinostats.data.FakeAuthApi
 import com.mooncowpines.kinostats.utils.*
 
 class RegisterScreenViewModel : ViewModel(){
-    //State and a function to modify it
     private val _state = MutableStateFlow(RegisterScreenState())
     val state: StateFlow<RegisterScreenState> = _state.asStateFlow()
 
+    //Functions to track text field value
     fun onUserNameChange(newUserName: String) {
         _state.update { it.copy(userName = newUserName, errorMsg = null, userNameError = null) }
-
     }
 
-    //Functions that listen to the change on the text fields
     fun onEmailChange(newEmail: String) {
         _state.update { it.copy(email = newEmail, errorMsg = null, emailError = null) }
     }
@@ -34,12 +32,12 @@ class RegisterScreenViewModel : ViewModel(){
         _state.update { it.copy(passCheck = newPassCheck, errorMsg = null) }
     }
 
-    //This check if the text fields are in conditions to be submitted and show errors if not
+    //Triggers a register attempt
     fun register() {
         val currentState = _state.value
-
         if (currentState.isSubmitting) return
 
+        //Local validation for the text fields
         val emailErrorResult = getEmailError((currentState.email))
         val userNameErrorResult = getUserNameError(currentState.userName)
         val passValid = isPassValid(currentState.pass)
@@ -50,12 +48,11 @@ class RegisterScreenViewModel : ViewModel(){
                 it.copy(
                     userNameError = userNameErrorResult,
                     emailError = emailErrorResult,
-                    errorMsg = "Please check the required fields"
-                )
-            }
+                    errorMsg = "Please check the required fields") }
             return
         }
 
+        //Tries to register a user
         viewModelScope.launch {
             _state.update { it.copy(isSubmitting = true, errorMsg = null, emailError = null, userNameError = null) }
 

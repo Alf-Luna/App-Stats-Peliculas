@@ -16,18 +16,20 @@ class LoginScreenViewModel : ViewModel(){
     private val _state = MutableStateFlow(LoginScreenState())
     val state: StateFlow<LoginScreenState> = _state.asStateFlow()
 
+    //Functions to track text field value
     fun onEmailChange(newEmail: String) {
         _state.update { it.copy(email = newEmail, errorMsg = null) }
     }
-
     fun onPassChange(newPass: String) {
         _state.update { it.copy(pass = newPass, errorMsg = null) }
     }
 
+    //Triggers a login attempt
     fun login() {
         val currentState = _state.value
         if (currentState.isSubmitting) return
 
+        //Local validation for the text fields
         val emailErrorResult = getEmailError(currentState.email)
         val isPassBlank = currentState.pass.isBlank()
 
@@ -36,6 +38,7 @@ class LoginScreenViewModel : ViewModel(){
             return
         }
 
+        //Tries to log in
         viewModelScope.launch {
             _state.update { it.copy(isSubmitting = true, errorMsg = null) }
 
@@ -57,5 +60,3 @@ class LoginScreenViewModel : ViewModel(){
         }
     }
 }
-
-

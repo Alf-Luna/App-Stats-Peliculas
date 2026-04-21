@@ -1,8 +1,6 @@
 package com.mooncowpines.kinostats.ui.screens.change
 
 import android.widget.Toast
-import androidx.compose.foundation.border
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,6 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoButton
+import com.mooncowpines.kinostats.ui.components.KinoFrame
 import com.mooncowpines.kinostats.ui.components.KinoTextField
 import com.mooncowpines.kinostats.ui.components.PasswordRequirementsFeedback
 import com.mooncowpines.kinostats.ui.components.PasswordMatchFeedback
@@ -85,6 +84,7 @@ fun Change(
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
 
+        //Header banner
         Text(
             text = "Please Enter Your New Password",
             color = KinoYellow,
@@ -94,25 +94,10 @@ fun Change(
         )
 
         Spacer(modifier = Modifier.height(40.dp))
-        //Column that wraps the text fields and buttons
-        Column(
-            modifier = Modifier
-                .border(
-                    width = 1.dp,
-                    color = KinoYellow,
-                    shape = CutCornerShape(
-                        topStart = 16.dp,
-                        topEnd = 16.dp,
-                        bottomStart = 16.dp,
-                        bottomEnd = 16.dp
-                    )
-                )
-                .padding(24.dp),
-        ) {
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            //Email text and text field
+        //Frame to wrap the form
+        KinoFrame {
+            //Password text field
             Column {
                 Text(
                     text = "New Password:",
@@ -129,11 +114,12 @@ fun Change(
                     placeholderText = "Password",
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth())
+                //Visual feedback to password requirements
                 PasswordRequirementsFeedback(passValue)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-
+            //Password check test field
             Column {
                 Text(
                     text = "Confirm New Password:",
@@ -150,14 +136,15 @@ fun Change(
                     placeholderText = "Confirm Password",
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth())
-
+                //Visual feedback for password match
                 PasswordMatchFeedback(passValue, passCheckValue)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            //Buttons text and buttons
+
             Column {
+                //General error message
                 if (errorMsg != null) {
                     Text(
                         text = errorMsg,
@@ -167,10 +154,8 @@ fun Change(
                     )
                 }
 
-
-
+                //Buttons section
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-
                     if (isSubmitting) {
                         Box(
                             modifier = Modifier
@@ -191,10 +176,7 @@ fun Change(
                         text = "Go to Log in",
                         onClick = onCancelClick,
                         modifier = Modifier.width(160.dp),
-                        enabled = !isSubmitting
-                    )
-
-
+                        enabled = !isSubmitting)
                     }
                 }
             }
