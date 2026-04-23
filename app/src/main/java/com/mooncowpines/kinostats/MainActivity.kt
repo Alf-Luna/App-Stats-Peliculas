@@ -7,24 +7,44 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 import com.mooncowpines.kinostats.navigation.NavGraph
-import com.mooncowpines.kinostats.ui.screens.login.LoginScreen
-import com.mooncowpines.kinostats.ui.screens.login.LoginScreenViewModel
-import com.mooncowpines.kinostats.ui.screens.register.RegisterScreen
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.runtime.getValue
 import com.mooncowpines.kinostats.ui.theme.KinoStatsTheme
+
+import com.mooncowpines.kinostats.navigation.Route
+import com.mooncowpines.kinostats.ui.components.KinoBottomBar
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             KinoStatsTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    NavGraph(modifier = Modifier.padding(innerPadding))
+                val navController = rememberNavController()
+
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
+
+                val screensWithBottomBar = listOf(Route.Home.path, Route.Stats.path, Route.Profile.path)
+                val showBottomBar = currentRoute in screensWithBottomBar
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    bottomBar = { if (showBottomBar) {
+                        KinoBottomBar(
+                            currentRoute = currentRoute ?: "",
+                            onNavigate = { route -> navController.navigate(route) {
+                                popUpTo(Route.Home.path) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            } })
+                    } }
+                    ){ innerPadding ->
+                    NavGraph(modifier = Modifier.padding(innerPadding), navController = navController)
                 }
             }
         }

@@ -59,4 +59,15 @@ class LoginScreenViewModel : ViewModel(){
             }
         }
     }
+
+    fun adminLogin() {
+        val currentState = _state.value
+
+        viewModelScope.launch {
+            _state.update {
+                it.copy(isSubmitting = false, success = true)
+            }
+        }
+
+    }
 }

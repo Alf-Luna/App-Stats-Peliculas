@@ -2,13 +2,16 @@ package com.mooncowpines.kinostats.ui.screens.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.CircularProgressIndicator
@@ -39,7 +42,8 @@ fun LoginScreen(
     onNavigateToRegister: () -> Unit,
     onNavigateToHome: () -> Unit,
     onNavigateToChange: () -> Unit,
-    onNavigateToRecover: () -> Unit
+    onNavigateToRecover: () -> Unit,
+    onAdminNavigate: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -61,7 +65,8 @@ fun LoginScreen(
             onLoginClick = { viewModel.login() },
             onRecoveryClick = onNavigateToRecover,
             onChangeClick = onNavigateToChange,
-            onRegisterClick = onNavigateToRegister
+            onRegisterClick = onNavigateToRegister,
+            onAdminClick = onAdminNavigate
         )
     }
 }
@@ -78,7 +83,8 @@ fun Login(
     onLoginClick: () -> Unit,
     onRecoveryClick: () -> Unit,
     onChangeClick: () -> Unit,
-    onRegisterClick: () -> Unit
+    onRegisterClick: () -> Unit,
+    onAdminClick: () -> Unit
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         //Header banner
@@ -174,11 +180,17 @@ fun Login(
                     enabled = !isSubmitting)
             }
 
-            Column{
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 KinoButton(
                     text = "Test",
                     onClick = onChangeClick,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.width(160.dp),
+                    enabled = !isSubmitting)
+
+                KinoButton(
+                    text = "Admin",
+                    onClick = onAdminClick,
+                    modifier = Modifier.width(160.dp),
                     enabled = !isSubmitting)
             }
         }
