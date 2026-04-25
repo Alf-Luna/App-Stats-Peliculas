@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 
 @Composable
@@ -18,7 +19,7 @@ fun PasswordRequirementsFeedback(pass: String, modifier: Modifier = Modifier) {
         "Special Character (@, #, $)" to pass.any { !it.isLetterOrDigit() }
     )
 
-    Column(modifier = Modifier.padding(top = 8.dp)) {
+    Column(modifier = Modifier.padding(top = KinoSpacing.small)) {
         requirements.forEach { (text, isMet) ->
             Text(
                 text = if (isMet) "✓ $text" else "• $text",
@@ -34,7 +35,7 @@ fun PasswordMatchFeedback(pass: String, passCheck: String, modifier: Modifier = 
 
     val isMatch = passCheck == pass && passCheck.isNotBlank()
 
-    Column(modifier = Modifier.padding(top = 8.dp)) {
+    Column(modifier = Modifier.padding(top = KinoSpacing.small)) {
         Text(
             text = if (isMatch) "✓ Passwords Match" else "• Passwords Match",
             color =  if (isMatch) KinoYellow else Color.Gray.copy(alpha = 0.6f),

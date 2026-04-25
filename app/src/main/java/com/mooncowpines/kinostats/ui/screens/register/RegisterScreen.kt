@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -35,6 +36,7 @@ import com.mooncowpines.kinostats.ui.components.KinoFrame
 import com.mooncowpines.kinostats.ui.components.KinoTextField
 import com.mooncowpines.kinostats.ui.components.PasswordRequirementsFeedback
 import com.mooncowpines.kinostats.ui.components.PasswordMatchFeedback
+import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 
 @Composable
 fun RegisterScreen(
@@ -52,7 +54,10 @@ fun RegisterScreen(
         }
     }
 
-    Box(Modifier.fillMaxSize().padding(30.dp)) {
+    Box(Modifier
+        .fillMaxSize()
+        .imePadding()
+        .padding(KinoSpacing.extraLarge)) {
         Register(
             modifier = Modifier.align(Alignment.Center),
             userNameValue = state.userName,
@@ -104,7 +109,7 @@ fun Register(
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
 
         //Frame to wrap the form
         KinoFrame {
@@ -117,7 +122,9 @@ fun Register(
                 HorizontalDivider(
                     color = KinoYellow,
                     thickness = 1.dp,
-                    modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+                    modifier = Modifier.padding(
+                        top = KinoSpacing.micro,
+                        bottom = KinoSpacing.small)
                 )
                 KinoTextField(
                     textValue = userNameValue,
@@ -130,12 +137,12 @@ fun Register(
                         text = userNameError,
                         color = Color.Red,
                         fontSize = 14.sp,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(KinoSpacing.small)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(KinoSpacing.medium))
 
             //Email field
             Column{
@@ -146,7 +153,9 @@ fun Register(
                 HorizontalDivider(
                     color = KinoYellow,
                     thickness = 1.dp,
-                    modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+                    modifier = Modifier.padding(
+                        top = KinoSpacing.micro,
+                        bottom = KinoSpacing.small)
                 )
                 KinoTextField(
                     textValue = emailValue,
@@ -159,12 +168,12 @@ fun Register(
                         text = emailError,
                         color = Color.Red,
                         fontSize = 14.sp,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(KinoSpacing.small)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(KinoSpacing.medium))
 
             //Password field
             Column{
@@ -175,7 +184,9 @@ fun Register(
                 HorizontalDivider(
                     color = KinoYellow,
                     thickness = 1.dp,
-                    modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+                    modifier = Modifier.padding(
+                        top = KinoSpacing.micro,
+                        bottom = KinoSpacing.small)
                 )
                 KinoTextField(
                     textValue = passValue,
@@ -188,7 +199,7 @@ fun Register(
                 PasswordRequirementsFeedback(passValue)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(KinoSpacing.medium))
 
             //Password check field
             Column{
@@ -199,7 +210,9 @@ fun Register(
                 HorizontalDivider(
                     color = KinoYellow,
                     thickness = 1.dp,
-                    modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+                    modifier = Modifier.padding(
+                        top = KinoSpacing.micro,
+                        bottom = KinoSpacing.small)
                 )
                 KinoTextField(
                     textValue = passCheckValue,
@@ -212,7 +225,7 @@ fun Register(
                 PasswordMatchFeedback(passValue, passCheckValue)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(KinoSpacing.medium))
 
             Column{
                 //General error message
@@ -221,7 +234,7 @@ fun Register(
                         text = errorMsg,
                         color = Color.Red,
                         fontSize = 14.sp,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(KinoSpacing.small)
                     )
                 }
 
@@ -230,29 +243,33 @@ fun Register(
                     text = "ALL FIELDS ARE MANDATORY",
                     color = KinoYellow,
                     textDecoration = TextDecoration.Underline,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(bottom = KinoSpacing.small)
                 )
 
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(KinoSpacing.medium)
+                ) {
                     if (isSubmitting) {
-                        Box(modifier = Modifier
-                            .width(150.dp)
-                            .height(48.dp),
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp),
                             contentAlignment = Alignment.Center)
                         { CircularProgressIndicator(color = KinoYellow) }
                     } else {
                         KinoButton(
                             text = "Create Account",
                             onClick = onRegisterClick,
-                            modifier = Modifier.width(180.dp))
+                            modifier = Modifier.weight(1.5f))
                     }
 
                     KinoButton(
                         text = "Cancel",
                         onClick = onCancelClick,
                         enabled = !isSubmitting,
-                        modifier = Modifier.width(150.dp))
+                        modifier = Modifier.weight(1f))
                 }
 
             }

@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.mooncowpines.kinostats.ui.theme.KinoBlack
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 
 @Composable
@@ -28,7 +29,7 @@ fun KinoFAB(
         modifier = modifier,
         shape = RoundedCornerShape(15.dp),
         containerColor = KinoYellow,
-        contentColor = Color.Black
+        contentColor = KinoBlack
     ) {
         Icon(
             imageVector = Icons.Filled.Add,
