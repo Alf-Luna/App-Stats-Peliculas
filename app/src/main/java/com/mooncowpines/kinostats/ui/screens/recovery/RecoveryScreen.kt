@@ -34,6 +34,7 @@ import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoButton
 import com.mooncowpines.kinostats.ui.components.KinoTextField
 import com.mooncowpines.kinostats.ui.components.KinoFrame
+import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 
 @Composable
 fun RecoveryScreen(
@@ -86,7 +87,7 @@ fun Recovery(
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
 
         //Frame to wrap the form
         KinoFrame {
@@ -99,7 +100,9 @@ fun Recovery(
                 HorizontalDivider(
                     color = KinoYellow,
                     thickness = 1.dp,
-                    modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+                    modifier = Modifier.padding(
+                        top = KinoSpacing.micro,
+                        bottom = KinoSpacing.small)
                 )
                 KinoTextField(
                     textValue = emailValue,
@@ -112,12 +115,12 @@ fun Recovery(
                         text = emailError,
                         color = Color.Red,
                         fontSize = 14.sp,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = KinoSpacing.small)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(KinoSpacing.medium))
 
 
             Column {
@@ -127,32 +130,34 @@ fun Recovery(
                         text = errorMsg,
                         color = Color.Red,
                         fontSize = 14.sp,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = KinoSpacing.small)
                     )
                 }
 
                 //Buttons section
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(KinoSpacing.medium)
+                ) {
                     if (isSubmitting) {
                         Box(
                             modifier = Modifier
-                                .width(180.dp)
+                                .weight(1f)
                                 .height(48.dp),
-                            contentAlignment = Alignment.Center
-                        )
+                            contentAlignment = Alignment.Center)
                         { CircularProgressIndicator(color = KinoYellow) }
                     } else {
                         KinoButton(
                             text = "Send",
                             onClick = onRecoveryClick,
-                            modifier = Modifier.width(180.dp)
-                        )
+                            modifier = Modifier.weight(1.5f))
                     }
 
                     KinoButton(
                         text = "Cancel",
                         onClick = onCancelClick,
-                        modifier = Modifier.width(150.dp),
+                        modifier = Modifier.weight(1f),
                         enabled = !isSubmitting
                     )
 

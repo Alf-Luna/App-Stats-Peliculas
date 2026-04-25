@@ -34,6 +34,7 @@ import com.mooncowpines.kinostats.ui.components.KinoFrame
 import com.mooncowpines.kinostats.ui.components.KinoTextField
 import com.mooncowpines.kinostats.ui.components.PasswordRequirementsFeedback
 import com.mooncowpines.kinostats.ui.components.PasswordMatchFeedback
+import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 
 @Composable
 fun ChangeScreen(
@@ -93,7 +94,7 @@ fun Change(
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
 
         //Frame to wrap the form
         KinoFrame {
@@ -106,7 +107,9 @@ fun Change(
                 HorizontalDivider(
                     color = KinoYellow,
                     thickness = 1.dp,
-                    modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+                    modifier = Modifier.padding(
+                        top = KinoSpacing.micro,
+                        bottom = KinoSpacing.small)
                 )
                 KinoTextField(
                     textValue = passValue,
@@ -118,7 +121,7 @@ fun Change(
                 PasswordRequirementsFeedback(passValue)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(KinoSpacing.medium))
             //Password check test field
             Column {
                 Text(
@@ -128,7 +131,9 @@ fun Change(
                 HorizontalDivider(
                     color = KinoYellow,
                     thickness = 1.dp,
-                    modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+                    modifier = Modifier.padding(
+                        top = KinoSpacing.micro,
+                        bottom = KinoSpacing.small)
                 )
                 KinoTextField(
                     textValue = passCheckValue,
@@ -140,7 +145,7 @@ fun Change(
                 PasswordMatchFeedback(passValue, passCheckValue)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(KinoSpacing.medium))
 
 
             Column {
@@ -150,32 +155,33 @@ fun Change(
                         text = errorMsg,
                         color = Color.Red,
                         fontSize = 14.sp,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = KinoSpacing.small)
                     )
                 }
 
                 //Buttons section
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(KinoSpacing.medium)
+                ) {
                     if (isSubmitting) {
                         Box(
                             modifier = Modifier
-                                .width(160.dp)
+                                .weight(1f)
                                 .height(48.dp),
                             contentAlignment = Alignment.Center
-                        )
-                        { CircularProgressIndicator(color = KinoYellow) }
+                        ) { CircularProgressIndicator(color = KinoYellow) }
                     } else {
                         KinoButton(
                             text = "Change",
                             onClick = onChangeClick,
-                            modifier = Modifier.width(160.dp)
+                            modifier = Modifier.weight(1.5f)
                         )
                     }
 
                     KinoButton(
-                        text = "Go to Log in",
+                        text = "Cancel",
                         onClick = onCancelClick,
-                        modifier = Modifier.width(160.dp),
+                        modifier = Modifier.weight(1f),
                         enabled = !isSubmitting)
                     }
                 }

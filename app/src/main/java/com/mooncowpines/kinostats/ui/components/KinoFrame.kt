@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 
 @Composable
@@ -20,14 +21,9 @@ fun KinoFrame(
             .border(
                 width = 1.dp,
                 color = KinoYellow,
-                shape = CutCornerShape(
-                    topStart = 16.dp,
-                    topEnd = 16.dp,
-                    bottomStart = 16.dp,
-                    bottomEnd = 16.dp
-                )
+                shape = CutCornerShape(16.dp,)
             )
-            .padding(24.dp)
+            .padding(KinoSpacing.large)
     ) {
         content()
 

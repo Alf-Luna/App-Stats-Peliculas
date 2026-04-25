@@ -2,13 +2,17 @@ package com.mooncowpines.kinostats.ui.screens.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.CircularProgressIndicator
@@ -25,12 +29,15 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.foundation.layout.imePadding
 
 import com.mooncowpines.kinostats.R
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoButton
 import com.mooncowpines.kinostats.ui.components.KinoFrame
 import com.mooncowpines.kinostats.ui.components.KinoTextField
+import com.mooncowpines.kinostats.ui.theme.KinoDarkYellow
+import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 
 @Composable
 fun LoginScreen(
@@ -39,7 +46,8 @@ fun LoginScreen(
     onNavigateToRegister: () -> Unit,
     onNavigateToHome: () -> Unit,
     onNavigateToChange: () -> Unit,
-    onNavigateToRecover: () -> Unit
+    onNavigateToRecover: () -> Unit,
+    onAdminNavigate: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -49,7 +57,10 @@ fun LoginScreen(
         }
     }
 
-    Box(Modifier.fillMaxSize().padding(30.dp)) {
+    Box(Modifier
+        .fillMaxSize()
+        .imePadding()
+        .padding(KinoSpacing.extraLarge)) {
         Login(
             modifier = Modifier.align(Alignment.Center),
             emailValue = state.email,
@@ -61,7 +72,8 @@ fun LoginScreen(
             onLoginClick = { viewModel.login() },
             onRecoveryClick = onNavigateToRecover,
             onChangeClick = onNavigateToChange,
-            onRegisterClick = onNavigateToRegister
+            onRegisterClick = onNavigateToRegister,
+            onAdminClick = onAdminNavigate
         )
     }
 }
@@ -78,13 +90,16 @@ fun Login(
     onLoginClick: () -> Unit,
     onRecoveryClick: () -> Unit,
     onChangeClick: () -> Unit,
-    onRegisterClick: () -> Unit
+    onRegisterClick: () -> Unit,
+    onAdminClick: () -> Unit
 ) {
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = modifier.verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally) {
         //Header banner
         HeaderImage()
 
-        Spacer(modifier = Modifier.height(100.dp))
+        Spacer(modifier = Modifier.height(KinoSpacing.jumbo))
 
         //Frame to wrap the form
         KinoFrame {
@@ -97,7 +112,9 @@ fun Login(
                 HorizontalDivider(
                     color = KinoYellow,
                     thickness = 1.dp,
-                    modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+                    modifier = Modifier.padding(
+                        top = KinoSpacing.micro,
+                        bottom = KinoSpacing.small)
                 )
                 KinoTextField(
                     textValue = emailValue,
@@ -106,7 +123,7 @@ fun Login(
                     modifier = Modifier.fillMaxWidth())
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(KinoSpacing.medium))
 
             //Password Field
             Column{
@@ -117,7 +134,9 @@ fun Login(
                 HorizontalDivider(
                     color = KinoYellow,
                     thickness = 1.dp,
-                    modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+                    modifier = Modifier.padding(
+                        top = KinoSpacing.micro,
+                        bottom = KinoSpacing.small)
                 )
                 KinoTextField(
                     textValue = passValue,
@@ -130,7 +149,7 @@ fun Login(
                 ForgotPassword(Modifier.align(Alignment.End), onClick = onRecoveryClick)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(KinoSpacing.medium))
 
             Column{
                 //General error message
@@ -139,7 +158,7 @@ fun Login(
                         text = errorMsg,
                         color = Color.Red,
                         fontSize = 14.sp,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = KinoSpacing.small)
                     )
                 }
 
@@ -148,7 +167,7 @@ fun Login(
                     text = "Create your account or log in:",
                     color = KinoYellow,
                     textDecoration = TextDecoration.Underline,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(bottom = KinoSpacing.small)
                 )
                 if (isSubmitting) {
                     Box(modifier = Modifier
@@ -164,8 +183,6 @@ fun Login(
                 }
             }
 
-            Spacer(modifier = Modifier.padding(2.dp))
-
             Column{
                 KinoButton(
                     text = "Create Account",
@@ -174,11 +191,17 @@ fun Login(
                     enabled = !isSubmitting)
             }
 
-            Column{
+            Row(horizontalArrangement = Arrangement.spacedBy(KinoSpacing.mediumSmall)) {
                 KinoButton(
                     text = "Test",
                     onClick = onChangeClick,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.weight(1f),
+                    enabled = !isSubmitting)
+
+                KinoButton(
+                    text = "Admin",
+                    onClick = onAdminClick,
+                    modifier = Modifier.weight(1f),
                     enabled = !isSubmitting)
             }
         }
@@ -192,7 +215,7 @@ fun ForgotPassword(modifier: Modifier, onClick:() -> Unit ) {
         modifier = modifier.clickable { onClick()},
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
-        color = Color(0xFFFB9600)
+        color = KinoDarkYellow
     )
 }
 

@@ -38,226 +38,261 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import com.mooncowpines.kinostats.ui.components.KinoFAB
+
 @Composable
 fun MovieDetailScreen(
     movie: Movie,
     onNavigateBack: () -> Unit,
+    onNavigateToLog: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(KinoBlack)
-            .verticalScroll(scrollState)
-    ) {
-        // --- 1. Top Banner / Poster ---
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(250.dp)
-        ) {
-            // Placeholder for the main banner image (e.g., from an API later)
-            Image(
-                painter = painterResource(id = movie.bannerResId),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-            // Overlay gradient or darkening could go here
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.4f))
-            )
-            IconButton(
-                onClick = onNavigateBack,
-                modifier = Modifier.padding(top = 32.dp, start = 8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Volver",
-                    tint = KinoWhite
-                )
-            }
+    Scaffold (
+        modifier = modifier.fillMaxSize(),
+        containerColor = KinoBlack,
+        floatingActionButton = {
+            KinoFAB(onClick = { onNavigateToLog(movie.id) })
         }
-
-        // --- 2. Title, Details, and Thumbnail ---
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
+    ) { paddingValues ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(KinoBlack)
+                .verticalScroll(scrollState)
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = movie.title,
-                    color = KinoWhite,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
+            // --- 1. Top Banner / Poster ---
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(250.dp)
+            ) {
+                // Placeholder for the main banner image (e.g., from an API later)
+                Image(
+                    painter = painterResource(id = movie.bannerResId),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
                 )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = movie.year, color = Color.Gray, fontSize = 14.sp)
-                    Text(text = "  ·  DIRECTED BY", color = Color.Gray, fontSize = 12.sp)
-                }
-                Text(text = movie.director, color = KinoWhite, fontSize = 16.sp)
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    KinoButton(text = "▶ TRAILER", onClick = { /* TODO */ })
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(text = movie.duration, color = Color.Gray, fontSize = 14.sp)
+                // Overlay gradient or darkening could go here
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.4f))
+                )
+                IconButton(
+                    onClick = onNavigateBack,
+                    modifier = Modifier.padding(top = 32.dp, start = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Volver",
+                        tint = KinoWhite
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
-
-            // Small Thumbnail Poster
-            Box(
+            // --- 2. Title, Details, and Thumbnail ---
+            Row(
                 modifier = Modifier
-                    .width(100.dp)
-                    .height(150.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.Gray) // Placeholder color
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
             ) {
-                // You would load the thumbnail here with Coil/Glide
-                Image(
-                    painter = painterResource(id = movie.thumbnailResId),
-                    contentDescription = null,
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = movie.title,
+                        color = KinoWhite,
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = movie.year, color = Color.Gray, fontSize = 14.sp)
+                        Text(text = "  ·  DIRECTED BY", color = Color.Gray, fontSize = 12.sp)
+                    }
+                    Text(text = movie.director, color = KinoWhite, fontSize = 16.sp)
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        KinoButton(text = "▶ TRAILER", onClick = { /* TODO */ })
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(text = movie.duration, color = Color.Gray, fontSize = 14.sp)
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                // Small Thumbnail Poster
+                Box(
                     modifier = Modifier
                         .width(100.dp)
                         .height(150.dp)
-                        .clip(RoundedCornerShape(8.dp)),
-                    contentScale = ContentScale.Crop
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.Gray) // Placeholder color
+                ) {
+                    // You would load the thumbnail here with Coil/Glide
+                    Image(
+                        painter = painterResource(id = movie.thumbnailResId),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .width(100.dp)
+                            .height(150.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+
+            // --- 3. Synopsis / Description ---
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = movie.tagLine,
+                    color = Color.Gray,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = movie.synopsis,
+                    color = Color.LightGray,
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp
                 )
             }
-        }
 
-        // --- 3. Synopsis / Description ---
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = movie.tagLine,
-                color = Color.Gray,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = movie.synopsis,
-                color = Color.LightGray,
-                fontSize = 14.sp,
-                lineHeight = 20.sp
-            )
-        }
+            Divider(color = Color.DarkGray, thickness = 1.dp)
 
-        Divider(color = Color.DarkGray, thickness = 1.dp)
-
-        // --- 4. Ratings Section ---
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "RATINGS",
-                color = Color.Gray,
-                fontSize = 12.sp,
-                letterSpacing = 1.sp
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Placeholder for the bar chart
+            // --- 4. Ratings Section ---
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "RATINGS",
+                    color = Color.Gray,
+                    fontSize = 12.sp,
+                    letterSpacing = 1.sp
+                )
+                Spacer(modifier = Modifier.height(8.dp))
                 Row(
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.spacedBy(2.dp),
-                    verticalAlignment = Alignment.Bottom
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    val heights = listOf(2, 5, 8, 15, 25, 40, 30, 15, 5, 10)
-                    heights.forEach { height ->
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(height.dp)
-                                .background(Color.DarkGray)
-                        )
+                    // Placeholder for the bar chart
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.spacedBy(2.dp),
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        val heights = listOf(2, 5, 8, 15, 25, 40, 30, 15, 5, 10)
+                        heights.forEach { height ->
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(height.dp)
+                                    .background(Color.DarkGray)
+                            )
+                        }
                     }
-                }
-                Spacer(modifier = Modifier.width(16.dp))
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "3.8",
-                        color = Color.LightGray,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Light
-                    )
-                    Row {
-                        repeat(5) {
-                            Text("★", color = KinoYellow, fontSize = 12.sp) // Using your KinoYellow
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "3.8",
+                            color = Color.LightGray,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Light
+                        )
+                        Row {
+                            repeat(5) {
+                                Text(
+                                    "★",
+                                    color = KinoYellow,
+                                    fontSize = 12.sp
+                                ) // Using your KinoYellow
+                            }
                         }
                     }
                 }
             }
-        }
 
-        Divider(color = Color.DarkGray, thickness = 1.dp)
+            Divider(color = Color.DarkGray, thickness = 1.dp)
 
-        // --- 5. Where to Watch ---
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Where to watch",
-                color = Color.LightGray,
-                fontSize = 16.sp
+            // --- 5. Where to Watch ---
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Where to watch",
+                    color = Color.LightGray,
+                    fontSize = 16.sp
+                )
+                Text(
+                    text = ">", // Placeholder for icon
+                    color = Color.Gray,
+                    fontSize = 16.sp
+                )
+            }
+
+            Divider(color = Color.DarkGray, thickness = 1.dp)
+
+            // --- 6. Stats Cards (Members, Reviews, Lists) ---
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                StatCard(
+                    modifier = Modifier.weight(1f),
+                    title = "Members",
+                    value = movie.membersCount,
+                    color = Color(0xFF00C853)
+                )
+                StatCard(
+                    modifier = Modifier.weight(1f),
+                    title = "Reviews",
+                    value = movie.reviewsCount,
+                    color = Color(0xFF78909C)
+                )
+                StatCard(
+                    modifier = Modifier.weight(1f),
+                    title = "Lists",
+                    value = movie.listsCount,
+                    color = Color(0xFF29B6F6)
+                )
+            }
+
+            Divider(color = Color.DarkGray, thickness = 1.dp)
+
+            // --- 7. Tabs (Cast, Crew, Details, etc.) ---
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Cast", color = KinoWhite, fontWeight = FontWeight.Bold)
+                Text("Crew", color = Color.Gray)
+                Text("Details", color = Color.Gray)
+                Text("Genre", color = Color.Gray)
+                Text("Releases", color = Color.Gray)
+            }
+            // Indicator for the active tab
+            Box(
+                modifier = Modifier.padding(horizontal = 16.dp).height(2.dp).width(30.dp)
+                    .background(KinoYellow)
             )
-            Text(
-                text = ">", // Placeholder for icon
-                color = Color.Gray,
-                fontSize = 16.sp
-            )
+
+            Spacer(modifier = Modifier.height(30.dp)) // Extra space at bottom
+
         }
-
-        Divider(color = Color.DarkGray, thickness = 1.dp)
-
-        // --- 6. Stats Cards (Members, Reviews, Lists) ---
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            StatCard(modifier = Modifier.weight(1f), title = "Members", value = movie.membersCount, color = Color(0xFF00C853))
-            StatCard(modifier = Modifier.weight(1f), title = "Reviews", value = movie.reviewsCount, color = Color(0xFF78909C))
-            StatCard(modifier = Modifier.weight(1f), title = "Lists", value = movie.listsCount, color = Color(0xFF29B6F6))
-        }
-
-        Divider(color = Color.DarkGray, thickness = 1.dp)
-
-        // --- 7. Tabs (Cast, Crew, Details, etc.) ---
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text("Cast", color = KinoWhite, fontWeight = FontWeight.Bold)
-            Text("Crew", color = Color.Gray)
-            Text("Details", color = Color.Gray)
-            Text("Genre", color = Color.Gray)
-            Text("Releases", color = Color.Gray)
-        }
-        // Indicator for the active tab
-        Box(modifier = Modifier.padding(horizontal = 16.dp).height(2.dp).width(30.dp).background(KinoYellow))
-
-        Spacer(modifier = Modifier.height(30.dp)) // Extra space at bottom
-
     }
 }
 
@@ -300,6 +335,7 @@ fun MovieDetailScreenPreview() {
     )
     MovieDetailScreen(
         movie = dummyMovie,
-        onNavigateBack = {}
+        onNavigateBack = {},
+        onNavigateToLog = {}
     )
 }

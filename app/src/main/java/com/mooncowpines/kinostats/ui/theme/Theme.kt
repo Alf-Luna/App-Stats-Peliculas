@@ -15,7 +15,6 @@ private val KinoColorScheme = darkColorScheme(
     onSurface = KinoWhite,
 )
 
-
 @Composable
 fun KinoStatsTheme(content: @Composable () -> Unit) {
 
@@ -24,6 +23,7 @@ fun KinoStatsTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        shapes = Shapes,
         content = content
     )
 
