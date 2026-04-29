@@ -16,8 +16,9 @@ import com.mooncowpines.kinostats.ui.screens.change.ChangeScreen
 import com.mooncowpines.kinostats.ui.screens.profile.ProfileScreen
 import com.mooncowpines.kinostats.ui.screens.MovieDetail.MovieDetailScreen
 import com.mooncowpines.kinostats.data.FakeMovieApi
-import com.mooncowpines.kinostats.ui.screens.log.MovieLogScreen
+import com.mooncowpines.kinostats.ui.screens.review.ReviewScreen
 import com.mooncowpines.kinostats.ui.screens.stats.StatsScreen
+import com.mooncowpines.kinostats.data.User
 
 @Composable
 fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
@@ -38,7 +39,6 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
                 },
                 onNavigateToRecover = { navController.navigate(Route.Recovery.path)},
                 onNavigateToChange = { navController.navigate(Route.Change.path)},
-                onAdminNavigate = { navController.navigate(Route.Home.path) }
             )
         }
 
@@ -81,7 +81,16 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
         }
 
         composable(Route.Profile.path) {
-            ProfileScreen()
+            ProfileScreen(
+                onNavigateToAccountInfo = {
+                    navController.navigate(Route.Change.path)
+                },
+                onLogout = {
+                    navController.navigate(Route.Login.path) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
         }
 
         composable(Route.Stats.path) {
@@ -100,27 +109,24 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
                     movie = movie,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateToLog = { id ->
-                        navController.navigate(Route.MovieLog.createRoute(id))
+                        navController.navigate(Route.Review.createRoute(id))
                     }
                 )
             }
         }
 
         composable(
-            route = Route.MovieLog.path,
+            route = Route.Review.path,
             arguments = listOf(navArgument("movieId") { type = NavType.IntType })
         ) { backStackEntry ->
             val movieId = backStackEntry.arguments?.getInt("movieId") ?: 1
             val movie = FakeMovieApi.getMovieByIdSync(movieId)
 
             if (movie != null) {
-                MovieLogScreen(
+                ReviewScreen(
                     movie = movie,
                     onNavigateBack = { navController.popBackStack() },
-                    // Asegúrate de que los tipos coincidan: Float, String, String
-                    onSaveLog = { rating: Float, date: String, review: String ->
-                        navController.popBackStack()
-                    }
+
                 )
             }
         }

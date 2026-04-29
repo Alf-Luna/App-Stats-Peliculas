@@ -1,5 +1,6 @@
 package com.mooncowpines.kinostats.ui.screens.login
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 import com.mooncowpines.kinostats.data.FakeAuthApi
+import com.mooncowpines.kinostats.data.MockSession
 import com.mooncowpines.kinostats.utils.getEmailError
 import com.mooncowpines.kinostats.utils.*
 
@@ -48,6 +50,7 @@ class LoginScreenViewModel : ViewModel(){
             )
 
             if (loggedUser != null) {
+                MockSession.currentUserId = loggedUser.id
                 _state.update { it.copy(isSubmitting = false, success = true) }
             } else {
                 _state.update {
@@ -60,14 +63,30 @@ class LoginScreenViewModel : ViewModel(){
         }
     }
 
+    //Triggers an admin login attempt
     fun adminLogin() {
         val currentState = _state.value
+        if (currentState.isSubmitting) return
 
+        //Tries to log in as admin, doesn't do a lot of validations
         viewModelScope.launch {
-            _state.update {
-                it.copy(isSubmitting = false, success = true)
+
+            val loggedAdmin = FakeAuthApi.authenticateAdmin()
+
+            if (loggedAdmin != null) {
+                MockSession.currentUserId = loggedAdmin.id
+                Log.d("Session User", "The current logged user is: ${MockSession.currentUserId}")
+                _state.update {
+                    it.copy(isSubmitting = false, success = true)
+                }
+            } else {
+                _state.update {
+                    it.copy(
+                        isSubmitting = false,
+                        errorMsg = "There was a problem login in as admin"
+                    )
+                }
             }
         }
-
     }
 }
