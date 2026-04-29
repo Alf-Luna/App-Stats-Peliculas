@@ -16,7 +16,12 @@ data class Movie(
     val reviewsCount: String,
     val listsCount: String,
     val bannerResId: Int,
-    val thumbnailResId: Int
+    val thumbnailResId: Int,
+    val country: String = "Desconocido",
+    val cinematographer: String = "Desconocido",
+    val productionCompany: String = "Desconocido",
+    val genres: String = "Desconocido",
+    val actors: String = "Desconocido"
 )
 
 object FakeMovieApi {
