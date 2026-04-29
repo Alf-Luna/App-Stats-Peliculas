@@ -10,10 +10,13 @@ import androidx.compose.material.icons.automirrored.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,21 +25,23 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mooncowpines.kinostats.data.User
+import androidx.lifecycle.viewmodel.compose.viewModel
+
 import com.mooncowpines.kinostats.ui.theme.KinoBlack
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
-
-// Color gris oscuro para las tarjetas, resalta sobre el KinoBlack
-val KinoDarkCard = Color(0xFF1E1E1E)
+import com.mooncowpines.kinostats.ui.theme.KinoDarkCard
 
 @Composable
 fun ProfileScreen(
-    user: User,
+    viewModel: ProfileScreenViewModel = viewModel(),
     onNavigateToAccountInfo: () -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+
+    val state by viewModel.state.collectAsState()
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -46,7 +51,6 @@ fun ProfileScreen(
     ) {
         Spacer(modifier = Modifier.height(32.dp))
 
-        // --- 1. TARJETA DE USUARIO (HEADER) ---
         Text(
             text = "PROFILE",
             color = Color.Gray,
@@ -64,7 +68,7 @@ fun ProfileScreen(
                 .background(KinoDarkCard)
                 .padding(20.dp)
         ) {
-            // Fondo circular sutil para el avatar
+
             Box(
                 modifier = Modifier
                     .size(72.dp)
@@ -83,24 +87,32 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.width(20.dp))
 
             Column {
-                Text(
-                    text = user.userName,
+                if (state.isLoading) {
+                    CircularProgressIndicator(color = KinoYellow)
+                } else if (state.errorMsg != null) {
+                    Text(text = state.errorMsg!!, color = Color.Red)
+                } else {
+                Text(text = state.userName,
                     color = KinoWhite,
                     fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                    fontWeight = FontWeight.Bold)
+                }
                 Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = user.email,
-                    color = Color.LightGray,
-                    fontSize = 14.sp
-                )
+                if (state.isLoading) {
+                    CircularProgressIndicator(color = KinoYellow)
+                } else if (state.errorMsg != null) {
+                    Text(text = state.errorMsg!!, color = Color.Red)
+                } else {
+                    Text(text = state.email,
+                        color = KinoWhite,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold)
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // --- 2. TARJETA DE OPCIONES (GENERAL) ---
         Text(
             text = "GENERAL",
             color = Color.Gray,
@@ -133,7 +145,6 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // --- 3. TARJETA DE CERRAR SESIÓN (AISLADA) ---
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -152,7 +163,6 @@ fun ProfileScreen(
     }
 }
 
-// --- COMPONENTE AUXILIAR MEJORADO ---
 @Composable
 fun ProfileOptionItem(
     icon: ImageVector,
@@ -170,7 +180,6 @@ fun ProfileOptionItem(
             .clickable { onClick() }
             .padding(vertical = 16.dp, horizontal = 20.dp)
     ) {
-        // Ícono dentro de un pequeño círculo para darle más peso visual
         Box(
             modifier = Modifier
                 .size(36.dp)

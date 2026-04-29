@@ -81,10 +81,7 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
         }
 
         composable(Route.Profile.path) {
-            val currentUser = User(userName = "Alfonso", email = "alfonso@kinostats.com")
-
             ProfileScreen(
-                user = currentUser, // <-- LE PASAMOS A ALFONSO
                 onNavigateToAccountInfo = {
                     navController.navigate(Route.Change.path)
                 },

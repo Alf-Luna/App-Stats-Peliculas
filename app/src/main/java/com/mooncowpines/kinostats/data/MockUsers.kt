@@ -77,4 +77,11 @@ object FakeAuthApi {
         return validPass && matchPass
     }
 
+    suspend fun getUserById(userId: Int) : User? {
+        delay(1500)
+
+        return mockUsers.find { it.id == userId }
+
+    }
+
 }
