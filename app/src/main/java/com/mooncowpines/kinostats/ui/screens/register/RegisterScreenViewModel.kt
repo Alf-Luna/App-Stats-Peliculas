@@ -57,9 +57,9 @@ class RegisterScreenViewModel : ViewModel(){
             _state.update { it.copy(isSubmitting = true, errorMsg = null, emailError = null, userNameError = null) }
 
             val isSuccess = FakeAuthApi.registerUser(
-                userName = currentState.userName,
-                email = currentState.email,
-                pass = currentState.pass
+                newUserName = currentState.userName,
+                newEmail = currentState.email,
+                newPass = currentState.pass
             )
 
             if (isSuccess) {

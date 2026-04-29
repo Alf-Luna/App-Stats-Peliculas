@@ -3,7 +3,6 @@ package com.mooncowpines.kinostats.data
 import com.mooncowpines.kinostats.R
 import kotlinx.coroutines.delay
 
-// 1. El Modelo de Datos
 data class Movie(
     val id: Int,
     val title: String,
@@ -20,11 +19,9 @@ data class Movie(
     val thumbnailResId: Int
 )
 
-// 2. La API Falsa (Simulando el Backend)
 object FakeMovieApi {
 
-    // Nuestra "Base de datos" de películas
-    private val mockMovieDatabase = listOf(
+    private val mockMovieDatabase = mutableListOf(
         Movie(
             id = 1,
             title = "Hoppers",

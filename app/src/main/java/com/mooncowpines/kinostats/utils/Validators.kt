@@ -1,6 +1,7 @@
 package com.mooncowpines.kinostats.utils
 
 import android.util.Patterns
+import java.time.LocalDate
 import kotlin.text.isLetterOrDigit
 
 fun getEmailError(email: String): String? {
@@ -31,6 +32,28 @@ fun getUserNameError(userName: String): String? {
         return null
 }
 
+fun getTextReviewError(textReview: String): String?{
+    if (textReview.isBlank()) {
+        return "The review text cannot be empty"
+    }
+
+    return null
+}
+
+fun getRatingError(rating: Float): String?{
+    if (rating == 0f) {
+        return "The review rating cannot be 0"
+    }
+    return null
+}
+
+fun getWatchDateError(watchDate: LocalDate?): String? {
+    if (watchDate == null) {
+        return "The review must have a date"
+    }
+    return null
+}
+
 fun isPassValid(pass: String): Boolean {
     return pass.length >= 7 && pass.any {it.isDigit()} && pass.any { !it.isLetterOrDigit() }
 }
@@ -38,3 +61,4 @@ fun isPassValid(pass: String): Boolean {
 fun isPassMatch(pass: String, passCheck: String): Boolean {
     return pass == passCheck && passCheck.isNotBlank()
 }
+
