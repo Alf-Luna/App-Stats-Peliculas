@@ -18,6 +18,7 @@ import com.mooncowpines.kinostats.ui.screens.MovieDetail.MovieDetailScreen
 import com.mooncowpines.kinostats.data.FakeMovieApi
 import com.mooncowpines.kinostats.ui.screens.log.MovieLogScreen
 import com.mooncowpines.kinostats.ui.screens.stats.StatsScreen
+import com.mooncowpines.kinostats.data.User
 
 @Composable
 fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
@@ -81,7 +82,19 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
         }
 
         composable(Route.Profile.path) {
-            ProfileScreen()
+            val currentUser = User(userName = "Alfonso", email = "alfonso@kinostats.com")
+
+            ProfileScreen(
+                user = currentUser, // <-- LE PASAMOS A ALFONSO
+                onNavigateToAccountInfo = {
+                    navController.navigate(Route.Change.path)
+                },
+                onLogout = {
+                    navController.navigate(Route.Login.path) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
         }
 
         composable(Route.Stats.path) {
