@@ -11,7 +11,7 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -134,7 +134,7 @@ fun ProfileScreen(
                 onClick = { /* TODO */ }
             )
 
-            Divider(color = KinoBlack, thickness = 1.dp, modifier = Modifier.padding(horizontal = 16.dp))
+            HorizontalDivider(color = KinoBlack, thickness = 1.dp, modifier = Modifier.padding(horizontal = 16.dp))
 
             ProfileOptionItem(
                 icon = Icons.Outlined.Info,
