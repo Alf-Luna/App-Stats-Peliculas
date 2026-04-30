@@ -105,7 +105,11 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
         }
 
         composable(Route.Stats.path) {
-            StatsScreen()
+            StatsScreen(
+               onMovieClick =  { movieId ->
+                    navController.navigate(Route.MovieDetail.createRoute(movieId))
+                }
+            )
         }
 
         composable(

@@ -9,6 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,7 +58,7 @@ fun MovieDetailScreen(
             ) {
                 // Imagen de Banner
                 Image(
-                    painter = painterResource(id = movie.bannerResId),
+                    painter = painterResource(id = movie.posterUrl),
                     contentDescription = "Banner",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -100,7 +101,7 @@ fun MovieDetailScreen(
                 ) {
                     // Portada
                     Image(
-                        painter = painterResource(id = movie.thumbnailResId),
+                        painter = painterResource(id = movie.posterUrl),
                         contentDescription = "Portada",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -122,7 +123,7 @@ fun MovieDetailScreen(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "${movie.year}  •  ${movie.duration}",
+                            text = "${movie.releaseYear}  •  ${movie.duration}",
                             color = Color.LightGray,
                             fontSize = 14.sp
                         )
@@ -133,7 +134,7 @@ fun MovieDetailScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // --- 2. SINOPSIS ---
-            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+            /*Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 if (movie.tagLine.isNotEmpty()) {
                     Text(
                         text = movie.tagLine.uppercase(),
@@ -150,10 +151,10 @@ fun MovieDetailScreen(
                     fontSize = 15.sp,
                     lineHeight = 22.sp
                 )
-            }
+            }*/
 
             Spacer(modifier = Modifier.height(24.dp))
-            Divider(color = Color.DarkGray.copy(alpha = 0.5f), thickness = 1.dp)
+            HorizontalDivider(thickness = 1.dp, color = Color.DarkGray.copy(alpha = 0.5f))
             Spacer(modifier = Modifier.height(16.dp))
 
             // --- 3. FICHA TÉCNICA ---
@@ -168,14 +169,14 @@ fun MovieDetailScreen(
 
                 // Usamos el componente modular DetailRow
                 DetailRow(label = "Director", value = movie.director)
-                DetailRow(label = "País", value = movie.country)
+                DetailRow(label = "País", value = movie.originCountry)
                 DetailRow(label = "Cinematógrafo", value = movie.cinematographer)
                 DetailRow(label = "Productora", value = movie.productionCompany)
-                DetailRow(label = "Géneros", value = movie.genres)
+                DetailRow(label = "Géneros", value = movie.genres.joinToString(separator = ", "))
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-            Divider(color = Color.DarkGray.copy(alpha = 0.5f), thickness = 1.dp)
+            HorizontalDivider(thickness = 1.dp, color = Color.DarkGray.copy(alpha = 0.5f))
             Spacer(modifier = Modifier.height(16.dp))
 
             // --- 4. REPARTO ---
@@ -187,8 +188,9 @@ fun MovieDetailScreen(
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(8.dp))
+
                 Text(
-                    text = movie.actors,
+                    text = movie.actors.joinToString(separator = ", "),
                     color = Color.LightGray,
                     fontSize = 15.sp,
                     lineHeight = 22.sp

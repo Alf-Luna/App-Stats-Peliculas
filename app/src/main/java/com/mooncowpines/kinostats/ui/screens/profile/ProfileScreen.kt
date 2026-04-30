@@ -30,7 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mooncowpines.kinostats.ui.theme.KinoBlack
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
-import com.mooncowpines.kinostats.ui.theme.KinoDarkCard
+import com.mooncowpines.kinostats.ui.theme.KinoDarkGray
 
 @Composable
 fun ProfileScreen(
@@ -65,7 +65,7 @@ fun ProfileScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
-                .background(KinoDarkCard)
+                .background(KinoDarkGray)
                 .padding(20.dp)
         ) {
 
@@ -126,7 +126,7 @@ fun ProfileScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
-                .background(KinoDarkCard)
+                .background(KinoDarkGray)
         ) {
             ProfileOptionItem(
                 icon = Icons.Outlined.Share,
@@ -149,7 +149,7 @@ fun ProfileScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
-                .background(KinoDarkCard)
+                .background(KinoDarkGray)
         ) {
             ProfileOptionItem(
                 icon = Icons.AutoMirrored.Outlined.ExitToApp,

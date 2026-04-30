@@ -176,7 +176,7 @@ private fun MovieHeaderInfo(movie: Movie) {
                 .clip(RoundedCornerShape(4.dp)).background(Color.DarkGray)
         ) {
             Image(
-                painter = painterResource(id = movie.thumbnailResId),
+                painter = painterResource(id = movie.posterUrl),
                 contentDescription = "Poster",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
@@ -186,7 +186,7 @@ private fun MovieHeaderInfo(movie: Movie) {
         Column {
             Text(text = movie.title, color = KinoWhite, fontSize = 24.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = movie.year, color = Color.Gray, fontSize = 16.sp)
+            Text(text = movie.releaseYear, color = Color.Gray, fontSize = 16.sp)
         }
     }
 }
