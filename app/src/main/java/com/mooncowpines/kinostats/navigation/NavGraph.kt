@@ -18,6 +18,7 @@ import com.mooncowpines.kinostats.ui.screens.profile.ProfileScreen
 import com.mooncowpines.kinostats.ui.screens.change.ChangeScreen
 import com.mooncowpines.kinostats.ui.screens.review.ReviewScreen
 import com.mooncowpines.kinostats.ui.screens.stats.StatsScreen
+import com.mooncowpines.kinostats.retrotest.*
 import com.mooncowpines.kinostats.ui.screens.MovieDetail.MovieDetailScreen
 
 @Composable
@@ -109,6 +110,12 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
                onMovieClick =  { movieId ->
                     navController.navigate(Route.MovieDetail.createRoute(movieId))
                 }
+            )
+        }
+
+        composable(Route.Test.path) {
+            PostScreen(
+
             )
         }
 

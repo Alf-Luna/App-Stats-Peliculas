@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PieChart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -51,6 +52,17 @@ fun KinoBottomBar(currentRoute: String, onNavigate: (String) -> Unit) {
             selected = currentRoute == Route.Profile.path,
             onClick = { onNavigate(Route.Profile.path) },
             icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = KinoYellow,
+                unselectedIconColor = Color.DarkGray,
+                indicatorColor = Color.Transparent
+            )
+        )
+
+        NavigationBarItem(
+            selected = currentRoute == Route.Test.path,
+            onClick = { onNavigate(Route.Test.path) },
+            icon = { Icon(Icons.Filled.Info, contentDescription = "Test") },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = KinoYellow,
                 unselectedIconColor = Color.DarkGray,

@@ -94,7 +94,6 @@ fun ReviewScreen(
             HorizontalDivider(color = Color.DarkGray.copy(alpha = 0.5f), thickness = 1.dp)
             Spacer(modifier = Modifier.height(16.dp))
 
-
             Text(text = "Specify the date you watched it", color = Color.Gray, fontSize = 14.sp)
             Spacer(modifier = Modifier.height(8.dp))
 

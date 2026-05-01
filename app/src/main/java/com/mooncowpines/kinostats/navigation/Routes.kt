@@ -18,4 +18,6 @@ sealed class Route(val path: String) {
     data object Review : Route("review/{movieId}") {
         fun createRoute(movieId: Int) = "review/$movieId"
     }
+
+    data object Test  : Route("test")
 }
