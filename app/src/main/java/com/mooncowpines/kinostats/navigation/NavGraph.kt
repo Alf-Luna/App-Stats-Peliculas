@@ -8,17 +8,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 
+import com.mooncowpines.kinostats.data.FakeMovieApi
 import com.mooncowpines.kinostats.ui.screens.home.HomeScreen
 import com.mooncowpines.kinostats.ui.screens.login.LoginScreen
 import com.mooncowpines.kinostats.ui.screens.register.RegisterScreen
 import com.mooncowpines.kinostats.ui.screens.recovery.RecoveryScreen
-import com.mooncowpines.kinostats.ui.screens.change.ChangeScreen
+import com.mooncowpines.kinostats.ui.screens.reset.ResetScreen
 import com.mooncowpines.kinostats.ui.screens.profile.ProfileScreen
-import com.mooncowpines.kinostats.ui.screens.MovieDetail.MovieDetailScreen
-import com.mooncowpines.kinostats.data.FakeMovieApi
+import com.mooncowpines.kinostats.ui.screens.change.ChangeScreen
 import com.mooncowpines.kinostats.ui.screens.review.ReviewScreen
 import com.mooncowpines.kinostats.ui.screens.stats.StatsScreen
-import com.mooncowpines.kinostats.data.User
+import com.mooncowpines.kinostats.retrotest.*
+import com.mooncowpines.kinostats.ui.screens.MovieDetail.MovieDetailScreen
 
 @Composable
 fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
@@ -38,7 +39,7 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
                     }
                 },
                 onNavigateToRecover = { navController.navigate(Route.Recovery.path)},
-                onNavigateToChange = { navController.navigate(Route.Change.path)},
+                onNavigateToReset = { navController.navigate(Route.Reset.path)},
             )
         }
 
@@ -59,12 +60,23 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
             )
         }
 
-        composable(Route.Change.path) {
-            ChangeScreen(
+        composable(Route.Reset.path) {
+            ResetScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToLogin = {
                     navController.navigate(Route.Login.path) {
                         popUpTo(Route.Login.path) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(Route.Change.path) {
+            ChangeScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToHome = {
+                    navController.navigate(Route.Home.path) {
+                        popUpTo(Route.Home.path) { inclusive = true }
                     }
                 }
             )
@@ -94,7 +106,17 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
         }
 
         composable(Route.Stats.path) {
-            StatsScreen()
+            StatsScreen(
+               onMovieClick =  { movieId ->
+                    navController.navigate(Route.MovieDetail.createRoute(movieId))
+                }
+            )
+        }
+
+        composable(Route.Test.path) {
+            PostScreen(
+
+            )
         }
 
         composable(

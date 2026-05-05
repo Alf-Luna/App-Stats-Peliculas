@@ -20,8 +20,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mooncowpines.kinostats.data.Movie
+import com.mooncowpines.kinostats.ui.components.KinoCalendar
 import com.mooncowpines.kinostats.ui.components.RatingDropdownSelector
 import com.mooncowpines.kinostats.ui.theme.KinoBlack
+import com.mooncowpines.kinostats.ui.theme.KinoGray
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import java.time.LocalDate
@@ -94,8 +96,7 @@ fun ReviewScreen(
             HorizontalDivider(color = Color.DarkGray.copy(alpha = 0.5f), thickness = 1.dp)
             Spacer(modifier = Modifier.height(16.dp))
 
-
-            Text(text = "Specify the date you watched it", color = Color.Gray, fontSize = 14.sp)
+            Text(text = "Specify the date you watched it", color = KinoGray, fontSize = 14.sp)
             Spacer(modifier = Modifier.height(8.dp))
 
             val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.getDefault())
@@ -108,14 +109,20 @@ fun ReviewScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        //Hacer algo pa la fecha
-                        viewModel.onWatchDateChange(LocalDate.now())
+                        viewModel.setShowCalendar(true)
                     }
                     .padding(vertical = 8.dp)
             )
 
             if (state.watchDateError != null) {
                 Text(text = state.watchDateError!!, color = Color.Red, fontSize = 12.sp)
+            }
+
+            if (state.showCalendar) {
+                KinoCalendar(
+                    onDismissRequest = { viewModel.setShowCalendar(false)},
+                    onDateSelected = { timestamp -> viewModel.onWatchDateSelected(timestamp)}
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -176,7 +183,7 @@ private fun MovieHeaderInfo(movie: Movie) {
                 .clip(RoundedCornerShape(4.dp)).background(Color.DarkGray)
         ) {
             Image(
-                painter = painterResource(id = movie.thumbnailResId),
+                painter = painterResource(id = movie.posterUrl),
                 contentDescription = "Poster",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
@@ -186,7 +193,7 @@ private fun MovieHeaderInfo(movie: Movie) {
         Column {
             Text(text = movie.title, color = KinoWhite, fontSize = 24.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = movie.year, color = Color.Gray, fontSize = 16.sp)
+            Text(text = movie.releaseYear, color = Color.Gray, fontSize = 16.sp)
         }
     }
 }

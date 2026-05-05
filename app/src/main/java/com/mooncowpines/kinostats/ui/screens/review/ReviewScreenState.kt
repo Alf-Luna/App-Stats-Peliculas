@@ -5,6 +5,7 @@ import java.time.LocalDate
 data class ReviewScreenState(
     val rating: Float = 0f,
     val watchDate: LocalDate? = null,
+    val showCalendar: Boolean = false,
     val reviewText: String = "",
     val ratingError: String? = null,
     val watchDateError: String? = null,

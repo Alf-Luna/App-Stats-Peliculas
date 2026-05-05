@@ -1,9 +1,11 @@
 package com.mooncowpines.kinostats.ui.screens.change
 
 data class ChangeScreenState(
-    val pass: String = "",
-    val passCheck: String = "",
-    val passError: String? = null,
+    val currentPass: String = "",
+    val newPass: String = "",
+    val newPassCheck: String = "",
+    val currentPassError: String? = null,
+    val newPassError: String? = null,
     val passCheckError: String? = null,
     val isSubmitting: Boolean = false,
     val canSubmit: Boolean = false,

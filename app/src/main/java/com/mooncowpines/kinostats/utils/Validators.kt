@@ -62,3 +62,11 @@ fun isPassMatch(pass: String, passCheck: String): Boolean {
     return pass == passCheck && passCheck.isNotBlank()
 }
 
+fun getCurrentPassError(currentPass: String) :String? {
+    if (currentPass.isBlank()) {
+        return "This field cannot be empty"
+    }
+
+    return null
+}
+

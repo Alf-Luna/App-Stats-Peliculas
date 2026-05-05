@@ -18,6 +18,7 @@ import com.mooncowpines.kinostats.ui.theme.KinoWhite
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import androidx.compose.foundation.Image
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.unit.sp
@@ -31,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 import com.mooncowpines.kinostats.data.FakeMovieApi
 import com.mooncowpines.kinostats.ui.theme.KinoGray
+import com.mooncowpines.kinostats.ui.theme.KinoLighterGray
 
 @Composable
 fun KinoLastSeenCard(
@@ -43,14 +45,15 @@ fun KinoLastSeenCard(
         .wrapContentHeight()
         .clickable { onClick(movie.id)},
         shape = MaterialTheme.shapes.small,
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        colors = CardDefaults.cardColors(KinoLighterGray),
+
     ) {
         Row(
             modifier = Modifier,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = painterResource(id = movie.thumbnailResId),
+                painter = painterResource(id = movie.posterUrl),
                 contentDescription = movie.title,
                 modifier = Modifier
                     .fillMaxWidth(0.30f)
@@ -69,9 +72,9 @@ fun KinoLastSeenCard(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis)
 
-                Text(movie.year, color = KinoGray, fontSize = 14.sp)
+                Text(movie.releaseYear, color = KinoGray, fontSize = 14.sp)
                 Spacer(modifier = Modifier.height(KinoSpacing.medium))
-                Text("★ ${movie.rating}", color = KinoYellow, fontSize = 14.sp)
+
             }
         }
     }

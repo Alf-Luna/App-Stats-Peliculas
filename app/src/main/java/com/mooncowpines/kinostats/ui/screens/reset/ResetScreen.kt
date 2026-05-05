@@ -1,4 +1,4 @@
-package com.mooncowpines.kinostats.ui.screens.change
+package com.mooncowpines.kinostats.ui.screens.reset
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
@@ -36,11 +36,11 @@ import com.mooncowpines.kinostats.ui.components.PasswordMatchFeedback
 import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 
 @Composable
-fun ChangeScreen(
+fun ResetScreen(
     modifier: Modifier = Modifier,
-    viewModel: ChangeScreenViewModel = viewModel(),
+    viewModel: ResetScreenViewModel = viewModel(),
     onNavigateBack: () -> Unit,
-    onNavigateToHome: () -> Unit
+    onNavigateToLogin: () -> Unit
 ) {
 
     val state by viewModel.state.collectAsState()
@@ -49,42 +49,38 @@ fun ChangeScreen(
     LaunchedEffect(state.success) {
         if (state.success) {
             Toast.makeText(context, "Password changed successfully!", Toast.LENGTH_LONG).show()
-            onNavigateToHome()
+            onNavigateToLogin()
         }
     }
 
     Box(Modifier.fillMaxSize().padding(30.dp)) {
-        Change(
+        Reset(
             modifier = Modifier.align(Alignment.Center),
-            currentPassValue = state.currentPass,
-            newPassValue = state.newPass,
-            newPassCheckValue = state.newPassCheck,
-            currentPassError = state.currentPassError,
+            passValue = state.pass,
+            passCheckValue = state.passCheck,
             isSubmitting = state.isSubmitting,
             errorMsg = state.errorMsg,
-            onCurrentPassChange = { viewModel.onCurrentPassChange(it)},
-            onNewPassChange = { viewModel.onNewPassChange(it) },
-            onNewPassCheckChange = { viewModel.onNewPassCheckChange(it) },
-            onChangeClick = { viewModel.change() },
+            onPassChange = { viewModel.onPassChange(it) },
+            onPassCheckChange = { viewModel.onPassCheckChange(it) },
+            onResetClick = { viewModel.reset() },
             onCancelClick = onNavigateBack,
+            onNavigateToLogin = {}
         )
     }
 }
 
 @Composable
-fun Change(
+fun Reset(
     modifier: Modifier,
-    currentPassValue: String,
-    newPassValue: String,
-    newPassCheckValue: String,
-    currentPassError: String?,
+    passValue: String,
+    passCheckValue: String,
     isSubmitting: Boolean,
     errorMsg: String?,
-    onCurrentPassChange: (String) -> Unit,
-    onNewPassChange: (String) -> Unit,
-    onNewPassCheckChange: (String) -> Unit,
-    onChangeClick: () -> Unit,
+    onPassChange: (String) -> Unit,
+    onPassCheckChange: (String) -> Unit,
+    onResetClick: () -> Unit,
     onCancelClick: () -> Unit,
+    onNavigateToLogin: () -> Unit
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -101,40 +97,6 @@ fun Change(
 
         //Frame to wrap the form
         KinoFrame {
-            //Current password text field
-            Column {
-                Text(
-                    text = "Current Password:",
-                    color = KinoYellow,
-                )
-                HorizontalDivider(
-                    color = KinoYellow,
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(
-                        top = KinoSpacing.micro,
-                        bottom = KinoSpacing.small)
-                )
-                KinoTextField(
-                    textValue = currentPassValue,
-                    onTextChange = onCurrentPassChange,
-                    placeholderText = "Current Password",
-                    isPassword = true,
-                    modifier = Modifier.fillMaxWidth())
-
-                //Visual feedback to password errors
-                if (currentPassError != null) {
-                    Text(
-                        text = currentPassError,
-                        color = Color.Red,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(KinoSpacing.small)
-                    )
-                }
-
-            }
-
-            Spacer(modifier = Modifier.height(KinoSpacing.medium))
-
             //Password text field
             Column {
                 Text(
@@ -149,13 +111,13 @@ fun Change(
                         bottom = KinoSpacing.small)
                 )
                 KinoTextField(
-                    textValue = newPassValue,
-                    onTextChange = onNewPassChange,
-                    placeholderText = "New Password",
+                    textValue = passValue,
+                    onTextChange = onPassChange,
+                    placeholderText = "Password",
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth())
                 //Visual feedback to password requirements
-                PasswordRequirementsFeedback(newPassValue)
+                PasswordRequirementsFeedback(passValue)
             }
 
             Spacer(modifier = Modifier.height(KinoSpacing.medium))
@@ -173,13 +135,13 @@ fun Change(
                         bottom = KinoSpacing.small)
                 )
                 KinoTextField(
-                    textValue = newPassCheckValue,
-                    onTextChange = onNewPassCheckChange,
+                    textValue = passCheckValue,
+                    onTextChange = onPassCheckChange,
                     placeholderText = "Confirm Password",
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth())
                 //Visual feedback for password match
-                PasswordMatchFeedback(newPassValue, newPassCheckValue)
+                PasswordMatchFeedback(passValue, passCheckValue)
             }
 
             Spacer(modifier = Modifier.height(KinoSpacing.medium))
@@ -210,7 +172,7 @@ fun Change(
                     } else {
                         KinoButton(
                             text = "Change",
-                            onClick = onChangeClick,
+                            onClick = onResetClick,
                             modifier = Modifier.weight(1.5f)
                         )
                     }

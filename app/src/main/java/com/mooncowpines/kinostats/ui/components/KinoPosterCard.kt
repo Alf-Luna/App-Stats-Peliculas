@@ -30,7 +30,7 @@ fun KinoPosterCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Image(
-            painter = painterResource(id = movie.thumbnailResId),
+            painter = painterResource(id = movie.posterUrl),
             contentDescription = movie.title,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop

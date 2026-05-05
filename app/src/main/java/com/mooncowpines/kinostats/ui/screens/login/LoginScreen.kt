@@ -45,7 +45,7 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     onNavigateToRegister: () -> Unit,
     onNavigateToHome: () -> Unit,
-    onNavigateToChange: () -> Unit,
+    onNavigateToReset: () -> Unit,
     onNavigateToRecover: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
@@ -70,7 +70,7 @@ fun LoginScreen(
             onPassChange = { viewModel.onPassChange(it) },
             onLoginClick = { viewModel.login() },
             onRecoveryClick = onNavigateToRecover,
-            onChangeClick = onNavigateToChange,
+            onChangeClick = onNavigateToReset,
             onRegisterClick = onNavigateToRegister,
             onAdminClick = { viewModel.adminLogin() }
         )

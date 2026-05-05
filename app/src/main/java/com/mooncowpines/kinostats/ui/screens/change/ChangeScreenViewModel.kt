@@ -16,12 +16,16 @@ class ChangeScreenViewModel : ViewModel(){
     val state: StateFlow<ChangeScreenState> = _state.asStateFlow()
 
     //Functions to track text field value
-    fun onPassChange(newPass: String) {
-        _state.update { it.copy(pass = newPass, errorMsg = null) }
+    fun onCurrentPassChange(currentPass: String) {
+        _state.update { it.copy(currentPass = currentPass, errorMsg = null, currentPassError = null) }
     }
 
-    fun onPassCheckChange(newPassCheck: String) {
-        _state.update { it.copy(passCheck = newPassCheck, errorMsg = null) }
+    fun onNewPassChange(newPass: String) {
+        _state.update { it.copy(newPass = newPass, errorMsg = null) }
+    }
+
+    fun onNewPassCheckChange(newPassCheck: String) {
+        _state.update { it.copy(newPassCheck = newPassCheck, errorMsg = null) }
     }
 
     //Triggers a password change attempt
@@ -30,11 +34,18 @@ class ChangeScreenViewModel : ViewModel(){
         if (currentState.isSubmitting) return
 
         //Local validation for the text field
-        val isPassValid = isPassValid(currentState.pass)
-        val isPassCheckValid = isPassMatch(currentState.pass, currentState.passCheck)
 
-        if (!isPassValid || !isPassCheckValid) {
-            _state.update { it.copy(errorMsg = "Check the password validations") }
+        val currentPassError = getCurrentPassError(currentPass = currentState.currentPass)
+        val isPassValid = isPassValid(currentState.newPass)
+        val isPassCheckValid = isPassMatch(currentState.newPass, currentState.newPassCheck)
+
+        if (currentPassError != null || !isPassValid || !isPassCheckValid) {
+            _state.update { it.copy(
+                currentPassError = currentPassError,
+                errorMsg =
+                    if (currentState.currentPass == currentState.newPass)
+                        {"You cannot use the same password right away!"} else {"Check the password validations"})
+            }
             return
         }
 

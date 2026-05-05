@@ -3,7 +3,8 @@ sealed class Route(val path: String) {
     data object Login    : Route("login")
     data object Register : Route("register")
     data object Recovery : Route("recovery")
-    data object Change   : Route("change")
+    data object Reset   : Route("reset")
+    data object Change  : Route("change")
     data object Home     : Route("home")
     data object Profile  : Route("profile")
     data object Stats  : Route("stats")
@@ -17,4 +18,6 @@ sealed class Route(val path: String) {
     data object Review : Route("review/{movieId}") {
         fun createRoute(movieId: Int) = "review/$movieId"
     }
+
+    data object Test  : Route("test")
 }
