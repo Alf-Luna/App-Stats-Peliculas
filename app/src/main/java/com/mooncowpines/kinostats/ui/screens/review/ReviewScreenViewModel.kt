@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.Instant
+import java.time.ZoneId
 import android.util.Log
 
 import com.mooncowpines.kinostats.utils.*
@@ -19,14 +21,35 @@ class ReviewScreenViewModel: ViewModel() {
     private val _state = MutableStateFlow(ReviewScreenState())
     val state: StateFlow<ReviewScreenState> = _state.asStateFlow()
 
+    //Function to show or hide the calendar
+    fun setShowCalendar(show: Boolean) {
+        _state.update { it.copy(showCalendar = show) }
+    }
+
+    //Function to track date field value
+    fun onWatchDateSelected(timestamp: Long?) {
+        if (timestamp != null) {
+            val localDate = Instant.ofEpochMilli(timestamp).atZone(ZoneId.of("UTC")).toLocalDate()
+
+            _state.update {
+                it.copy(
+                    watchDate = localDate,
+                    watchDateError = null,
+                    errorMsg = null,
+                    showCalendar = false
+                )
+            }
+        } else {
+            setShowCalendar(false)
+        }
+    }
+
+
     //Functions to track text field value
     fun onRatingChange(newRating: Float) {
         _state.update { it.copy(rating = newRating, ratingError = null, errorMsg = null ) }
     }
 
-    fun onWatchDateChange(newWatchDate: LocalDate) {
-        _state.update { it.copy(watchDate = newWatchDate, watchDateError = null, errorMsg = null)}
-    }
     fun reviewTextChange(newReviewText: String) {
         _state.update { it.copy(reviewText = newReviewText, reviewTextError = null, errorMsg = null)}
     }

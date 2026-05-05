@@ -10,8 +10,8 @@ import kotlinx.coroutines.launch
 
 class StatsScreenViewModel : ViewModel() {
 
-    private val _uiState = MutableStateFlow(StatsScreenState())
-    val uiState: StateFlow<StatsScreenState> = _uiState.asStateFlow()
+    private val _state = MutableStateFlow(StatsScreenState())
+    val state: StateFlow<StatsScreenState> = _state.asStateFlow()
 
     init {
 
@@ -27,7 +27,7 @@ class StatsScreenViewModel : ViewModel() {
             val lastMovie = movies.firstOrNull()
 
 
-            _uiState.value = _uiState.value.copy(
+            _state.value = _state.value.copy(
                 isLoading = false,
                 lastSeenMovie = lastMovie
             )

@@ -37,7 +37,7 @@ fun StatsScreen(
     onMovieClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.state.collectAsState()
     val scrollState = rememberScrollState()
 
     if (state.isLoading) {
