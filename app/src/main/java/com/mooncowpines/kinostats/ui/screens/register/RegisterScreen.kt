@@ -1,10 +1,5 @@
 package com.mooncowpines.kinostats.ui.screens.register
 
-import android.widget.Space
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,7 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.CircularProgressIndicator
@@ -22,9 +20,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
@@ -32,28 +30,40 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
-import com.mooncowpines.kinostats.R
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoButton
+import com.mooncowpines.kinostats.ui.components.KinoFrame
 import com.mooncowpines.kinostats.ui.components.KinoTextField
+import com.mooncowpines.kinostats.ui.components.PasswordRequirementsFeedback
+import com.mooncowpines.kinostats.ui.components.PasswordMatchFeedback
+import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 
 @Composable
-fun RegisterScreen(viewModel: RegisterScreenViewModel = viewModel(), modifier: Modifier = Modifier){
+fun RegisterScreen(
+    viewModel: RegisterScreenViewModel = viewModel(),
+    modifier: Modifier = Modifier,
+    onNavigateToHome: () -> Unit,
+    onNavigateBack: () -> Unit
+){
 
     val state by viewModel.state.collectAsState()
 
-    if (state.success) {
-        Box(Modifier.fillMaxSize().padding(30.dp), contentAlignment = Alignment.Center) {
-            Text("FUNCIONA EL REGISTER VIEWMODEL", color = KinoYellow, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+    LaunchedEffect(state.success) {
+        if (state.success) {
+            onNavigateToHome()
         }
-        return
     }
 
-    Box(Modifier.fillMaxSize().padding(30.dp)) {
+    Box(Modifier
+        .fillMaxSize()
+        .imePadding()
+        .padding(KinoSpacing.extraLarge)) {
         Register(
             modifier = Modifier.align(Alignment.Center),
             userNameValue = state.userName,
+            userNameError= state.userNameError,
             emailValue = state.email,
+            emailError = state.emailError,
             passValue = state.pass,
             passCheckValue = state.passCheck,
             isSubmitting = state.isSubmitting,
@@ -62,8 +72,9 @@ fun RegisterScreen(viewModel: RegisterScreenViewModel = viewModel(), modifier: M
             onEmailChange = { viewModel.onEmailChange(it) },
             onPassChange = { viewModel.onPassChange(it) },
             onPassCheckChange = { viewModel.onPassCheckChange(it) },
-            onRegisterClick = { viewModel.register() }
-            )
+            onRegisterClick = { viewModel.register() },
+            onCancelClick = onNavigateBack
+        )
     }
 }
 
@@ -71,7 +82,9 @@ fun RegisterScreen(viewModel: RegisterScreenViewModel = viewModel(), modifier: M
 fun Register(
     modifier: Modifier,
     userNameValue: String,
+    userNameError: String?,
     emailValue: String,
+    emailError: String?,
     passValue: String,
     passCheckValue: String,
     isSubmitting: Boolean,
@@ -80,10 +93,14 @@ fun Register(
     onEmailChange: (String) -> Unit,
     onPassChange: (String) -> Unit,
     onPassCheckChange: (String) -> Unit,
-    onRegisterClick: () -> Unit
+    onRegisterClick: () -> Unit,
+    onCancelClick: () -> Unit
 ) {
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-
+    Column(
+        modifier = modifier.verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+        //Header banner
         Text(
             text = "Create your account",
             color = KinoYellow,
@@ -92,17 +109,11 @@ fun Register(
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(40.dp))
-        //Column that wraps the text fields and buttons
-        Column(
-            modifier = Modifier
-                .border(
-                    width = 1.dp,
-                    color = KinoYellow,
-                    shape = CutCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 16.dp, bottomEnd = 16.dp))
-                .padding(24.dp),
-        ) {
+        Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
 
+        //Frame to wrap the form
+        KinoFrame {
+            //Username field
             Column{
                 Text(
                     text = "User Name:",
@@ -111,18 +122,29 @@ fun Register(
                 HorizontalDivider(
                     color = KinoYellow,
                     thickness = 1.dp,
-                    modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+                    modifier = Modifier.padding(
+                        top = KinoSpacing.micro,
+                        bottom = KinoSpacing.small)
                 )
                 KinoTextField(
                     textValue = userNameValue,
                     onTextChange = onUserNameChange,
                     placeholderText = "User Name",
                     modifier = Modifier.fillMaxWidth())
+
+                if (userNameError != null) {
+                    Text(
+                        text = userNameError,
+                        color = Color.Red,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(KinoSpacing.small)
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(KinoSpacing.medium))
 
-            //Email text and text field
+            //Email field
             Column{
                 Text(
                     text = "Email:",
@@ -131,18 +153,29 @@ fun Register(
                 HorizontalDivider(
                     color = KinoYellow,
                     thickness = 1.dp,
-                    modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+                    modifier = Modifier.padding(
+                        top = KinoSpacing.micro,
+                        bottom = KinoSpacing.small)
                 )
                 KinoTextField(
                     textValue = emailValue,
                     onTextChange = onEmailChange,
                     placeholderText = "example@gmail.com",
                     modifier = Modifier.fillMaxWidth())
+
+                if (emailError != null) {
+                    Text(
+                        text = emailError,
+                        color = Color.Red,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(KinoSpacing.small)
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(KinoSpacing.medium))
 
-            //Password text and text field
+            //Password field
             Column{
                 Text(
                     text = "Password:",
@@ -151,7 +184,9 @@ fun Register(
                 HorizontalDivider(
                     color = KinoYellow,
                     thickness = 1.dp,
-                    modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+                    modifier = Modifier.padding(
+                        top = KinoSpacing.micro,
+                        bottom = KinoSpacing.small)
                 )
                 KinoTextField(
                     textValue = passValue,
@@ -160,26 +195,13 @@ fun Register(
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth())
 
-                val requirements = listOf(
-                    "7 characters min" to (passValue.length >= 7),
-                    "Includes a number" to passValue.any { it.isDigit() },
-                    "Special Character (@, #, $)" to passValue.any { !it.isLetterOrDigit() }
-                )
-
-                Column(modifier = Modifier.padding(top = 8.dp)) {
-                    requirements.forEach { (text, isMet) ->
-                        Text(
-                            text = if (isMet) "✓ $text" else "• $text",
-                            color = if (isMet) KinoYellow else Color.Gray.copy(alpha = 0.6f),
-                            fontSize = 13.sp
-                        )
-                    }
-                }
+                //Visual feedback to password requirements
+                PasswordRequirementsFeedback(passValue)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(KinoSpacing.medium))
 
-            //Password text and text field
+            //Password check field
             Column{
                 Text(
                     text = "Check Password:",
@@ -188,7 +210,9 @@ fun Register(
                 HorizontalDivider(
                     color = KinoYellow,
                     thickness = 1.dp,
-                    modifier = Modifier.padding(top = 2.dp, bottom = 12.dp)
+                    modifier = Modifier.padding(
+                        top = KinoSpacing.micro,
+                        bottom = KinoSpacing.small)
                 )
                 KinoTextField(
                     textValue = passCheckValue,
@@ -196,58 +220,58 @@ fun Register(
                     placeholderText = "Confirm Password",
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth())
-                Column(modifier = Modifier.padding(top = 8.dp)) {
-                    Text(
-                        text = if (passCheckValue == passValue && passCheckValue.isNotBlank()) "✓ Passwords Match" else "• Passwords Match",
-                        color =  if (passCheckValue == passValue && passCheckValue.isNotBlank()) KinoYellow else Color.Gray.copy(alpha = 0.6f),
-                        fontSize = 13.sp
-                    )
-                }
+
+                //Visual feedback for password match
+                PasswordMatchFeedback(passValue, passCheckValue)
             }
 
+            Spacer(modifier = Modifier.height(KinoSpacing.medium))
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            //Buttons text and buttons
             Column{
+                //General error message
                 if (errorMsg != null) {
                     Text(
                         text = errorMsg,
                         color = Color.Red,
                         fontSize = 14.sp,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(KinoSpacing.small)
                     )
                 }
 
+                //Buttons section
                 Text(
-                    text = "Create your account or get out",
+                    text = "ALL FIELDS ARE MANDATORY",
                     color = KinoYellow,
                     textDecoration = TextDecoration.Underline,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(bottom = KinoSpacing.small)
                 )
 
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(KinoSpacing.medium)
+                ) {
                     if (isSubmitting) {
-                        Box(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp),
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp),
                             contentAlignment = Alignment.Center)
                         { CircularProgressIndicator(color = KinoYellow) }
                     } else {
                         KinoButton(
                             text = "Create Account",
                             onClick = onRegisterClick,
-                            modifier = Modifier.width(180.dp))
+                            modifier = Modifier.weight(1.5f))
                     }
 
                     KinoButton(
                         text = "Cancel",
-                        onClick = { },
-                        modifier = Modifier.width(150.dp))
-
-
+                        onClick = onCancelClick,
+                        enabled = !isSubmitting,
+                        modifier = Modifier.weight(1f))
                 }
+
             }
         }
     }
