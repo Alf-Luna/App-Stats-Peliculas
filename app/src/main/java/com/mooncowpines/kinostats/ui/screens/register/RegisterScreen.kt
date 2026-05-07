@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoButton
@@ -40,7 +40,7 @@ import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 @Composable
 fun RegisterScreen(
     modifier: Modifier = Modifier,
-    viewModel: RegisterScreenViewModel = viewModel(),
+    viewModel: RegisterScreenViewModel = hiltViewModel(),
     onNavigateToHome: () -> Unit,
     onNavigateBack: () -> Unit
 ){

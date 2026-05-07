@@ -17,7 +17,6 @@ import com.mooncowpines.kinostats.ui.screens.profile.ProfileScreen
 import com.mooncowpines.kinostats.ui.screens.change.ChangeScreen
 import com.mooncowpines.kinostats.ui.screens.review.ReviewScreen
 import com.mooncowpines.kinostats.ui.screens.stats.StatsScreen
-import com.mooncowpines.kinostats.retrotest.*
 import com.mooncowpines.kinostats.ui.screens.movieDetail.MovieDetailScreen
 
 
@@ -95,7 +94,7 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
                 onNavigateToAccountInfo = {
                     navController.navigate(Route.Change.path)
                 },
-                onLogout = {
+                onNavigateToLogin = {
                     navController.navigate(Route.Login.path) {
                         popUpTo(0) { inclusive = true }
                     }
@@ -108,12 +107,6 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
                onMovieClick =  { movieId ->
                     navController.navigate(Route.MovieDetail.createRoute(movieId))
                 }
-            )
-        }
-
-        composable(Route.Test.path) {
-            PostScreen(
-
             )
         }
 

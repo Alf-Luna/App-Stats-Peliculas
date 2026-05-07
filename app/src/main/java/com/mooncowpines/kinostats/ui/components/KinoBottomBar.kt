@@ -57,16 +57,6 @@ fun KinoBottomBar(currentRoute: String, onNavigate: (String) -> Unit) {
             )
         )
 
-        NavigationBarItem(
-            selected = currentRoute == Route.Test.path,
-            onClick = { onNavigate(Route.Test.path) },
-            icon = { Icon(Icons.Filled.Info, contentDescription = "Test") },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = KinoYellow,
-                unselectedIconColor = Color.DarkGray,
-                indicatorColor = Color.Transparent
-            )
-        )
     }
 }
 

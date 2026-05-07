@@ -2,17 +2,21 @@ package com.mooncowpines.kinostats.ui.screens.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mooncowpines.kinostats.data.FakeAuthApi
+import com.mooncowpines.kinostats.domain.repository.AuthRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-import com.mooncowpines.kinostats.data.MockSession
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
-class ProfileScreenViewModel : ViewModel() {
+@HiltViewModel
+class ProfileScreenViewModel @Inject constructor(
+    private val authRepository: AuthRepository
+) : ViewModel() {
     private val _state = MutableStateFlow(ProfileScreenState())
     val state: StateFlow<ProfileScreenState> = _state.asStateFlow()
 
@@ -21,15 +25,9 @@ class ProfileScreenViewModel : ViewModel() {
     }
 
     private fun loadUser() {
-        val currentUserId = MockSession.currentUserId
-
-        if (currentUserId == null) {
-            _state.update { it.copy(isLoading = false, errorMsg = "No user logged in") }
-            return
-        }
-
         viewModelScope.launch {
-            val user = FakeAuthApi.getUserById(currentUserId)
+
+            val user = authRepository.getCurrentUser()
 
             if (user != null) {
                 _state.update {
@@ -40,8 +38,15 @@ class ProfileScreenViewModel : ViewModel() {
                     )
                 }
             } else {
-                _state.update { it.copy(isLoading = false, errorMsg = "User not found") }
+                _state.update { it.copy(isLoading = false, errorMsg = "No user logged in") }
             }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            authRepository.logout()
+
         }
     }
 }

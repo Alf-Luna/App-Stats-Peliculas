@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.layout.imePadding
+import androidx.hilt.navigation.compose.hiltViewModel
 
 import com.mooncowpines.kinostats.R
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
@@ -42,7 +43,7 @@ import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    viewModel: LoginScreenViewModel = viewModel(),
+    viewModel: LoginScreenViewModel = hiltViewModel(),
     onNavigateToRegister: () -> Unit,
     onNavigateToHome: () -> Unit,
     onNavigateToReset: () -> Unit,

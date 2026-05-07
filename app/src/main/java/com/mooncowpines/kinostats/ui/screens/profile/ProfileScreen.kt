@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 import com.mooncowpines.kinostats.ui.theme.KinoBlack
@@ -35,12 +36,31 @@ import com.mooncowpines.kinostats.ui.theme.KinoDarkGray
 @Composable
 fun ProfileScreen(
     modifier: Modifier = Modifier,
-    viewModel: ProfileScreenViewModel = viewModel(),
+    viewModel: ProfileScreenViewModel = hiltViewModel(),
+    onNavigateToAccountInfo: () -> Unit,
+    onNavigateToLogin: () -> Unit
+) {
+    val state by viewModel.state.collectAsState()
+
+    ProfileContent(
+        state = state,
+        onNavigateToAccountInfo = onNavigateToAccountInfo,
+        onLogout = {
+            viewModel.logout()
+            onNavigateToLogin()
+        },
+        modifier = modifier
+    )
+
+}
+
+@Composable
+fun ProfileContent(
+    state: ProfileScreenState,
     onNavigateToAccountInfo: () -> Unit,
     onLogout: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-
-    val state by viewModel.state.collectAsState()
 
     Column(
         modifier = modifier

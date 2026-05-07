@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 
@@ -39,7 +40,7 @@ import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 @Composable
 fun RecoveryScreen(
     modifier: Modifier = Modifier,
-    viewModel: RecoveryScreenViewModel = viewModel(),
+    viewModel: RecoveryScreenViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit
 ) {
 

@@ -1,7 +1,9 @@
 package com.mooncowpines.kinostats.di
 
+import com.mooncowpines.kinostats.data.repositoryImpl.MockAuthRepositoryImpl
 import com.mooncowpines.kinostats.data.repositoryImpl.MockMovieRepositoryImpl
 import com.mooncowpines.kinostats.data.repositoryImpl.MockReviewRepositoryImpl
+import com.mooncowpines.kinostats.domain.repository.AuthRepository
 import com.mooncowpines.kinostats.domain.repository.MovieRepository
 import com.mooncowpines.kinostats.domain.repository.ReviewRepository
 import dagger.Module
@@ -14,6 +16,11 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    @Provides
+    @Singleton
+    fun provideAuthRepository(): AuthRepository {
+        return MockAuthRepositoryImpl()
+    }
 
     @Provides
     @Singleton

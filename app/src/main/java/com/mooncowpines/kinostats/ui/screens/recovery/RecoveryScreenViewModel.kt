@@ -9,9 +9,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-import com.mooncowpines.kinostats.data.FakeAuthApi.sendRecoveryEmail
+import com.mooncowpines.kinostats.domain.repository.AuthRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class RecoveryScreenViewModel : ViewModel(){
+@HiltViewModel
+class RecoveryScreenViewModel @Inject constructor(
+    private val authRepository: AuthRepository // Inyectamos la dependencia
+) : ViewModel() {
     private val _state = MutableStateFlow(RecoveryScreenState())
     val state: StateFlow<RecoveryScreenState> = _state.asStateFlow()
 
@@ -39,7 +44,7 @@ class RecoveryScreenViewModel : ViewModel(){
         viewModelScope.launch {
             _state.update { it.copy(isSubmitting = true, errorMsg = null) }
 
-            val isSuccess = sendRecoveryEmail(currentState.email)
+            val isSuccess = authRepository.sendRecoveryEmail(currentState.email)
 
             if (isSuccess) {
                 _state.update { it.copy(isSubmitting = false, success = true) }

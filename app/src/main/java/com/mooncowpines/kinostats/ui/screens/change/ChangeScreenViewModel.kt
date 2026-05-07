@@ -2,6 +2,7 @@ package com.mooncowpines.kinostats.ui.screens.change
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mooncowpines.kinostats.domain.repository.AuthRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,8 +11,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 import com.mooncowpines.kinostats.utils.*
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class ChangeScreenViewModel : ViewModel(){
+@HiltViewModel
+class ChangeScreenViewModel @Inject constructor(
+    private val authRepository: AuthRepository
+) : ViewModel() {
     private val _state = MutableStateFlow(ChangeScreenState())
     val state: StateFlow<ChangeScreenState> = _state.asStateFlow()
 
@@ -53,10 +59,16 @@ class ChangeScreenViewModel : ViewModel(){
         viewModelScope.launch {
             _state.update { it.copy(isSubmitting = true, errorMsg = null) }
 
-            delay(1500)
+            val isSuccess = authRepository.changePassword(
+                pass = currentState.newPass,
+                passCheck = currentState.newPassCheck
+            )
 
-            _state.update { it.copy(isSubmitting = false, success = true) }
-        }
+            if (isSuccess) {
+                _state.update { it.copy(isSubmitting = false, success = true) }
+            } else {
+                _state.update { it.copy(isSubmitting = false, errorMsg = "Could not change password") }
+            }        }
     }
 }
 
