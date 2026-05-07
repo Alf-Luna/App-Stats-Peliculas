@@ -1,7 +1,6 @@
 package com.mooncowpines.kinostats.ui.screens.stats
 
-import com.mooncowpines.kinostats.R
-import com.mooncowpines.kinostats.data.Movie
+import com.mooncowpines.kinostats.domain.model.Movie
 
 
 data class StatsScreenState(

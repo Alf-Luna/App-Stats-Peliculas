@@ -41,8 +41,8 @@ import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginScreenViewModel = viewModel(),
     modifier: Modifier = Modifier,
+    viewModel: LoginScreenViewModel = viewModel(),
     onNavigateToRegister: () -> Unit,
     onNavigateToHome: () -> Unit,
     onNavigateToReset: () -> Unit,

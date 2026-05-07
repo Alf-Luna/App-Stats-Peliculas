@@ -20,7 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 
 import com.mooncowpines.kinostats.ui.components.KinoLastSeenCard
 import com.mooncowpines.kinostats.ui.components.KinoTimeSummaryRow
@@ -30,24 +30,35 @@ import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
 
-
 @Composable
 fun StatsScreen(
-    viewModel: StatsScreenViewModel = viewModel(),
-    onMovieClick: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: StatsScreenViewModel = hiltViewModel(),
+    onMovieClick: (Int) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-    val scrollState = rememberScrollState()
 
     if (state.isLoading) {
-        Box(
-            modifier = modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
+        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(color = KinoYellow)
         }
     } else {
+        StatsContent(
+            state = state,
+            onMovieClick = onMovieClick,
+            modifier = modifier
+        )
+    }
+}
+
+
+@Composable
+fun StatsContent(
+    state: StatsScreenState,
+    onMovieClick: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+        val scrollState = rememberScrollState()
 
         Column(
             modifier = modifier
@@ -149,5 +160,4 @@ fun StatsScreen(
 
             Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
         }
-    }
 }

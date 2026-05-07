@@ -2,13 +2,18 @@ package com.mooncowpines.kinostats.ui.screens.stats
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mooncowpines.kinostats.data.FakeMovieApi
+import com.mooncowpines.kinostats.domain.repository.MovieRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class StatsScreenViewModel : ViewModel() {
+@HiltViewModel
+class StatsScreenViewModel @Inject constructor(
+    private val movieRepository: MovieRepository
+) : ViewModel() {
 
     private val _state = MutableStateFlow(StatsScreenState())
     val state: StateFlow<StatsScreenState> = _state.asStateFlow()
@@ -21,7 +26,7 @@ class StatsScreenViewModel : ViewModel() {
     private fun loadStatsData() {
         viewModelScope.launch {
 
-            val movies = FakeMovieApi.getMovies()
+            val movies = movieRepository.getMovies()
 
 
             val lastMovie = movies.firstOrNull()

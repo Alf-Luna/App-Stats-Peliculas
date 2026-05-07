@@ -18,34 +18,66 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.mooncowpines.kinostats.data.Movie
+import com.mooncowpines.kinostats.domain.model.Movie
 import com.mooncowpines.kinostats.ui.components.KinoCalendar
 import com.mooncowpines.kinostats.ui.components.RatingDropdownSelector
 import com.mooncowpines.kinostats.ui.theme.KinoBlack
 import com.mooncowpines.kinostats.ui.theme.KinoGray
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
-import java.time.LocalDate
+import androidx.hilt.navigation.compose.hiltViewModel
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReviewScreen(
-    movie: Movie,
-    viewModel: ReviewScreenViewModel = viewModel(),
-    onNavigateBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: ReviewScreenViewModel = hiltViewModel(),
+    onNavigateBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(state.success) {
-        if (state.success) {
-            onNavigateBack()
+        if (state.success) onNavigateBack()
+    }
+
+    if (state.isLoadingMovie) {
+        Box(modifier = modifier.fillMaxSize().background(KinoBlack), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = KinoYellow)
+        }
+    } else if (state.movie != null) {
+        ReviewContent(
+            state = state,
+            movie = state.movie!!,
+            onNavigateBack = onNavigateBack,
+            onSaveReview = { viewModel.saveReview() },
+            onRatingChange = { viewModel.onRatingChange(it) },
+            onReviewTextChange = { viewModel.reviewTextChange(it) },
+            onShowCalendar = { viewModel.setShowCalendar(it) },
+            onDateSelected = { viewModel.onWatchDateSelected(it) },
+            modifier = modifier
+        )
+    } else {
+        Box(modifier = modifier.fillMaxSize().background(KinoBlack), contentAlignment = Alignment.Center) {
+            Text("Error al cargar la película", color = Color.Red)
         }
     }
 
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ReviewContent(
+    state: ReviewScreenState,
+    movie: Movie,
+    onNavigateBack: () -> Unit,
+    onSaveReview: () -> Unit,
+    onRatingChange: (Float) -> Unit,
+    onReviewTextChange: (String) -> Unit,
+    onShowCalendar: (Boolean) -> Unit,
+    onDateSelected: (Long?) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = KinoBlack,
@@ -59,7 +91,7 @@ fun ReviewScreen(
                 },
                 actions = {
                     TextButton(
-                        onClick = { viewModel.saveReview(movieId = movie.id) },
+                        onClick = onSaveReview,
                         enabled = !state.isSubmitting
                     ) {
                         Text(
@@ -109,7 +141,7 @@ fun ReviewScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        viewModel.setShowCalendar(true)
+                        onShowCalendar(true)
                     }
                     .padding(vertical = 8.dp)
             )
@@ -120,8 +152,8 @@ fun ReviewScreen(
 
             if (state.showCalendar) {
                 KinoCalendar(
-                    onDismissRequest = { viewModel.setShowCalendar(false)},
-                    onDateSelected = { timestamp -> viewModel.onWatchDateSelected(timestamp)}
+                    onDismissRequest = { onShowCalendar(false) },
+                    onDateSelected = { timestamp -> onDateSelected(timestamp)}
                 )
             }
 
@@ -134,7 +166,7 @@ fun ReviewScreen(
 
             RatingDropdownSelector(
                 rating = state.rating,
-                onRatingChange = { viewModel.onRatingChange(it) }
+                onRatingChange = onRatingChange
             )
 
             if (state.ratingError != null) {
@@ -149,7 +181,7 @@ fun ReviewScreen(
 
             TextField(
                 value = state.reviewText,
-                onValueChange = { viewModel.reviewTextChange(it) },
+                onValueChange = onReviewTextChange,
                 modifier = Modifier.fillMaxWidth().heightIn(min = 150.dp),
                 placeholder = { Text("Write a review...", color = Color.DarkGray) },
                 colors = TextFieldDefaults.colors(

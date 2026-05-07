@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 import com.mooncowpines.kinostats.data.FakeAuthApi
 import com.mooncowpines.kinostats.data.MockSession
 import com.mooncowpines.kinostats.utils.getEmailError
-import com.mooncowpines.kinostats.utils.*
 
 class LoginScreenViewModel : ViewModel(){
     private val _state = MutableStateFlow(LoginScreenState())

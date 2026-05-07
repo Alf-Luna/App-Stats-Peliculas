@@ -1,24 +1,11 @@
-package com.mooncowpines.kinostats.data
+package com.mooncowpines.kinostats.data.repositoryImpl
 
 import com.mooncowpines.kinostats.R
+import com.mooncowpines.kinostats.domain.model.Movie
+import com.mooncowpines.kinostats.domain.repository.MovieRepository
 import kotlinx.coroutines.delay
 
-data class Movie(
-    val id: Int,
-    val title: String,
-    val releaseYear: String,
-    val originCountry: String,
-    val director: String,
-    val cinematographer: String,
-    val productionCompany: String,
-    val genres: List<String>,
-    val duration: Int,
-    val posterUrl: Int,
-    val actors: List<String>
-)
-
-object FakeMovieApi {
-
+class MockMovieRepositoryImpl : MovieRepository {
     private val mockMovieDatabase = mutableListOf(
         Movie(
             id = 1,
@@ -281,17 +268,14 @@ object FakeMovieApi {
             actors = listOf("Ralph Fiennes", "F. Murray Abraham", "Mathieu Amalric")
         )
     )
-    
-    suspend fun getMovies(): List<Movie> {
+
+    override suspend fun getMovies(): List<Movie> {
         delay(1500)
         return mockMovieDatabase
     }
 
-    suspend fun getMovieById(id: Int): Movie? {
+    override suspend fun getMovieById(id: Int): Movie? {
         delay(1500)
         return mockMovieDatabase.find { it.id == id }
     }
-    val allMoviesSync = mockMovieDatabase
-
-    fun getMovieByIdSync(id: Int): Movie? = mockMovieDatabase.find { it.id == id }
 }

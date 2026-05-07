@@ -34,10 +34,10 @@ import com.mooncowpines.kinostats.ui.theme.KinoDarkGray
 
 @Composable
 fun ProfileScreen(
+    modifier: Modifier = Modifier,
     viewModel: ProfileScreenViewModel = viewModel(),
     onNavigateToAccountInfo: () -> Unit,
     onLogout: () -> Unit,
-    modifier: Modifier = Modifier
 ) {
 
     val state by viewModel.state.collectAsState()

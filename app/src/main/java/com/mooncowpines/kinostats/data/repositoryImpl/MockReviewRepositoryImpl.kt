@@ -1,21 +1,12 @@
-package com.mooncowpines.kinostats.data
+package com.mooncowpines.kinostats.data.repositoryImpl
 
 import android.util.Log
+import com.mooncowpines.kinostats.domain.model.Review
+import com.mooncowpines.kinostats.domain.repository.ReviewRepository
 import kotlinx.coroutines.delay
-import org.w3c.dom.Text
 import java.time.LocalDate
 
-data class Review(
-    val id: Int,
-    val movieId: Int,
-    val userId: Int?,
-    val rating: Float,
-    val watchDate: LocalDate?,
-    val reviewText: String
-)
-
-object FakeReviewApi {
-
+class MockReviewRepositoryImpl : ReviewRepository {
     private val mockReviews = mutableListOf(
         Review(
             id = 1,
@@ -43,12 +34,12 @@ object FakeReviewApi {
         )
     )
 
-    suspend fun getReviewsForMovie(movieId: Int): List<Review> {
+    override suspend fun getReviewsForMovie(movieId: Int): List<Review> {
         delay(1500)
-        return FakeReviewApi.mockReviews.filter { it.movieId == movieId }
+        return mockReviews.filter { it.movieId == movieId }
     }
 
-    suspend fun saveReview(
+    override suspend fun saveReview(
         newMovieId: Int,
         newUserId: Int?,
         newRating: Float,
@@ -64,12 +55,12 @@ object FakeReviewApi {
             userId = newUserId,
             rating = newRating,
             watchDate = newWatchDate,
-            reviewText = newReviewText)
+            reviewText = newReviewText
+        )
         mockReviews.add(newReview)
 
-        Log.d("Review saved", "El usuario logueado es: ${newReview}")
+        Log.d("Review saved", "El usuario logueado es: $newReview")
 
         return true
     }
 }
-

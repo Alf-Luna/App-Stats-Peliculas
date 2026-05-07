@@ -2,24 +2,48 @@ package com.mooncowpines.kinostats.ui.screens.review
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mooncowpines.kinostats.data.FakeAuthApi
-import com.mooncowpines.kinostats.data.FakeReviewApi
 import com.mooncowpines.kinostats.data.MockSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import java.time.Instant
 import java.time.ZoneId
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
+import com.mooncowpines.kinostats.domain.repository.MovieRepository
+import com.mooncowpines.kinostats.domain.repository.ReviewRepository
 
 import com.mooncowpines.kinostats.utils.*
+import javax.inject.Inject
+import dagger.hilt.android.lifecycle.HiltViewModel
 
-class ReviewScreenViewModel: ViewModel() {
+@HiltViewModel
+class ReviewScreenViewModel @Inject constructor(
+    private val movieRepository: MovieRepository,
+    private val reviewRepository: ReviewRepository,
+    savedStateHandle: SavedStateHandle
+): ViewModel() {
     private val _state = MutableStateFlow(ReviewScreenState())
     val state: StateFlow<ReviewScreenState> = _state.asStateFlow()
+
+    private val movieId: Int = checkNotNull(savedStateHandle["movieId"])
+
+    init {
+        loadMovie()
+    }
+
+    private fun loadMovie() {
+        viewModelScope.launch {
+            val fetchedMovie = movieRepository.getMovieById(movieId)
+            if (fetchedMovie != null) {
+                _state.update { it.copy(isLoadingMovie = false, movie = fetchedMovie) }
+            } else {
+                _state.update { it.copy(isLoadingMovie = false, errorMsg = "Movie not found") }
+            }
+        }
+    }
 
     //Function to show or hide the calendar
     fun setShowCalendar(show: Boolean) {
@@ -55,7 +79,7 @@ class ReviewScreenViewModel: ViewModel() {
     }
 
     //Triggers a save attempt
-    fun saveReview(movieId: Int) {
+    fun saveReview() {
         val currentState = _state.value
         if (currentState.isSubmitting) return
 
@@ -79,7 +103,7 @@ class ReviewScreenViewModel: ViewModel() {
         viewModelScope.launch {
             _state.update { it.copy(isSubmitting = true, errorMsg = null, ratingError = null, watchDateError = null, reviewTextError = null) }
 
-            val isSuccess = FakeReviewApi.saveReview(
+            val isSuccess = reviewRepository.saveReview(
                 newMovieId = movieId,
                 newUserId = MockSession.currentUserId,
                 newRating = currentState.rating,

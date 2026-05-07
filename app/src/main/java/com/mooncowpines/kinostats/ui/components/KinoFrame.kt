@@ -21,7 +21,7 @@ fun KinoFrame(
             .border(
                 width = 1.dp,
                 color = KinoYellow,
-                shape = CutCornerShape(16.dp,)
+                shape = CutCornerShape(16.dp)
             )
             .padding(KinoSpacing.large)
     ) {

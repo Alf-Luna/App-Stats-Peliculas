@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.collectAsState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,22 +20,54 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoPosterCard
 import com.mooncowpines.kinostats.ui.components.KinoLastSeenCard
 import com.mooncowpines.kinostats.ui.theme.KinoSpacing
-import com.mooncowpines.kinostats.data.Movie
+import com.mooncowpines.kinostats.domain.model.Movie
 import com.mooncowpines.kinostats.ui.components.KinoSearchBar
-
 
 @Composable
 fun HomeScreen(
+    modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = hiltViewModel(),
+    onMovieClick: (Int) -> Unit
+) {
+    val state by viewModel.state.collectAsState()
+
+    when (state) {
+        is HomeScreenState.Loading -> {
+            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = KinoYellow)
+            }
+        }
+        is HomeScreenState.Error -> {
+            val errorMessage = (state as HomeScreenState.Error).message
+            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = errorMessage, color = KinoWhite)
+            }
+        }
+        is HomeScreenState.Success -> {
+            val successState = state as HomeScreenState.Success
+            HomeContent(
+                movies = successState.movies,
+                movie = successState.lastSeenMovie,
+                onMovieClick = onMovieClick,
+                modifier = modifier
+            )
+        }
+    }
+
+    
+}
+@Composable
+fun HomeContent(
     movies: List<Movie>,
     movie: Movie,
     onMovieClick: (Int) -> Unit,
     modifier: Modifier = Modifier
-
 ) {
 
     val scrollState = rememberScrollState()
@@ -74,7 +108,7 @@ fun WatchlistSection(
     movies: List<Movie>,
     onMovieClick: (Int) -> Unit
 ) {
-    Column() {
+    Column {
         Text(
             text = "Watchlist...",
             color = KinoWhite,
@@ -113,7 +147,7 @@ fun LastSeenSection(
     movie: Movie,
     onMovieClick: (Int) -> Unit
 ) {
-    Column() {
+    Column {
         Text(
             text = "Last seen...",
             color = KinoWhite,
@@ -149,7 +183,7 @@ fun JustWatchedSection(
     movies: List<Movie>,
     onMovieClick: (Int) -> Unit
 ) {
-    Column() {
+    Column {
         Text(
             text = "Just Watched...",
             color = KinoWhite,

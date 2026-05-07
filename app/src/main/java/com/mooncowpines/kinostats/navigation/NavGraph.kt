@@ -8,7 +8,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 
-import com.mooncowpines.kinostats.data.FakeMovieApi
 import com.mooncowpines.kinostats.ui.screens.home.HomeScreen
 import com.mooncowpines.kinostats.ui.screens.login.LoginScreen
 import com.mooncowpines.kinostats.ui.screens.register.RegisterScreen
@@ -19,7 +18,8 @@ import com.mooncowpines.kinostats.ui.screens.change.ChangeScreen
 import com.mooncowpines.kinostats.ui.screens.review.ReviewScreen
 import com.mooncowpines.kinostats.ui.screens.stats.StatsScreen
 import com.mooncowpines.kinostats.retrotest.*
-import com.mooncowpines.kinostats.ui.screens.MovieDetail.MovieDetailScreen
+import com.mooncowpines.kinostats.ui.screens.movieDetail.MovieDetailScreen
+
 
 @Composable
 fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
@@ -84,8 +84,6 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
 
         composable(Route.Home.path) {
             HomeScreen(
-                movies = FakeMovieApi.allMoviesSync,
-                movie = FakeMovieApi.getMovieByIdSync(5) ?: FakeMovieApi.allMoviesSync.first(),
                 onMovieClick = { movieId ->
                     navController.navigate(Route.MovieDetail.createRoute(movieId))
                 }
@@ -122,35 +120,24 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
         composable(
             route = Route.MovieDetail.path,
             arguments = listOf(navArgument("movieId") { type = NavType.IntType })
-        ) { backStackEntry ->
-            val movieId = backStackEntry.arguments?.getInt("movieId") ?: 1
-            val movie = FakeMovieApi.getMovieByIdSync(movieId)
-
-            if (movie != null) {
+        ) {
                 MovieDetailScreen(
-                    movie = movie,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateToLog = { id ->
                         navController.navigate(Route.Review.createRoute(id))
                     }
                 )
-            }
         }
+
 
         composable(
             route = Route.Review.path,
             arguments = listOf(navArgument("movieId") { type = NavType.IntType })
-        ) { backStackEntry ->
-            val movieId = backStackEntry.arguments?.getInt("movieId") ?: 1
-            val movie = FakeMovieApi.getMovieByIdSync(movieId)
-
-            if (movie != null) {
+        ) {
                 ReviewScreen(
-                    movie = movie,
                     onNavigateBack = { navController.popBackStack() },
 
                 )
             }
         }
     }
-}
