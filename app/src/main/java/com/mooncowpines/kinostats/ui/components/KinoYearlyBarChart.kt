@@ -20,7 +20,7 @@ import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
 
 @Composable
-fun KinoWeeklyBarChart(
+fun KinoYearlyBarChart(
     data: List<Pair<String, Float>>,
     barColor: Color,
     modifier: Modifier = Modifier

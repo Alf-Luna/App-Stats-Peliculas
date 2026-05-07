@@ -16,16 +16,23 @@ import androidx.compose.material3.HorizontalDivider
 
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
 
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.mooncowpines.kinostats.ui.components.KinoCountryPieChart
 
+import com.mooncowpines.kinostats.ui.components.KinoDateSelector
+import com.mooncowpines.kinostats.ui.components.KinoDecadeLineChart
 import com.mooncowpines.kinostats.ui.components.KinoLastSeenCard
+import com.mooncowpines.kinostats.ui.components.KinoGenreBarChart
+import com.mooncowpines.kinostats.ui.components.KinoRatingBarChart
 import com.mooncowpines.kinostats.ui.components.KinoTimeSummaryRow
+import com.mooncowpines.kinostats.ui.components.KinoTopList
 import com.mooncowpines.kinostats.ui.components.KinoTopListColumn
-import com.mooncowpines.kinostats.ui.components.KinoWeeklyBarChart
+import com.mooncowpines.kinostats.ui.components.KinoYearlyBarChart
 import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
@@ -38,24 +45,19 @@ fun StatsScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    if (state.isLoading) {
-        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(color = KinoYellow)
-        }
-    } else {
         StatsContent(
             state = state,
             onMovieClick = onMovieClick,
-            modifier = modifier
+            modifier = modifier,
+            onFilterChange = { year, month -> viewModel.updateFilter(year, month) },
         )
-    }
 }
-
 
 @Composable
 fun StatsContent(
     state: StatsScreenState,
     onMovieClick: (Int) -> Unit,
+    onFilterChange: (Int?, Int?) -> Unit,
     modifier: Modifier = Modifier
 ) {
         val scrollState = rememberScrollState()
@@ -89,7 +91,7 @@ fun StatsContent(
                         onClick = { id -> onMovieClick(id) }
                     )
                 } ?: run {
-                    Text("Aún no tienes actividad.", color = KinoWhite.copy(alpha = 0.7f))
+                    Text("You don't have any activity yet!", color = KinoWhite.copy(alpha = 0.7f))
                 }
             }
 
@@ -112,52 +114,102 @@ fun StatsContent(
                 modifier = Modifier.padding(bottom = KinoSpacing.medium)
             )
 
-            KinoWeeklyBarChart(
-                data = state.weeklyWatchData,
-                barColor = KinoYellow
+            KinoDateSelector(
+                selectedYear = state.selectedYear,
+                selectedMonth = state.selectedMonth,
+                onFilterChange = onFilterChange
             )
 
-            Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
+            Spacer(modifier = Modifier.height(KinoSpacing.medium))
 
-            KinoTimeSummaryRow(label = "Today", value = state.todayWatchTime)
-            Spacer(modifier = Modifier.height(KinoSpacing.small))
-            KinoTimeSummaryRow(label = "Last 7 days", value = state.last7DaysWatchTime)
+            if (state.selectedYear == null) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 40.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Select a year to check your stats!",
+                        color = KinoWhite.copy(alpha = 0.5f),
+                        fontSize = 16.sp
+                    )
+                }
+            } else if (state.isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(top = 100.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = KinoYellow)
+                }
+            } else {
 
-            Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
+                state.stats?.let { statsData ->
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                KinoTopListColumn(
-                    title = "Top directors",
-                    items = state.topDirectors,
-                    modifier = Modifier.weight(1f)
-                )
-                KinoTopListColumn(
-                    title = "Top genres",
-                    items = state.topGenres,
-                    modifier = Modifier.weight(1f)
-                )
+                    Text(
+                        text = "Time Watched this Year",
+                        fontSize = 18.sp,
+                        color = KinoWhite.copy(alpha = 0.7f),
+                        modifier = Modifier.padding(bottom = KinoSpacing.small)
+                    )
+
+                    KinoYearlyBarChart(data = statsData.weeklyWatchData, barColor = KinoYellow)
+
+                    Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
+
+                    KinoTimeSummaryRow(label = "Today", value = statsData.todayWatchTime)
+
+                    Spacer(modifier = Modifier.height(KinoSpacing.small))
+
+                    KinoTimeSummaryRow(label = "Last 7 days", value = statsData.last7DaysWatchTime)
+
+                    Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
+
+                    KinoGenreBarChart(genres = statsData.genres, maxMinutes = state.genreMaxMinutes)
+
+                    Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
+
+                    Text("Countries", color = KinoWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+
+                    KinoCountryPieChart(countries = statsData.countries)
+
+                    Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
+
+                    Text("Ratings Distribution", color = KinoWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                    KinoRatingBarChart(ratings = statsData.ratings)
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Text("Movies by Decade", color = KinoWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                    KinoDecadeLineChart(decades = statsData.decades)
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        KinoTopList(
+                            title = "Top Actors",
+                            items = statsData.topActors.sortedByDescending { it.value }.take(5),
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        KinoTopList(
+                            title = "Top Directors",
+                            items = statsData.topActors.sortedByDescending { it.value }.take(5),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                } ?: run {
+                    if (state.errorMsg != null) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = state.errorMsg, color = Color.Red)
+                        }
+                }
+
+                Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
             }
-
-            Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
-
-            Column {
-                Text(
-                    text = "Most viewed film",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = KinoWhite
-                )
-                Text(
-                    text = "${state.mostViewedFilm} - Viewed ${state.mostViewedCount} times",
-                    fontSize = 16.sp,
-                    color = KinoWhite.copy(alpha = 0.7f),
-                    modifier = Modifier.padding(top = KinoSpacing.small)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
         }
+    }
 }
