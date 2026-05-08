@@ -2,7 +2,7 @@ package com.mooncowpines.kinostats.ui.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.mooncowpines.kinostats.data.Movie
+import com.mooncowpines.kinostats.domain.model.Movie
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Column
@@ -15,10 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
-import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import androidx.compose.foundation.Image
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.unit.sp
@@ -27,10 +25,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 
 import com.mooncowpines.kinostats.ui.theme.KinoSpacing
-import com.mooncowpines.kinostats.data.FakeMovieApi
 import com.mooncowpines.kinostats.ui.theme.KinoGray
 import com.mooncowpines.kinostats.ui.theme.KinoLighterGray
 
@@ -78,16 +74,4 @@ fun KinoLastSeenCard(
             }
         }
     }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF121212, widthDp = 150, heightDp = 150, name = "KinoLastSeenCard")
-@Composable
-fun KinoLastSeenCardPreview() {
-
-    val mockMovie = FakeMovieApi.getMovieByIdSync(5) ?: FakeMovieApi.allMoviesSync.first()
-
-    KinoLastSeenCard(
-        movie = mockMovie,
-        onClick = { }
-    )
 }

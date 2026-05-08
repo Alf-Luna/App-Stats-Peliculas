@@ -16,7 +16,9 @@ import com.mooncowpines.kinostats.ui.theme.KinoStatsTheme
 
 import com.mooncowpines.kinostats.navigation.Route
 import com.mooncowpines.kinostats.ui.components.KinoBottomBar
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

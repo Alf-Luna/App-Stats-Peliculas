@@ -1,4 +1,4 @@
-package com.mooncowpines.kinostats.ui.screens.MovieDetail
+package com.mooncowpines.kinostats.ui.screens.movieDetail
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,14 +21,50 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mooncowpines.kinostats.data.Movie
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.mooncowpines.kinostats.domain.model.Movie
 import com.mooncowpines.kinostats.ui.components.KinoFAB
 import com.mooncowpines.kinostats.ui.theme.KinoBlack
+import com.mooncowpines.kinostats.ui.theme.KinoLighterGray
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 
 @Composable
 fun MovieDetailScreen(
+    modifier: Modifier = Modifier,
+    viewModel: MovieDetailViewModel = hiltViewModel(),
+    onNavigateBack: () -> Unit,
+    onNavigateToLog: (Int) -> Unit
+) {
+    val state by viewModel.state.collectAsState()
+
+    when (state) {
+        is MovieDetailState.Loading -> {
+            Box(modifier = modifier.fillMaxSize().background(KinoBlack), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = KinoYellow)
+            }
+        }
+        is MovieDetailState.Error -> {
+            val errorMessage = (state as MovieDetailState.Error).message
+            Box(modifier = modifier.fillMaxSize().background(KinoBlack), contentAlignment = Alignment.Center) {
+                Text(errorMessage, color = Color.Red)
+            }
+        }
+        is MovieDetailState.Success -> {
+            val movie = (state as MovieDetailState.Success).movie
+            MovieDetailContent(
+                movie = movie,
+                onNavigateBack = onNavigateBack,
+                onNavigateToLog = onNavigateToLog,
+                modifier = modifier
+            )
+        }
+    }
+}
+@Composable
+fun MovieDetailContent(
     movie: Movie,
     onNavigateBack: () -> Unit,
     onNavigateToLog: (Int) -> Unit,
@@ -50,13 +86,13 @@ fun MovieDetailScreen(
                 .verticalScroll(scrollState)
                 .padding(paddingValues)
         ) {
-            // --- 1. CABECERA (Banner, Póster y Título) ---
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(280.dp) // Altura total de la sección superior
+                    .height(280.dp)
             ) {
-                // Imagen de Banner
+
                 Image(
                     painter = painterResource(id = movie.posterUrl),
                     contentDescription = "Banner",
@@ -67,7 +103,6 @@ fun MovieDetailScreen(
                         .align(Alignment.TopCenter)
                 )
 
-                // Gradiente para fundir el banner con el fondo oscuro
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -81,7 +116,6 @@ fun MovieDetailScreen(
                         )
                 )
 
-                // Botón de Volver
                 IconButton(
                     onClick = onNavigateBack,
                     modifier = Modifier
@@ -91,7 +125,6 @@ fun MovieDetailScreen(
                     Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = KinoWhite)
                 }
 
-                // Póster y metadatos superpuestos
                 Row(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
@@ -99,7 +132,6 @@ fun MovieDetailScreen(
                         .fillMaxWidth(),
                     verticalAlignment = Alignment.Bottom
                 ) {
-                    // Portada
                     Image(
                         painter = painterResource(id = movie.posterUrl),
                         contentDescription = "Portada",
@@ -112,7 +144,6 @@ fun MovieDetailScreen(
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    // Título, Año y Duración
                     Column(modifier = Modifier.padding(bottom = 8.dp)) {
                         Text(
                             text = movie.title,
@@ -123,17 +154,20 @@ fun MovieDetailScreen(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "${movie.releaseYear}  •  ${movie.duration}",
-                            color = Color.LightGray,
+                            text = "• Release year: ${movie.releaseYear}",
                             fontSize = 14.sp
                         )
+                        Text(
+                            text = "• Total minutes: ${movie.duration}",
+                            fontSize = 14.sp
+                        )
+
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // --- 2. SINOPSIS ---
             /*Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 if (movie.tagLine.isNotEmpty()) {
                     Text(
@@ -157,32 +191,29 @@ fun MovieDetailScreen(
             HorizontalDivider(thickness = 1.dp, color = Color.DarkGray.copy(alpha = 0.5f))
             Spacer(modifier = Modifier.height(16.dp))
 
-            // --- 3. FICHA TÉCNICA ---
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Text(
-                    text = "Ficha Técnica",
+                    text = "Film Data",
                     color = KinoWhite,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Usamos el componente modular DetailRow
                 DetailRow(label = "Director", value = movie.director)
-                DetailRow(label = "País", value = movie.originCountry)
-                DetailRow(label = "Cinematógrafo", value = movie.cinematographer)
-                DetailRow(label = "Productora", value = movie.productionCompany)
-                DetailRow(label = "Géneros", value = movie.genres.joinToString(separator = ", "))
+                DetailRow(label = "Country", value = movie.originCountry)
+                DetailRow(label = "Cinematographer", value = movie.cinematographer)
+                DetailRow(label = "Production company", value = movie.productionCompany)
+                DetailRow(label = "Genres", value = movie.genres.joinToString(separator = ", "))
             }
 
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider(thickness = 1.dp, color = Color.DarkGray.copy(alpha = 0.5f))
             Spacer(modifier = Modifier.height(16.dp))
 
-            // --- 4. REPARTO ---
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Text(
-                    text = "Reparto Principal",
+                    text = "Cast",
                     color = KinoWhite,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -197,20 +228,18 @@ fun MovieDetailScreen(
                 )
             }
 
-            // Espacio final para asegurar que el FAB no tape el texto al scrollear
             Spacer(modifier = Modifier.height(100.dp))
         }
     }
 }
 
-// --- COMPONENTE AUXILIAR PARA LA FICHA TÉCNICA ---
 @Composable
 fun DetailRow(label: String, value: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 12.dp),
-            verticalAlignment = Alignment.Top // Alinea arriba por si el texto ocupa 2 líneas
+            verticalAlignment = Alignment.Top
     ) {
         Text(
             text = label,

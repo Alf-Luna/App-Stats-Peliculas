@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -28,7 +27,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoButton
@@ -40,8 +39,8 @@ import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 
 @Composable
 fun RegisterScreen(
-    viewModel: RegisterScreenViewModel = viewModel(),
     modifier: Modifier = Modifier,
+    viewModel: RegisterScreenViewModel = hiltViewModel(),
     onNavigateToHome: () -> Unit,
     onNavigateBack: () -> Unit
 ){

@@ -12,8 +12,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PieChart
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 
 import com.mooncowpines.kinostats.navigation.Route
@@ -59,16 +57,6 @@ fun KinoBottomBar(currentRoute: String, onNavigate: (String) -> Unit) {
             )
         )
 
-        NavigationBarItem(
-            selected = currentRoute == Route.Test.path,
-            onClick = { onNavigate(Route.Test.path) },
-            icon = { Icon(Icons.Filled.Info, contentDescription = "Test") },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = KinoYellow,
-                unselectedIconColor = Color.DarkGray,
-                indicatorColor = Color.Transparent
-            )
-        )
     }
 }
 

@@ -1,0 +1,87 @@
+package com.mooncowpines.kinostats.ui.components
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import co.yml.charts.axis.AxisData
+import co.yml.charts.common.model.Point
+import co.yml.charts.ui.linechart.LineChart
+import co.yml.charts.ui.linechart.model.IntersectionPoint
+import co.yml.charts.ui.linechart.model.Line
+import co.yml.charts.ui.linechart.model.LineChartData
+import co.yml.charts.ui.linechart.model.LinePlotData
+import co.yml.charts.ui.linechart.model.LineStyle
+import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
+import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
+import co.yml.charts.ui.linechart.model.ShadowUnderLine
+import androidx.compose.ui.graphics.drawscope.Stroke
+import com.mooncowpines.kinostats.domain.model.StatItem
+import com.mooncowpines.kinostats.ui.theme.KinoBlack
+import com.mooncowpines.kinostats.ui.theme.KinoWhite
+import com.mooncowpines.kinostats.ui.theme.KinoYellow
+
+@Composable
+fun KinoDecadeLineChart(decades: List<StatItem<Int, Int>>) {
+    val sortedDecades = decades.sortedBy { it.label }
+
+    val points = sortedDecades.mapIndexed { index, item ->
+        Point(index.toFloat(), item.value.toFloat())
+    }
+
+    val xAxisData = AxisData.Builder()
+        .axisStepSize(100.dp)
+        .steps(points.size - 1)
+        .labelData { i -> sortedDecades[i].label.toString().takeLast(2) + "s" } // Muestra "80s", "90s", etc.
+        .axisLabelColor(KinoWhite)
+        .axisLineColor(Color.DarkGray)
+        .build()
+
+    val maxY = points.maxOfOrNull { it.y } ?: 0f
+    val ySteps = 5
+
+    val yAxisData = AxisData.Builder()
+        .steps(ySteps)
+        .labelAndAxisLinePadding(15.dp)
+        .labelData { i ->
+            val value = (maxY / ySteps) * i
+            value.toInt().toString()
+        }
+        .axisLabelColor(KinoWhite)
+        .axisLineColor(Color.DarkGray)
+        .build()
+
+    val lineChartData = LineChartData(
+        linePlotData = LinePlotData(
+            lines = listOf(
+                Line(
+                    dataPoints = points,
+                    lineStyle = LineStyle(
+                        color = KinoYellow,
+                        style = Stroke(width = 3f)),
+                    intersectionPoint = IntersectionPoint(color = KinoWhite, radius = 4.dp),
+                    selectionHighlightPoint = SelectionHighlightPoint(color = KinoYellow),
+                    shadowUnderLine = ShadowUnderLine(
+                        alpha = 0.3f,
+                        brush = Brush.verticalGradient(
+                            colors = listOf(KinoYellow, Color.Transparent)
+                        )
+                    ),
+                    selectionHighlightPopUp = SelectionHighlightPopUp()
+                )
+            )
+        ),
+        xAxisData = xAxisData,
+        yAxisData = yAxisData,
+        backgroundColor = KinoBlack
+    )
+
+    Column(modifier = Modifier.padding(vertical = 16.dp)) {
+        LineChart(
+            modifier = Modifier.height(400.dp).fillMaxWidth(),
+            lineChartData = lineChartData
+        )
+    }
+}
