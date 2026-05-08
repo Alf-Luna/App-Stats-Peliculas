@@ -33,7 +33,8 @@ import com.mooncowpines.kinostats.ui.components.KinoSearchBar
 fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
-    onMovieClick: (Int) -> Unit
+    onMovieClick: (Int) -> Unit,
+    onSearchSubmit: (String) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -55,7 +56,8 @@ fun HomeScreen(
                 movies = successState.movies,
                 movie = successState.lastSeenMovie,
                 onMovieClick = onMovieClick,
-                modifier = modifier
+                modifier = modifier,
+                onSearchSubmit = onSearchSubmit
             )
         }
     }
@@ -67,7 +69,8 @@ fun HomeContent(
     movies: List<Movie>,
     movie: Movie,
     onMovieClick: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSearchSubmit: (String) -> Unit,
 ) {
 
     val scrollState = rememberScrollState()
@@ -85,6 +88,7 @@ fun HomeContent(
         KinoSearchBar(
             query = searchQuery,
             onQueryChange = { searchQuery = it },
+            onSearchSubmit = { onSearchSubmit(searchQuery) },
             modifier = Modifier.padding(horizontal = KinoSpacing.medium)
         )
 

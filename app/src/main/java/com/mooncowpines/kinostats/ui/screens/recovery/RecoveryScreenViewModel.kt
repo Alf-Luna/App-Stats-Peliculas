@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RecoveryScreenViewModel @Inject constructor(
-    private val authRepository: AuthRepository // Inyectamos la dependencia
+    private val authRepository: AuthRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(RecoveryScreenState())
     val state: StateFlow<RecoveryScreenState> = _state.asStateFlow()

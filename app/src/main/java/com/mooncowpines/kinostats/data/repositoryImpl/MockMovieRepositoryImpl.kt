@@ -278,4 +278,14 @@ class MockMovieRepositoryImpl : MovieRepository {
         delay(1500)
         return mockMovieDatabase.find { it.id == id }
     }
+
+    override suspend fun searchMovies(query: String): List<Movie> {
+        delay(1000)
+
+        val results = mockMovieDatabase.filter { movie ->
+            movie.title.contains(query, ignoreCase = true)
+        }
+
+        return results.take(15)
+    }
 }

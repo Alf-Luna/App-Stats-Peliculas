@@ -18,6 +18,7 @@ import com.mooncowpines.kinostats.ui.screens.change.ChangeScreen
 import com.mooncowpines.kinostats.ui.screens.review.ReviewScreen
 import com.mooncowpines.kinostats.ui.screens.stats.StatsScreen
 import com.mooncowpines.kinostats.ui.screens.movieDetail.MovieDetailScreen
+import com.mooncowpines.kinostats.ui.screens.search.SearchScreen
 
 
 @Composable
@@ -85,6 +86,9 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
             HomeScreen(
                 onMovieClick = { movieId ->
                     navController.navigate(Route.MovieDetail.createRoute(movieId))
+                },
+                onSearchSubmit = { query ->
+                    navController.navigate(Route.Search.createRoute(query))
                 }
             )
         }
@@ -132,5 +136,21 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
 
                 )
             }
+
+        composable(
+            route = Route.Search.path,
+            arguments = listOf(navArgument("query") { type = NavType.StringType })
+        ) {
+            SearchScreen(
+                onMovieClick = { movieId ->
+                    navController.navigate(Route.MovieDetail.createRoute(movieId))
+                },
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+
         }
     }

@@ -27,6 +27,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.mooncowpines.kinostats.domain.model.Movie
 import com.mooncowpines.kinostats.ui.components.KinoFAB
 import com.mooncowpines.kinostats.ui.theme.KinoBlack
+import com.mooncowpines.kinostats.ui.theme.KinoLighterGray
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 
@@ -153,10 +154,14 @@ fun MovieDetailContent(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "${movie.releaseYear}  •  ${movie.duration}",
-                            color = Color.LightGray,
+                            text = "• Release year: ${movie.releaseYear}",
                             fontSize = 14.sp
                         )
+                        Text(
+                            text = "• Total minutes: ${movie.duration}",
+                            fontSize = 14.sp
+                        )
+
                     }
                 }
             }
@@ -188,7 +193,7 @@ fun MovieDetailContent(
 
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Text(
-                    text = "Ficha Técnica",
+                    text = "Film Data",
                     color = KinoWhite,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -196,10 +201,10 @@ fun MovieDetailContent(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 DetailRow(label = "Director", value = movie.director)
-                DetailRow(label = "País", value = movie.originCountry)
-                DetailRow(label = "Cinematógrafo", value = movie.cinematographer)
-                DetailRow(label = "Productora", value = movie.productionCompany)
-                DetailRow(label = "Géneros", value = movie.genres.joinToString(separator = ", "))
+                DetailRow(label = "Country", value = movie.originCountry)
+                DetailRow(label = "Cinematographer", value = movie.cinematographer)
+                DetailRow(label = "Production company", value = movie.productionCompany)
+                DetailRow(label = "Genres", value = movie.genres.joinToString(separator = ", "))
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -208,7 +213,7 @@ fun MovieDetailContent(
 
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Text(
-                    text = "Reparto Principal",
+                    text = "Cast",
                     color = KinoWhite,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
