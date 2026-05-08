@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
@@ -38,7 +39,7 @@ import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 @Composable
 fun ChangeScreen(
     modifier: Modifier = Modifier,
-    viewModel: ChangeScreenViewModel = viewModel(),
+    viewModel: ChangeScreenViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
     onNavigateToHome: () -> Unit
 ) {

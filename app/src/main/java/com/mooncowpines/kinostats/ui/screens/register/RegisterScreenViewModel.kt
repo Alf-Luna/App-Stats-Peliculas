@@ -8,10 +8,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-import com.mooncowpines.kinostats.data.FakeAuthApi
+import com.mooncowpines.kinostats.domain.repository.AuthRepository
 import com.mooncowpines.kinostats.utils.*
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class RegisterScreenViewModel : ViewModel(){
+@HiltViewModel
+class RegisterScreenViewModel @Inject constructor(
+    private val authRepository: AuthRepository
+) : ViewModel() {
     private val _state = MutableStateFlow(RegisterScreenState())
     val state: StateFlow<RegisterScreenState> = _state.asStateFlow()
 
@@ -56,10 +61,10 @@ class RegisterScreenViewModel : ViewModel(){
         viewModelScope.launch {
             _state.update { it.copy(isSubmitting = true, errorMsg = null, emailError = null, userNameError = null) }
 
-            val isSuccess = FakeAuthApi.registerUser(
-                newUserName = currentState.userName,
-                newEmail = currentState.email,
-                newPass = currentState.pass
+            val isSuccess = authRepository.register(
+                userName = currentState.userName,
+                email = currentState.email,
+                pass = currentState.pass
             )
 
             if (isSuccess) {

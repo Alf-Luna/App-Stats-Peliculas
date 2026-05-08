@@ -2,7 +2,6 @@ package com.mooncowpines.kinostats.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -21,7 +20,7 @@ import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
 
 @Composable
-fun KinoWeeklyBarChart(
+fun KinoYearlyBarChart(
     data: List<Pair<String, Float>>,
     barColor: Color,
     modifier: Modifier = Modifier

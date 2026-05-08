@@ -9,12 +9,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-import com.mooncowpines.kinostats.data.FakeAuthApi
-import com.mooncowpines.kinostats.data.MockSession
+import com.mooncowpines.kinostats.domain.repository.AuthRepository
 import com.mooncowpines.kinostats.utils.getEmailError
-import com.mooncowpines.kinostats.utils.*
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class LoginScreenViewModel : ViewModel(){
+@HiltViewModel
+class LoginScreenViewModel @Inject constructor(
+    private val authRepository: AuthRepository
+) : ViewModel(){
     private val _state = MutableStateFlow(LoginScreenState())
     val state: StateFlow<LoginScreenState> = _state.asStateFlow()
 
@@ -44,13 +47,12 @@ class LoginScreenViewModel : ViewModel(){
         viewModelScope.launch {
             _state.update { it.copy(isSubmitting = true, errorMsg = null) }
 
-            val loggedUser = FakeAuthApi.authenticate(
+            val isSuccess = authRepository.login(
                 email = currentState.email,
                 pass = currentState.pass
             )
 
-            if (loggedUser != null) {
-                MockSession.currentUserId = loggedUser.id
+            if (isSuccess) {
                 _state.update { it.copy(isSubmitting = false, success = true) }
             } else {
                 _state.update {
@@ -68,24 +70,15 @@ class LoginScreenViewModel : ViewModel(){
         val currentState = _state.value
         if (currentState.isSubmitting) return
 
-        //Tries to log in as admin, doesn't do a lot of validations
         viewModelScope.launch {
+            _state.update { it.copy(isSubmitting = true) }
 
-            val loggedAdmin = FakeAuthApi.authenticateAdmin()
+            val isSuccess = authRepository.adminLogin("kinoadmin2026")
 
-            if (loggedAdmin != null) {
-                MockSession.currentUserId = loggedAdmin.id
-                Log.d("Session User", "The current logged user is: ${MockSession.currentUserId}")
-                _state.update {
-                    it.copy(isSubmitting = false, success = true)
-                }
+            if (isSuccess) {
+                _state.update { it.copy(isSubmitting = false, success = true) }
             } else {
-                _state.update {
-                    it.copy(
-                        isSubmitting = false,
-                        errorMsg = "There was a problem login in as admin"
-                    )
-                }
+                _state.update { it.copy(isSubmitting = false, errorMsg = "Admin login failed") }
             }
         }
     }

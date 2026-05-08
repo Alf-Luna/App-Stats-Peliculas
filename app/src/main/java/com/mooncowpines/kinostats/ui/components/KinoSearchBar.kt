@@ -18,6 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
 import com.mooncowpines.kinostats.ui.theme.KinoBlack
 import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
@@ -26,7 +29,9 @@ import com.mooncowpines.kinostats.ui.theme.KinoYellow
 fun KinoSearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    onSearchSubmit: (String) -> Unit,
+    modifier: Modifier = Modifier,
+
 ) {
     Surface(
         modifier = modifier
@@ -47,6 +52,14 @@ fun KinoSearchBar(
                 onValueChange = onQueryChange,
                 modifier = Modifier.weight(1f),
                 singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(
+                    onSearch = {
+                        if (query.isNotBlank()) {
+                            onSearchSubmit(query)
+                        }
+                    }
+                ),
                 textStyle = TextStyle(
                     color = KinoBlack,
                     fontSize = 16.sp
