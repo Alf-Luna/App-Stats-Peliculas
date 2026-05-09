@@ -51,6 +51,10 @@ fun LoginScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.testApiEndpoint()
+    }
+
     LaunchedEffect(state.success) {
         if (state.success) {
             onNavigateToHome()

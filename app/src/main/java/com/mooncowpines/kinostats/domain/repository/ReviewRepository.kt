@@ -4,10 +4,10 @@ import com.mooncowpines.kinostats.domain.model.Review
 import java.time.LocalDate
 
 interface ReviewRepository {
-    suspend fun getReviewsForMovie(movieId: Int) :List<Review>
+    suspend fun getReviewsForMovie(movieId: Long) :List<Review>
     suspend fun saveReview(
-        newMovieId: Int,
-        newUserId: Int?,
+        newMovieId: Long,
+        newUserId: Long?,
         newRating: Float,
         newWatchDate: LocalDate?,
         newReviewText: String

@@ -41,7 +41,7 @@ import com.mooncowpines.kinostats.ui.theme.KinoWhite
 fun StatsScreen(
     modifier: Modifier = Modifier,
     viewModel: StatsScreenViewModel = hiltViewModel(),
-    onMovieClick: (Int) -> Unit
+    onMovieClick: (Long) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -56,7 +56,7 @@ fun StatsScreen(
 @Composable
 fun StatsContent(
     state: StatsScreenState,
-    onMovieClick: (Int) -> Unit,
+    onMovieClick: (Long) -> Unit,
     onFilterChange: (Int?, Int?) -> Unit,
     modifier: Modifier = Modifier
 ) {

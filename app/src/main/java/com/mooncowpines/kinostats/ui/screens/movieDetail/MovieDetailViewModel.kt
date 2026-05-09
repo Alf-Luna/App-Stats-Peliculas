@@ -20,7 +20,7 @@ class MovieDetailViewModel @Inject constructor(
     private val _state = MutableStateFlow<MovieDetailState>(MovieDetailState.Loading)
     val state: StateFlow<MovieDetailState> = _state.asStateFlow()
 
-    private val movieId: Int = checkNotNull(savedStateHandle["movieId"])
+    private val movieId: Long = checkNotNull(savedStateHandle["movieId"])
 
     init {
         loadMovie()

@@ -1,6 +1,9 @@
 package com.mooncowpines.kinostats.di
 
-import com.mooncowpines.kinostats.data.remote.KinoStatsApi
+import com.mooncowpines.kinostats.data.remote.AuthApi
+import com.mooncowpines.kinostats.data.remote.MovieApi
+import com.mooncowpines.kinostats.data.remote.ReviewApi
+import com.mooncowpines.kinostats.data.remote.StatsApi
 import com.mooncowpines.kinostats.data.repositoryImpl.AuthRepositoryImpl
 import com.mooncowpines.kinostats.data.repositoryImpl.MockAuthRepositoryImpl
 import com.mooncowpines.kinostats.data.repositoryImpl.MockMovieRepositoryImpl
@@ -25,27 +28,48 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    private const val USE_MOCKS = true
+    private const val USE_MOCKS_USERS = false
+    private const val USE_MOCKS_MOVIES = true
+    private const val USE_MOCKS_REVIEWS = true
+    private const val USE_MOCKS_STATS = true
 
     @Provides
     @Singleton
     fun provideRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://10.0.2.2:8080/api/v1")
+            .baseUrl("http://10.0.2.2:8080")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
 
     @Provides
     @Singleton
-    fun provideKinoStatsApi(retrofit: Retrofit): KinoStatsApi {
-        return retrofit.create(KinoStatsApi::class.java)
+    fun provideAuthApi(retrofit: Retrofit): AuthApi {
+        return retrofit.create(AuthApi::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideAuthRepository(api: KinoStatsApi): AuthRepository {
-        return if (USE_MOCKS) {
+    fun provideMovieApi(retrofit: Retrofit): MovieApi {
+        return retrofit.create(MovieApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideReviewApi(retrofit: Retrofit): ReviewApi {
+        return retrofit.create(ReviewApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideStatsApi(retrofit: Retrofit): StatsApi {
+        return retrofit.create(StatsApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthRepository(api: AuthApi): AuthRepository {
+        return if (USE_MOCKS_USERS) {
             MockAuthRepositoryImpl()
         } else {
             AuthRepositoryImpl(api)
@@ -55,8 +79,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideMovieRepository(api: KinoStatsApi): MovieRepository {
-        return if (USE_MOCKS) {
+    fun provideMovieRepository(api: MovieApi): MovieRepository {
+        return if (USE_MOCKS_MOVIES) {
             MockMovieRepositoryImpl()
         } else {
             MovieRepositoryImpl(api)
@@ -65,8 +89,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideReviewRepository(api: KinoStatsApi): ReviewRepository {
-        return if (USE_MOCKS)
+    fun provideReviewRepository(api: ReviewApi): ReviewRepository {
+        return if (USE_MOCKS_REVIEWS)
         {
             MockReviewRepositoryImpl()
         } else {
@@ -76,8 +100,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideStatsRepository(api: KinoStatsApi): StatsRepository {
-        return if (USE_MOCKS)
+    fun provideStatsRepository(api: StatsApi): StatsRepository {
+        return if (USE_MOCKS_STATS)
         {
             MockStatsRepositoryImpl()
         } else {

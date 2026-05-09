@@ -1,7 +1,7 @@
 package com.mooncowpines.kinostats.domain.model
 
 data class Movie(
-    val id: Int,
+    val id: Long,
     val title: String,
     val releaseYear: String,
     val originCountry: String,

@@ -28,7 +28,7 @@ import com.mooncowpines.kinostats.ui.theme.KinoYellow
 
 @Composable
 fun SearchScreen(
-    onMovieClick: (Int) -> Unit,
+    onMovieClick: (Long) -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SearchScreenViewModel = hiltViewModel()
@@ -48,7 +48,7 @@ fun SearchScreen(
 @Composable
 fun SearchContent(
     state: SearchScreenState,
-    onMovieClick: (Int) -> Unit,
+    onMovieClick: (Long) -> Unit,
     onBackClick: () -> Unit,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -137,7 +137,7 @@ fun SearchContent(
                         items(state.results) { movie ->
                             KinoLastSeenCard(
                                 movie = movie,
-                                onClick = { onMovieClick(movie.id) } // O el ID que maneje tu app
+                                onClick = { onMovieClick(movie.id) }
                             )
                         }
                     }

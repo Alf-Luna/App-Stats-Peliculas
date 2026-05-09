@@ -274,7 +274,7 @@ class MockMovieRepositoryImpl : MovieRepository {
         return mockMovieDatabase
     }
 
-    override suspend fun getMovieById(id: Int): Movie? {
+    override suspend fun getMovieById(id: Long): Movie? {
         delay(1500)
         return mockMovieDatabase.find { it.id == id }
     }

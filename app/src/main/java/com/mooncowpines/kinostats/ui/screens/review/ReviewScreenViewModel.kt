@@ -29,7 +29,7 @@ class ReviewScreenViewModel @Inject constructor(
     private val _state = MutableStateFlow(ReviewScreenState())
     val state: StateFlow<ReviewScreenState> = _state.asStateFlow()
 
-    private val movieId: Int = checkNotNull(savedStateHandle["movieId"])
+    private val movieId: Long = checkNotNull(savedStateHandle["movieId"])
 
     init {
         loadMovie()

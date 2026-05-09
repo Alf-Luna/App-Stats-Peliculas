@@ -29,6 +29,23 @@ class LoginScreenViewModel @Inject constructor(
         _state.update { it.copy(pass = newPass, errorMsg = null) }
     }
 
+    fun testApiEndpoint() {
+        viewModelScope.launch {
+            Log.d("API_TEST", "Iniciando llamada al backend...")
+            try {
+                val user = authRepository.getUserById(1)
+
+                if (user != null) {
+                    Log.d("API_TEST", "✅ ÉXITO: Usuario recibido -> ${user.userName} | ${user.email}")
+                } else {
+                    Log.w("API_TEST", "⚠️ AVISO: El backend respondió pero el usuario no existe (404)")
+                }
+            } catch (e: Exception) {
+                Log.e("API_TEST", "❌ ERROR: Falló la comunicación con la API", e)
+            }
+        }
+    }
+
     //Triggers a login attempt
     fun login() {
         val currentState = _state.value

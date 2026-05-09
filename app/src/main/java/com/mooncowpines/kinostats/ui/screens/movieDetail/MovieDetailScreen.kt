@@ -36,7 +36,7 @@ fun MovieDetailScreen(
     modifier: Modifier = Modifier,
     viewModel: MovieDetailViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
-    onNavigateToLog: (Int) -> Unit
+    onNavigateToLog: (Long) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -67,7 +67,7 @@ fun MovieDetailScreen(
 fun MovieDetailContent(
     movie: Movie,
     onNavigateBack: () -> Unit,
-    onNavigateToLog: (Int) -> Unit,
+    onNavigateToLog: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()

@@ -6,7 +6,7 @@ import com.mooncowpines.kinostats.domain.repository.StatsRepository
 import kotlinx.coroutines.delay
 
 class MockStatsRepositoryImpl : StatsRepository {
-    override suspend fun getUserStats(userId: Int, year: Int?, month: Int?): UserStats {
+    override suspend fun getUserStats(userId: Long, year: Int?, month: Int?): UserStats {
         delay(1500)
 
         return UserStats(

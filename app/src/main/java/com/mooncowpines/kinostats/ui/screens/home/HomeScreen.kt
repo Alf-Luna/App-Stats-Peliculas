@@ -33,7 +33,7 @@ import com.mooncowpines.kinostats.ui.components.KinoSearchBar
 fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
-    onMovieClick: (Int) -> Unit,
+    onMovieClick: (Long) -> Unit,
     onSearchSubmit: (String) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
@@ -68,7 +68,7 @@ fun HomeScreen(
 fun HomeContent(
     movies: List<Movie>,
     movie: Movie,
-    onMovieClick: (Int) -> Unit,
+    onMovieClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     onSearchSubmit: (String) -> Unit,
 ) {
@@ -110,7 +110,7 @@ fun HomeContent(
 fun WatchlistSection(
     modifier: Modifier = Modifier,
     movies: List<Movie>,
-    onMovieClick: (Int) -> Unit
+    onMovieClick: (Long) -> Unit
 ) {
     Column {
         Text(
@@ -149,7 +149,7 @@ fun WatchlistSection(
 fun LastSeenSection(
     modifier: Modifier = Modifier,
     movie: Movie,
-    onMovieClick: (Int) -> Unit
+    onMovieClick: (Long) -> Unit
 ) {
     Column {
         Text(
@@ -185,7 +185,7 @@ fun LastSeenSection(
 fun JustWatchedSection(
     modifier: Modifier = Modifier,
     movies: List<Movie>,
-    onMovieClick: (Int) -> Unit
+    onMovieClick: (Long) -> Unit
 ) {
     Column {
         Text(

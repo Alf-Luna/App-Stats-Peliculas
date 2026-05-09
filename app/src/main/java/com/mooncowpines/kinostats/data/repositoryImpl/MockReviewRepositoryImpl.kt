@@ -34,14 +34,14 @@ class MockReviewRepositoryImpl : ReviewRepository {
         )
     )
 
-    override suspend fun getReviewsForMovie(movieId: Int): List<Review> {
+    override suspend fun getReviewsForMovie(movieId: Long): List<Review> {
         delay(1500)
         return mockReviews.filter { it.movieId == movieId }
     }
 
     override suspend fun saveReview(
-        newMovieId: Int,
-        newUserId: Int?,
+        newMovieId: Long,
+        newUserId: Long?,
         newRating: Float,
         newWatchDate: LocalDate?,
         newReviewText: String) : Boolean {

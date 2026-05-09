@@ -33,7 +33,7 @@ import com.mooncowpines.kinostats.ui.theme.KinoLighterGray
 @Composable
 fun KinoLastSeenCard(
     movie: Movie,
-    onClick: (Int) -> Unit,
+    onClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card (modifier = modifier

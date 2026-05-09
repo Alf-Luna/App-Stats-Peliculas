@@ -19,7 +19,7 @@ import com.mooncowpines.kinostats.domain.model.Movie
 @Composable
 fun KinoPosterCard(
     movie: Movie,
-    onClick: (Int) -> Unit,
+    onClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(modifier = modifier

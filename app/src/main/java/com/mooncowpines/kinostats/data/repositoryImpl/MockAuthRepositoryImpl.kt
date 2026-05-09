@@ -34,7 +34,7 @@ class MockAuthRepositoryImpl : AuthRepository {
         )
     )
 
-    private var currentLoggedUserId: Int? = null
+    private var currentLoggedUserId: Long? = null
 
     override suspend fun login(email: String, pass: String): Boolean {
         delay(1500)
@@ -97,7 +97,7 @@ class MockAuthRepositoryImpl : AuthRepository {
         return false
     }
 
-    override suspend fun getUserById(userId: Int): User? {
+    override suspend fun getUserById(userId: Long): User? {
         delay(1500)
         return mockUsers.find { it.id == userId }
     }
