@@ -10,7 +10,7 @@ class StatsRepositoryImpl @Inject constructor(
     private val api : StatsApi
 ) : StatsRepository {
 
-    override suspend fun getUserStats(userId: Long, year: Int?, month: Int?): UserStats {
+    override suspend fun getUserStats(userId: Long?, year: Int?, month: Int?): UserStats {
         TODO("Not developed yet")
     }
 }

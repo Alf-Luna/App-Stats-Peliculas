@@ -1,5 +1,6 @@
 package com.mooncowpines.kinostats.di
 
+import com.mooncowpines.kinostats.data.local.SessionManager
 import com.mooncowpines.kinostats.data.remote.AuthApi
 import com.mooncowpines.kinostats.data.remote.MovieApi
 import com.mooncowpines.kinostats.data.remote.ReviewApi
@@ -20,6 +21,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -35,9 +38,32 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(): Retrofit {
+    fun provideAuthInterceptor(sessionManager: SessionManager): Interceptor {
+        return Interceptor { chain ->
+            val requestBuilder = chain.request().newBuilder()
+
+            sessionManager.fetchAuthToken()?.let { token ->
+                requestBuilder.addHeader("Authorization", token)
+            }
+
+            chain.proceed(requestBuilder.build())
+        }
+    }
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(authInterceptor: Interceptor): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080")
+            .baseUrl("http://10.0.2.2:8080/")
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -68,11 +94,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(api: AuthApi): AuthRepository {
+    fun provideAuthRepository(api: AuthApi, sessionManager: SessionManager): AuthRepository {
         return if (USE_MOCKS_USERS) {
             MockAuthRepositoryImpl()
         } else {
-            AuthRepositoryImpl(api)
+            AuthRepositoryImpl(api, sessionManager)
         }
     }
 

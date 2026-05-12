@@ -46,15 +46,6 @@ class MockAuthRepositoryImpl : AuthRepository {
         return false
     }
 
-    override suspend fun adminLogin(pass: String): Boolean {
-        delay(1500)
-        if (pass == "kinoadmin2026") {
-            currentLoggedUserId = 777
-            return true
-        }
-        return false
-    }
-
     override suspend fun logout() {
         delay(500)
         currentLoggedUserId = null
@@ -65,16 +56,7 @@ class MockAuthRepositoryImpl : AuthRepository {
     }
 
     override suspend fun register(newUserName: String, newEmail: String, newPass: String): Boolean {
-        delay(1500)
 
-        val emailExists = mockUsers.any { it.email == newEmail }
-        if (emailExists) {
-            return false
-        }
-
-        val newId = if (mockUsers.isEmpty()) 1 else mockUsers.maxOf { it.id } + 1
-        val newUser = User(id = newId, userName = newUserName, email = newEmail, pass = newPass)
-        mockUsers.add(newUser)
 
         return true
     }

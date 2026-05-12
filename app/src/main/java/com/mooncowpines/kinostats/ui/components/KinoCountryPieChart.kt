@@ -17,7 +17,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import co.yml.charts.ui.piechart.charts.PieChart
 import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
@@ -29,6 +31,7 @@ import com.mooncowpines.kinostats.ui.theme.KinoWhite
 
 @Composable
 fun KinoCountryPieChart(countries: List<StatItem<String, Int>>) {
+    Text("Countries", color = KinoWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp)
     val dynamicColors = countries.mapIndexed { index, _ ->
         val hue = (360f / countries.size) * index
         Color.hsv(hue = hue, saturation = 0.6f, value = 0.9f)

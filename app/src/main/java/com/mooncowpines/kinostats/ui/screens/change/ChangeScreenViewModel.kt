@@ -60,8 +60,8 @@ class ChangeScreenViewModel @Inject constructor(
             _state.update { it.copy(isSubmitting = true, errorMsg = null) }
 
             val isSuccess = authRepository.changePassword(
-                pass = currentState.newPass,
-                passCheck = currentState.newPassCheck
+                newPass = currentState.newPass,
+                newPassCheck = currentState.newPassCheck
             )
 
             if (isSuccess) {

@@ -6,20 +6,18 @@ import com.mooncowpines.kinostats.domain.repository.StatsRepository
 import kotlinx.coroutines.delay
 
 class MockStatsRepositoryImpl : StatsRepository {
-    override suspend fun getUserStats(userId: Long, year: Int?, month: Int?): UserStats {
+    override suspend fun getUserStats(userId: Long?, year: Int?, month: Int?): UserStats {
         delay(1500)
 
         return UserStats(
-            weeklyWatchData = listOf(
+            yearlyWatchData = listOf(
                 "Jan" to 6f, "Feb" to 3f, "Mar" to 5f, "Apr" to 2f,
                 "May" to 4f, "Jun" to 1f, "Jul" to 8f, "Aug" to 0.5f,
                 "Sep" to 8f, "Oct" to 3f, "Nov" to 4f, "Dec" to 6f
             ),
-            todayWatchTime = "30 min",
-            last7DaysWatchTime = "8 hrs 39 min",
 
             genres = listOf(
-                StatItem("Drama", 120),
+                StatItem("Drama", 23),
                 StatItem("Romance", 100),
                 StatItem("Comedy", 95),
                 StatItem("Sci-Fi", 80),
@@ -92,7 +90,7 @@ class MockStatsRepositoryImpl : StatsRepository {
                 StatItem(1.75f, 2), StatItem(2.0f, 5), StatItem(2.25f, 4),
                 StatItem(2.5f, 8), StatItem(2.75f, 6), StatItem(3.0f, 12),
                 StatItem(3.25f, 10), StatItem(3.5f, 18), StatItem(3.75f, 15),
-                StatItem(4.0f, 25), StatItem(4.25f, 20), StatItem(4.5f, 14),
+                StatItem(4.0f, 50), StatItem(4.25f, 20), StatItem(4.5f, 14),
                 StatItem(4.75f, 8), StatItem(5.0f, 12)
             ),
 

@@ -77,7 +77,6 @@ fun LoginScreen(
             onRecoveryClick = onNavigateToRecover,
             onChangeClick = onNavigateToReset,
             onRegisterClick = onNavigateToRegister,
-            onAdminClick = { viewModel.adminLogin() }
         )
     }
 }
@@ -95,7 +94,6 @@ fun Login(
     onRecoveryClick: () -> Unit,
     onChangeClick: () -> Unit,
     onRegisterClick: () -> Unit,
-    onAdminClick: () -> Unit
 ) {
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()),
@@ -195,19 +193,6 @@ fun Login(
                     enabled = !isSubmitting)
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(KinoSpacing.mediumSmall)) {
-                KinoButton(
-                    text = "Test",
-                    onClick = onChangeClick,
-                    modifier = Modifier.weight(1f),
-                    enabled = !isSubmitting)
-
-                KinoButton(
-                    text = "Admin",
-                    onClick = onAdminClick,
-                    modifier = Modifier.weight(1f),
-                    enabled = !isSubmitting)
-            }
         }
     }
 }

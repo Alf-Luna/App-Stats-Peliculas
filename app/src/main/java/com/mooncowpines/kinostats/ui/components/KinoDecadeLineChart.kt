@@ -6,6 +6,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.rotate
 import co.yml.charts.axis.AxisData
 import co.yml.charts.common.model.Point
 import co.yml.charts.ui.linechart.LineChart
@@ -18,6 +21,8 @@ import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
 import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
 import co.yml.charts.ui.linechart.model.ShadowUnderLine
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.mooncowpines.kinostats.domain.model.StatItem
 import com.mooncowpines.kinostats.ui.theme.KinoBlack
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
@@ -25,6 +30,7 @@ import com.mooncowpines.kinostats.ui.theme.KinoYellow
 
 @Composable
 fun KinoDecadeLineChart(decades: List<StatItem<Int, Int>>) {
+    Text("Movies By Decade", color = KinoWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp)
     val sortedDecades = decades.sortedBy { it.label }
 
     val points = sortedDecades.mapIndexed { index, item ->
@@ -78,10 +84,39 @@ fun KinoDecadeLineChart(decades: List<StatItem<Int, Int>>) {
         backgroundColor = KinoBlack
     )
 
-    Column(modifier = Modifier.padding(vertical = 16.dp)) {
-        LineChart(
-            modifier = Modifier.height(400.dp).fillMaxWidth(),
-            lineChartData = lineChartData
-        )
-    }
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier.width(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Movies Count",
+                    color = KinoWhite.copy(alpha = 0.5f),
+                    fontSize = 12.sp,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .rotate(-90f)
+                        .requiredWidth(120.dp)
+                )
+            }
+            LineChart(
+                modifier = Modifier.height(400.dp).fillMaxWidth(),
+                lineChartData = lineChartData
+            )
+        }
+
+        Text(
+            text = "Decades",
+            color = KinoWhite.copy(alpha = 0.5f),
+            fontSize = 12.sp,
+            modifier = Modifier.padding(top = 4.dp)
+        ) }
 }
