@@ -15,6 +15,8 @@ import com.mooncowpines.kinostats.ui.screens.recovery.RecoveryScreen
 import com.mooncowpines.kinostats.ui.screens.reset.ResetScreen
 import com.mooncowpines.kinostats.ui.screens.profile.ProfileScreen
 import com.mooncowpines.kinostats.ui.screens.change.ChangeScreen
+import com.mooncowpines.kinostats.ui.screens.listDetail.ListDetailScreen
+import com.mooncowpines.kinostats.ui.screens.lists.ListsScreen
 import com.mooncowpines.kinostats.ui.screens.review.ReviewScreen
 import com.mooncowpines.kinostats.ui.screens.stats.StatsScreen
 import com.mooncowpines.kinostats.ui.screens.movieDetail.MovieDetailScreen
@@ -147,6 +149,26 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
                 },
                 onBackClick = {
                     navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Route.Lists.path) {
+            ListsScreen(
+                onNavigateToListDetail = { listId ->
+                    navController.navigate(Route.ListDetail.createRoute(listId))
+                }
+            )
+        }
+
+        composable(
+            route = Route.ListDetail.path,
+            arguments = listOf(navArgument("listId") { type = NavType.LongType })
+        ) {
+            ListDetailScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onMovieClick = { movieId ->
+                    navController.navigate(Route.MovieDetail.createRoute(movieId))
                 }
             )
         }

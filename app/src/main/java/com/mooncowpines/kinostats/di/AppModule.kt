@@ -2,10 +2,12 @@ package com.mooncowpines.kinostats.di
 
 import com.mooncowpines.kinostats.data.local.SessionManager
 import com.mooncowpines.kinostats.data.remote.AuthApi
+import com.mooncowpines.kinostats.data.remote.ListApi
 import com.mooncowpines.kinostats.data.remote.MovieApi
 import com.mooncowpines.kinostats.data.remote.ReviewApi
 import com.mooncowpines.kinostats.data.remote.StatsApi
 import com.mooncowpines.kinostats.data.repositoryImpl.AuthRepositoryImpl
+import com.mooncowpines.kinostats.data.repositoryImpl.ListRepositoryImpl
 import com.mooncowpines.kinostats.data.repositoryImpl.MockAuthRepositoryImpl
 import com.mooncowpines.kinostats.data.repositoryImpl.MockMovieRepositoryImpl
 import com.mooncowpines.kinostats.data.repositoryImpl.MockReviewRepositoryImpl
@@ -14,6 +16,7 @@ import com.mooncowpines.kinostats.data.repositoryImpl.MovieRepositoryImpl
 import com.mooncowpines.kinostats.data.repositoryImpl.ReviewRepositoryImpl
 import com.mooncowpines.kinostats.data.repositoryImpl.StatsRepositoryImpl
 import com.mooncowpines.kinostats.domain.repository.AuthRepository
+import com.mooncowpines.kinostats.domain.repository.ListRepository
 import com.mooncowpines.kinostats.domain.repository.MovieRepository
 import com.mooncowpines.kinostats.domain.repository.ReviewRepository
 import com.mooncowpines.kinostats.domain.repository.StatsRepository
@@ -94,6 +97,12 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideListApi(retrofit: Retrofit): ListApi {
+        return retrofit.create(ListApi::class.java)
+    }
+
+    @Provides
+    @Singleton
     fun provideAuthRepository(api: AuthApi, sessionManager: SessionManager): AuthRepository {
         return if (USE_MOCKS_USERS) {
             MockAuthRepositoryImpl()
@@ -133,5 +142,11 @@ object AppModule {
         } else {
             StatsRepositoryImpl(api)
         }
+    }
+
+    @Provides
+    @Singleton
+    fun provideListRepository(api: ListApi): ListRepository {
+        return ListRepositoryImpl(api)
     }
 }

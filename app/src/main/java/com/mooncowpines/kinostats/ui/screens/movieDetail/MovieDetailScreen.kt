@@ -1,5 +1,6 @@
 package com.mooncowpines.kinostats.ui.screens.movieDetail
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,9 +25,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mooncowpines.kinostats.domain.model.Movie
+import com.mooncowpines.kinostats.domain.model.MovieList
 import com.mooncowpines.kinostats.ui.components.KinoFAB
+import com.mooncowpines.kinostats.ui.components.KinoListSelectionSheet
 import com.mooncowpines.kinostats.ui.theme.KinoBlack
 import com.mooncowpines.kinostats.ui.theme.KinoLighterGray
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
@@ -53,11 +58,17 @@ fun MovieDetailScreen(
             }
         }
         is MovieDetailState.Success -> {
-            val movie = (state as MovieDetailState.Success).movie
+            val successState = state as MovieDetailState.Success
             MovieDetailContent(
-                movie = movie,
+                successState = successState,
                 onNavigateBack = onNavigateBack,
                 onNavigateToLog = onNavigateToLog,
+                onToggleFabMenu = { viewModel.toggleFabMenu() },
+                onDismissFabMenu = { viewModel.dismissFabMenu() },
+                onOpenListSheet = { viewModel.onOpenListSheet() },
+                onDismissListSheet = { viewModel.dismissListSheet() },
+                onAddFilmToList = { list -> viewModel.addFilmToList(list) },
+                onClearListMessage = { viewModel.clearListMessage() },
                 modifier = modifier
             )
         }
@@ -65,18 +76,53 @@ fun MovieDetailScreen(
 }
 @Composable
 fun MovieDetailContent(
-    movie: Movie,
+    successState: MovieDetailState.Success,
     onNavigateBack: () -> Unit,
     onNavigateToLog: (Long) -> Unit,
+    onToggleFabMenu: () -> Unit,
+    onDismissFabMenu: () -> Unit,
+    onOpenListSheet: () -> Unit,
+    onDismissListSheet: () -> Unit,
+    onAddFilmToList: (MovieList) -> Unit,
+    onClearListMessage: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val movie = successState.movie
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
+
+    LaunchedEffect(successState.listActionMessage) {
+        successState.listActionMessage?.let { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            onClearListMessage()
+        }
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = KinoBlack,
         floatingActionButton = {
-            KinoFAB(onClick = { onNavigateToLog(movie.id) })
+            Box {
+                KinoFAB(onClick = onToggleFabMenu)
+
+                DropdownMenu(
+                    expanded = successState.isFabMenuExpanded,
+                    onDismissRequest = onDismissFabMenu,
+                    modifier = Modifier.background(KinoLighterGray)
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Add Review", color = KinoWhite) },
+                        onClick = {
+                            onDismissFabMenu()
+                            onNavigateToLog(movie.id)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Save to List", color = KinoWhite) },
+                        onClick = onOpenListSheet
+                    )
+                }
+            }
         }
     ) { paddingValues ->
         Column(
@@ -229,6 +275,17 @@ fun MovieDetailContent(
             }
 
             Spacer(modifier = Modifier.height(100.dp))
+        }
+
+        if (successState.isListSheetOpen) {
+            KinoListSelectionSheet(
+                lists = successState.userLists,
+                isLoading = successState.isFetchingLists,
+                onDismiss = onDismissListSheet,
+                onListSelected = { selectedList ->
+                    onAddFilmToList(selectedList)
+                }
+            )
         }
     }
 }

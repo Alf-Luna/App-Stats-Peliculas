@@ -40,7 +40,7 @@ fun KinoDecadeLineChart(decades: List<StatItem<Int, Int>>) {
     val xAxisData = AxisData.Builder()
         .axisStepSize(100.dp)
         .steps(points.size - 1)
-        .labelData { i -> sortedDecades[i].label.toString().takeLast(2) + "s" } // Muestra "80s", "90s", etc.
+        .labelData { i -> sortedDecades[i].label.toString().takeLast(2) + "s" }
         .axisLabelColor(KinoWhite)
         .axisLineColor(Color.DarkGray)
         .build()

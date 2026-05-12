@@ -8,6 +8,12 @@ sealed class Route(val path: String) {
     data object Home     : Route("home")
     data object Profile  : Route("profile")
     data object Stats  : Route("stats")
+
+    data object Lists : Route("lists")
+
+    data object ListDetail : Route("list_detail/{listId}") {
+        fun createRoute(listId: Long) = "list_detail/$listId"
+    }
     data object MovieDetail : Route("movie_detail/{movieId}") {
         fun createRoute(movieId: Long) = "movie_detail/$movieId"
     }
