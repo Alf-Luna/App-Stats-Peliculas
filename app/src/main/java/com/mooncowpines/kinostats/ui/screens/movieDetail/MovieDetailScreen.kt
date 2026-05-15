@@ -1,63 +1,76 @@
 package com.mooncowpines.kinostats.ui.screens.movieDetail
 
-import androidx.compose.foundation.Image
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.mooncowpines.kinostats.domain.model.Movie
+import com.mooncowpines.kinostats.domain.model.MovieList
 import com.mooncowpines.kinostats.ui.components.KinoFAB
+import com.mooncowpines.kinostats.ui.components.KinoListSelectionSheet
 import com.mooncowpines.kinostats.ui.theme.KinoBlack
 import com.mooncowpines.kinostats.ui.theme.KinoLighterGray
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
+import coil.compose.AsyncImagePainter
+import coil.request.ImageRequest
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImageContent
+import com.mooncowpines.kinostats.ui.components.KinoFallBackCoverCard
 
 @Composable
 fun MovieDetailScreen(
     modifier: Modifier = Modifier,
     viewModel: MovieDetailViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
-    onNavigateToLog: (Int) -> Unit
+    onNavigateToLog: (Long) -> Unit,
+    onDataModified: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
 
-    when (state) {
+    when (val currentState = state) {
         is MovieDetailState.Loading -> {
             Box(modifier = modifier.fillMaxSize().background(KinoBlack), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = KinoYellow)
             }
         }
         is MovieDetailState.Error -> {
-            val errorMessage = (state as MovieDetailState.Error).message
             Box(modifier = modifier.fillMaxSize().background(KinoBlack), contentAlignment = Alignment.Center) {
-                Text(errorMessage, color = Color.Red)
+                Text(currentState.message, color = Color.Red)
             }
         }
         is MovieDetailState.Success -> {
-            val movie = (state as MovieDetailState.Success).movie
             MovieDetailContent(
-                movie = movie,
+                state = currentState,
                 onNavigateBack = onNavigateBack,
                 onNavigateToLog = onNavigateToLog,
+                onToggleFabMenu = { viewModel.toggleFabMenu() },
+                onDismissFabMenu = { viewModel.dismissFabMenu() },
+                onOpenListSheet = { viewModel.onOpenListSheet() },
+                onDismissListSheet = { viewModel.dismissListSheet() },
+                onAddFilmToList = { list -> viewModel.addFilmToList(list) },
+                onClearListMessage = { viewModel.clearListMessage() },
+                onDataModified = onDataModified,
                 modifier = modifier
             )
         }
@@ -65,18 +78,55 @@ fun MovieDetailScreen(
 }
 @Composable
 fun MovieDetailContent(
-    movie: Movie,
+    state: MovieDetailState.Success,
     onNavigateBack: () -> Unit,
-    onNavigateToLog: (Int) -> Unit,
+    onNavigateToLog: (Long) -> Unit,
+    onToggleFabMenu: () -> Unit,
+    onDismissFabMenu: () -> Unit,
+    onOpenListSheet: () -> Unit,
+    onDismissListSheet: () -> Unit,
+    onAddFilmToList: (MovieList) -> Unit,
+    onClearListMessage: () -> Unit,
+    onDataModified: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val movie = state.movie
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
+
+    LaunchedEffect(state.listActionMessage) {
+        state.listActionMessage?.let { msg ->
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            onDataModified()
+            onClearListMessage()
+        }
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = KinoBlack,
         floatingActionButton = {
-            KinoFAB(onClick = { onNavigateToLog(movie.id) })
+            Box {
+                KinoFAB(onClick = onToggleFabMenu)
+
+                DropdownMenu(
+                    expanded = state.isFabMenuExpanded,
+                    onDismissRequest = onDismissFabMenu,
+                    modifier = Modifier.background(KinoLighterGray)
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Add Log", color = KinoWhite) },
+                        onClick = {
+                            onDismissFabMenu()
+                            onNavigateToLog(movie.id)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Save to List", color = KinoWhite) },
+                        onClick = onOpenListSheet
+                    )
+                }
+            }
         }
     ) { paddingValues ->
         Column(
@@ -92,16 +142,33 @@ fun MovieDetailContent(
                     .fillMaxWidth()
                     .height(280.dp)
             ) {
-
-                Image(
-                    painter = painterResource(id = movie.posterUrl),
+                SubcomposeAsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(movie.backDropUrl)
+                        .crossfade(true)
+                        .build(),
                     contentDescription = "Banner",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
                         .align(Alignment.TopCenter)
-                )
+                ) {
+                    val state = painter.state
+                    when {
+                        movie.backDropUrl.isEmpty() || state is AsyncImagePainter.State.Error -> {
+                            KinoFallBackCoverCard(modifier = Modifier.fillMaxSize())
+                        }
+
+                        state is AsyncImagePainter.State.Loading -> {
+                            Box(modifier = Modifier.fillMaxSize().background(KinoLighterGray))
+                        }
+
+                        else -> {
+                            SubcomposeAsyncImageContent()
+                        }
+                    }
+                }
 
                 Box(
                     modifier = Modifier
@@ -122,7 +189,7 @@ fun MovieDetailContent(
                         .padding(top = 32.dp, start = 8.dp)
                         .align(Alignment.TopStart)
                 ) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = KinoWhite)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = KinoWhite)
                 }
 
                 Row(
@@ -132,16 +199,34 @@ fun MovieDetailContent(
                         .fillMaxWidth(),
                     verticalAlignment = Alignment.Bottom
                 ) {
-                    Image(
-                        painter = painterResource(id = movie.posterUrl),
-                        contentDescription = "Portada",
+                    SubcomposeAsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(movie.posterUrl)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "Cover",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .width(105.dp)
                             .height(155.dp)
                             .clip(RoundedCornerShape(8.dp))
-                    )
+                    ) {
+                        val asyncImageState = painter.state
+                        when {
+                            movie.backDropUrl.isEmpty() || asyncImageState is AsyncImagePainter.State.Error -> {
+                                KinoFallBackCoverCard(modifier = Modifier.fillMaxSize())
+                            }
 
+                            asyncImageState is AsyncImagePainter.State.Loading -> {
+                                Box(modifier = Modifier.fillMaxSize().background(KinoLighterGray))
+                            }
+
+                            else -> {
+                                SubcomposeAsyncImageContent()
+                            }
+                        }
+                    }
+                    
                     Spacer(modifier = Modifier.width(16.dp))
 
                     Column(modifier = Modifier.padding(bottom = 8.dp)) {
@@ -154,7 +239,7 @@ fun MovieDetailContent(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "• Release year: ${movie.releaseYear}",
+                            text = "• Release date: ${movie.releaseDate}",
                             fontSize = 14.sp
                         )
                         Text(
@@ -229,6 +314,17 @@ fun MovieDetailContent(
             }
 
             Spacer(modifier = Modifier.height(100.dp))
+        }
+
+        if (state.isListSheetOpen) {
+            KinoListSelectionSheet(
+                lists = state.userLists,
+                isLoading = state.isFetchingLists,
+                onDismiss = onDismissListSheet,
+                onListSelected = { selectedList ->
+                    onAddFilmToList(selectedList)
+                }
+            )
         }
     }
 }

@@ -24,13 +24,13 @@ import com.mooncowpines.kinostats.ui.theme.KinoWhite
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 
 @Composable
-fun KinoGenreBarChart(genres: List<StatItem<String, Int>>, maxMinutes: Int) {
+fun KinoGenreBarChart(genres: List<StatItem<String, Int>>, maxMovieCount: Int) {
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)) {
         Text("Top Genres", color = KinoWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp)
         Spacer(modifier = Modifier.height(16.dp))
 
         genres.forEach { genre ->
-            val percentage = if (maxMinutes > 0) genre.value.toFloat() / maxMinutes.toFloat() else 0f
+            val percentage = if (maxMovieCount > 0) genre.value.toFloat() / maxMovieCount.toFloat() else 0f
 
             Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(text = genre.label, color = Color.LightGray, modifier = Modifier.width(80.dp), fontSize = 14.sp)
@@ -42,7 +42,7 @@ fun KinoGenreBarChart(genres: List<StatItem<String, Int>>, maxMinutes: Int) {
                         .background(KinoYellow, RoundedCornerShape(4.dp))
                     )
                 }
-                Text(text = "${genre.value} min", color = KinoWhite, modifier = Modifier.padding(start = 8.dp), fontSize = 12.sp)
+                Text(text = "${genre.value} movies", color = KinoWhite, modifier = Modifier.padding(start = 8.dp), fontSize = 12.sp)
             }
         }
     }

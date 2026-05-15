@@ -64,22 +64,4 @@ class LoginScreenViewModel @Inject constructor(
             }
         }
     }
-
-    //Triggers an admin login attempt
-    fun adminLogin() {
-        val currentState = _state.value
-        if (currentState.isSubmitting) return
-
-        viewModelScope.launch {
-            _state.update { it.copy(isSubmitting = true) }
-
-            val isSuccess = authRepository.adminLogin("kinoadmin2026")
-
-            if (isSuccess) {
-                _state.update { it.copy(isSubmitting = false, success = true) }
-            } else {
-                _state.update { it.copy(isSubmitting = false, errorMsg = "Admin login failed") }
-            }
-        }
-    }
 }

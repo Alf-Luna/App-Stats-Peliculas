@@ -67,9 +67,7 @@ fun RatingDropdownSelector(
             modifier = Modifier.background(Color(0xFF1F252B))
         ) {
             val options = listOf(
-                0f, 0.25f, 0.5f, 0.75f, 1f, 1.25f, 1.5f, 1.75f,
-                2f, 2.25f, 2.5f, 2.75f, 3f, 3.25f, 3.5f, 3.75f,
-                4f, 4.25f, 4.5f, 4.75f, 5f
+                0f, 0.5f, 1f, 1.5f, 2f, 2.5f, 3f, 3.5f, 4f, 4.5f, 5f
             )
 
             options.forEach { option ->

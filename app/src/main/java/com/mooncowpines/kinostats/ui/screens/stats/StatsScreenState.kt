@@ -8,11 +8,9 @@ data class StatsScreenState(
     val isLoading: Boolean = true,
     val errorMsg: String? = null,
 
-    val lastSeenMovie: Movie? = null,
-
-    val selectedYear: Int? = null,
+    val selectedYear: Int = 0,
     val selectedMonth: Int? = null,
 
     val stats: UserStats? = null,
-    val genreMaxMinutes: Int = 0
+    val genreMaxMovieCount: Int = 0
 )

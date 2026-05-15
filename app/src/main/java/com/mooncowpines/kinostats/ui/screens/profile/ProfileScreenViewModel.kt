@@ -28,7 +28,6 @@ class ProfileScreenViewModel @Inject constructor(
         viewModelScope.launch {
 
             val user = authRepository.getCurrentUser()
-
             if (user != null) {
                 _state.update {
                     it.copy(

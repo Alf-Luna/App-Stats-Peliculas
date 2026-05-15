@@ -35,6 +35,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.mooncowpines.kinostats.R
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoButton
+import com.mooncowpines.kinostats.ui.components.KinoErrorText
 import com.mooncowpines.kinostats.ui.components.KinoFrame
 import com.mooncowpines.kinostats.ui.components.KinoTextField
 import com.mooncowpines.kinostats.ui.theme.KinoDarkYellow
@@ -46,7 +47,6 @@ fun LoginScreen(
     viewModel: LoginScreenViewModel = hiltViewModel(),
     onNavigateToRegister: () -> Unit,
     onNavigateToHome: () -> Unit,
-    onNavigateToReset: () -> Unit,
     onNavigateToRecover: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
@@ -63,17 +63,12 @@ fun LoginScreen(
         .padding(KinoSpacing.extraLarge)) {
         Login(
             modifier = Modifier.align(Alignment.Center),
-            emailValue = state.email,
-            passValue = state.pass,
-            isSubmitting = state.isSubmitting,
-            errorMsg = state.errorMsg,
+            state = state,
             onEmailChange = { viewModel.onEmailChange(it) },
             onPassChange = { viewModel.onPassChange(it) },
             onLoginClick = { viewModel.login() },
             onRecoveryClick = onNavigateToRecover,
-            onChangeClick = onNavigateToReset,
             onRegisterClick = onNavigateToRegister,
-            onAdminClick = { viewModel.adminLogin() }
         )
     }
 }
@@ -81,17 +76,12 @@ fun LoginScreen(
 @Composable
 fun Login(
     modifier: Modifier,
-    emailValue: String,
-    passValue: String,
-    isSubmitting: Boolean,
-    errorMsg: String?,
+    state: LoginScreenState,
     onEmailChange: (String) -> Unit,
     onPassChange: (String) -> Unit,
     onLoginClick: () -> Unit,
     onRecoveryClick: () -> Unit,
-    onChangeClick: () -> Unit,
     onRegisterClick: () -> Unit,
-    onAdminClick: () -> Unit
 ) {
     Column(
         modifier = modifier.verticalScroll(rememberScrollState()),
@@ -117,7 +107,7 @@ fun Login(
                         bottom = KinoSpacing.small)
                 )
                 KinoTextField(
-                    textValue = emailValue,
+                    textValue = state.email,
                     onTextChange = onEmailChange,
                     placeholderText = "example@gmail.com",
                     modifier = Modifier.fillMaxWidth())
@@ -139,7 +129,7 @@ fun Login(
                         bottom = KinoSpacing.small)
                 )
                 KinoTextField(
-                    textValue = passValue,
+                    textValue = state.pass,
                     onTextChange = onPassChange,
                     placeholderText = "Password",
                     isPassword = true,
@@ -153,14 +143,7 @@ fun Login(
 
             Column{
                 //General error message
-                if (errorMsg != null) {
-                    Text(
-                        text = errorMsg,
-                        color = Color.Red,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(bottom = KinoSpacing.small)
-                    )
-                }
+                state.errorMsg?.let { KinoErrorText(it) }
 
                 //Buttons section
                 Text(
@@ -169,7 +152,7 @@ fun Login(
                     textDecoration = TextDecoration.Underline,
                     modifier = Modifier.padding(bottom = KinoSpacing.small)
                 )
-                if (isSubmitting) {
+                if (state.isSubmitting) {
                     Box(modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
@@ -188,22 +171,9 @@ fun Login(
                     text = "Create Account",
                     onClick = onRegisterClick,
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = !isSubmitting)
+                    enabled = !state.isSubmitting)
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(KinoSpacing.mediumSmall)) {
-                KinoButton(
-                    text = "Test",
-                    onClick = onChangeClick,
-                    modifier = Modifier.weight(1f),
-                    enabled = !isSubmitting)
-
-                KinoButton(
-                    text = "Admin",
-                    onClick = onAdminClick,
-                    modifier = Modifier.weight(1f),
-                    enabled = !isSubmitting)
-            }
         }
     }
 }
