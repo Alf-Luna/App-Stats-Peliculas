@@ -31,6 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoButton
+import com.mooncowpines.kinostats.ui.components.KinoErrorText
 import com.mooncowpines.kinostats.ui.components.KinoFrame
 import com.mooncowpines.kinostats.ui.components.KinoTextField
 import com.mooncowpines.kinostats.ui.components.PasswordRequirementsFeedback
@@ -59,14 +60,7 @@ fun RegisterScreen(
         .padding(KinoSpacing.extraLarge)) {
         Register(
             modifier = Modifier.align(Alignment.Center),
-            userNameValue = state.userName,
-            userNameError= state.userNameError,
-            emailValue = state.email,
-            emailError = state.emailError,
-            passValue = state.pass,
-            passCheckValue = state.passCheck,
-            isSubmitting = state.isSubmitting,
-            errorMsg = state.errorMsg,
+            state = state,
             onUserNameChange = { viewModel.onUserNameChange(it) },
             onEmailChange = { viewModel.onEmailChange(it) },
             onPassChange = { viewModel.onPassChange(it) },
@@ -80,14 +74,7 @@ fun RegisterScreen(
 @Composable
 fun Register(
     modifier: Modifier,
-    userNameValue: String,
-    userNameError: String?,
-    emailValue: String,
-    emailError: String?,
-    passValue: String,
-    passCheckValue: String,
-    isSubmitting: Boolean,
-    errorMsg: String?,
+    state: RegisterScreenState,
     onUserNameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onPassChange: (String) -> Unit,
@@ -126,19 +113,12 @@ fun Register(
                         bottom = KinoSpacing.small)
                 )
                 KinoTextField(
-                    textValue = userNameValue,
+                    textValue = state.userName,
                     onTextChange = onUserNameChange,
                     placeholderText = "User Name",
                     modifier = Modifier.fillMaxWidth())
 
-                if (userNameError != null) {
-                    Text(
-                        text = userNameError,
-                        color = Color.Red,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(KinoSpacing.small)
-                    )
-                }
+                state.userNameError?.let { KinoErrorText(message = it) }
             }
 
             Spacer(modifier = Modifier.height(KinoSpacing.medium))
@@ -157,19 +137,12 @@ fun Register(
                         bottom = KinoSpacing.small)
                 )
                 KinoTextField(
-                    textValue = emailValue,
+                    textValue = state.email,
                     onTextChange = onEmailChange,
                     placeholderText = "example@gmail.com",
                     modifier = Modifier.fillMaxWidth())
 
-                if (emailError != null) {
-                    Text(
-                        text = emailError,
-                        color = Color.Red,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(KinoSpacing.small)
-                    )
-                }
+                state.emailError?.let { KinoErrorText(message = it) }
             }
 
             Spacer(modifier = Modifier.height(KinoSpacing.medium))
@@ -188,14 +161,14 @@ fun Register(
                         bottom = KinoSpacing.small)
                 )
                 KinoTextField(
-                    textValue = passValue,
+                    textValue = state.pass,
                     onTextChange = onPassChange,
                     placeholderText = "Password",
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth())
 
                 //Visual feedback to password requirements
-                PasswordRequirementsFeedback(passValue)
+                PasswordRequirementsFeedback(state.pass)
             }
 
             Spacer(modifier = Modifier.height(KinoSpacing.medium))
@@ -214,28 +187,21 @@ fun Register(
                         bottom = KinoSpacing.small)
                 )
                 KinoTextField(
-                    textValue = passCheckValue,
+                    textValue = state.passCheck,
                     onTextChange = onPassCheckChange,
                     placeholderText = "Confirm Password",
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth())
 
                 //Visual feedback for password match
-                PasswordMatchFeedback(passValue, passCheckValue)
+                PasswordMatchFeedback(state.pass, state.passCheck)
             }
 
             Spacer(modifier = Modifier.height(KinoSpacing.medium))
 
             Column{
                 //General error message
-                if (errorMsg != null) {
-                    Text(
-                        text = errorMsg,
-                        color = Color.Red,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(KinoSpacing.small)
-                    )
-                }
+                state.errorMsg?.let { KinoErrorText(message = it) }
 
                 //Buttons section
                 Text(
@@ -250,7 +216,7 @@ fun Register(
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(KinoSpacing.medium)
                 ) {
-                    if (isSubmitting) {
+                    if (state.isSubmitting) {
                         Box(
                             modifier = Modifier
                                 .weight(1f)
@@ -267,7 +233,7 @@ fun Register(
                     KinoButton(
                         text = "Cancel",
                         onClick = onCancelClick,
-                        enabled = !isSubmitting,
+                        enabled = !state.isSubmitting,
                         modifier = Modifier.weight(1f))
                 }
 

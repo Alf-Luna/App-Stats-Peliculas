@@ -69,15 +69,12 @@ fun ProfileContent(
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.Start
     ) {
-        Spacer(modifier = Modifier.height(32.dp))
-
         Text(
-            text = "PROFILE",
-            color = Color.Gray,
-            fontSize = 13.sp,
+            text = "My Profile",
+            color = KinoYellow,
+            fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp,
-            modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 16.dp, top = 32.dp)
         )
 
         Row(
@@ -109,24 +106,24 @@ fun ProfileContent(
             Column {
                 if (state.isLoading) {
                     CircularProgressIndicator(color = KinoYellow)
-                } else if (state.errorMsg != null) {
-                    Text(text = state.errorMsg!!, color = Color.Red)
                 } else {
-                Text(text = state.userName,
-                    color = KinoWhite,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold)
-                }
-                Spacer(modifier = Modifier.height(6.dp))
-                if (state.isLoading) {
-                    CircularProgressIndicator(color = KinoYellow)
-                } else if (state.errorMsg != null) {
-                    Text(text = state.errorMsg!!, color = Color.Red)
-                } else {
-                    Text(text = state.email,
-                        color = KinoWhite,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold)
+                    state.errorMsg?.let { error ->
+                        Text(text = error, color = Color.Red)
+                    } ?: run {
+                        Text(
+                            text = state.userName,
+                            color = KinoWhite,
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = state.email,
+                            color = KinoWhite,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Normal
+                        )
+                    }
                 }
             }
         }
@@ -158,7 +155,7 @@ fun ProfileContent(
 
             ProfileOptionItem(
                 icon = Icons.Outlined.Info,
-                text = "Change your password",
+                text = "Update your account",
                 onClick = onNavigateToAccountInfo
             )
         }

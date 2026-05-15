@@ -3,7 +3,6 @@ package com.mooncowpines.kinostats.ui.screens.change
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mooncowpines.kinostats.domain.repository.AuthRepository
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +20,19 @@ class ChangeScreenViewModel @Inject constructor(
     private val _state = MutableStateFlow(ChangeScreenState())
     val state: StateFlow<ChangeScreenState> = _state.asStateFlow()
 
+    init {
+        loadCurrentUser()
+    }
+
     //Functions to track text field value
+    fun onEmailChange(email: String) {
+        _state.update { it.copy(email = email, errorMsg = null, emailError = null) }
+    }
+
+    fun onUserNameChange(userName: String) {
+        _state.update { it.copy(userName = userName, errorMsg = null, userNameError = null) }
+    }
+
     fun onCurrentPassChange(currentPass: String) {
         _state.update { it.copy(currentPass = currentPass, errorMsg = null, currentPassError = null) }
     }
@@ -34,24 +45,49 @@ class ChangeScreenViewModel @Inject constructor(
         _state.update { it.copy(newPassCheck = newPassCheck, errorMsg = null) }
     }
 
-    //Triggers a password change attempt
+    private fun loadCurrentUser() {
+        viewModelScope.launch {
+            val user = authRepository.getCurrentUser()
+
+            user?.let { currentUser ->
+                _state.update {
+                    it.copy(
+                        userName = currentUser.userName ?: "",
+                        email = currentUser.email ?: ""
+                    )
+                }
+            }
+        }
+    }
+
+    //Triggers a data change attempt
     fun change() {
         val currentState = _state.value
         if (currentState.isSubmitting) return
 
         //Local validation for the text field
 
-        val currentPassError = getCurrentPassError(currentPass = currentState.currentPass)
+        val emailError = getEmailError(currentState.email)
+        val userNameError = getUserNameError(currentState.userName)
+        val currentPassError = getCurrentPassError(currentState.currentPass)
+
+        val isTryingToChangePass = currentState.newPass.isNotEmpty() || currentState.newPassCheck.isNotEmpty()
         val isPassValid = isPassValid(currentState.newPass)
         val isPassCheckValid = isPassMatch(currentState.newPass, currentState.newPassCheck)
 
-        if (currentPassError != null || !isPassValid || !isPassCheckValid) {
-            _state.update { it.copy(
-                currentPassError = currentPassError,
-                errorMsg =
-                    if (currentState.currentPass == currentState.newPass)
-                        {"You cannot use the same password right away!"} else {"Check the password validations"})
+        if (emailError != null || userNameError != null || currentPassError != null || !isPassValid || !isPassCheckValid) {
+            val generalError = when {
+                currentState.currentPass == currentState.newPass && isTryingToChangePass -> "You cannot use the same password right away!"
+                !isPassValid || !isPassCheckValid -> "Check the password validations"
+                else -> "Please check the fields in red"
             }
+
+            _state.update { it.copy(
+                emailError = emailError,
+                userNameError = userNameError,
+                currentPassError = currentPassError,
+                errorMsg = generalError
+            )}
             return
         }
 
@@ -59,9 +95,11 @@ class ChangeScreenViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isSubmitting = true, errorMsg = null) }
 
-            val isSuccess = authRepository.changePassword(
-                pass = currentState.newPass,
-                passCheck = currentState.newPassCheck
+            val isSuccess = authRepository.updateUser(
+                userName = currentState.userName,
+                email = currentState.email,
+                currentPassword = currentState.currentPass,
+                newPassword = if (isTryingToChangePass) currentState.newPass else null
             )
 
             if (isSuccess) {

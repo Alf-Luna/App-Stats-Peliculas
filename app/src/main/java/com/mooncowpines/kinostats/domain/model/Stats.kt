@@ -1,9 +1,7 @@
 package com.mooncowpines.kinostats.domain.model
 
 data class UserStats(
-    val weeklyWatchData: List<Pair<String, Float>>,
-    val todayWatchTime: String,
-    val last7DaysWatchTime: String,
+    val yearlyWatchData: List<Pair<String, Float>>,
     val genres: List<StatItem<String, Int>>,
     val countries: List<StatItem<String, Int>>,
     val topActors: List<StatItem<String, Int>>,

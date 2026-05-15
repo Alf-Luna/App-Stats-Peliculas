@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.collectAsState
 import androidx.compose.material3.Text
@@ -14,50 +16,61 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoPosterCard
 import com.mooncowpines.kinostats.ui.components.KinoLastSeenCard
 import com.mooncowpines.kinostats.ui.theme.KinoSpacing
-import com.mooncowpines.kinostats.domain.model.Movie
+import com.mooncowpines.kinostats.domain.model.MovieCard
 import com.mooncowpines.kinostats.ui.components.KinoSearchBar
+import com.mooncowpines.kinostats.ui.components.KinoSkeletonPosterCard
+import com.mooncowpines.kinostats.ui.theme.KinoGray
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
-    onMovieClick: (Int) -> Unit,
-    onSearchSubmit: (String) -> Unit
+    onMovieClick: (Long) -> Unit,
+    onSearchSubmit: (String) -> Unit,
+    shouldRefresh: Boolean = false,
+    onRefreshDone: () -> Unit = {}
 ) {
+    LaunchedEffect(shouldRefresh) {
+        if (shouldRefresh) {
+            viewModel.loadHomeData()
+            onRefreshDone()
+        }
+    }
+
     val state by viewModel.state.collectAsState()
 
-    when (state) {
+    when (val currentState = state) {
         is HomeScreenState.Loading -> {
             Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = KinoYellow)
             }
         }
         is HomeScreenState.Error -> {
-            val errorMessage = (state as HomeScreenState.Error).message
             Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = errorMessage, color = KinoWhite)
+                Text(text = currentState.message, color = KinoWhite)
             }
         }
         is HomeScreenState.Success -> {
-            val successState = state as HomeScreenState.Success
             HomeContent(
-                movies = successState.movies,
-                movie = successState.lastSeenMovie,
+                state = currentState,
                 onMovieClick = onMovieClick,
-                modifier = modifier,
-                onSearchSubmit = onSearchSubmit
+                onSearchSubmit = onSearchSubmit,
+                modifier = modifier
             )
         }
     }
@@ -66,9 +79,8 @@ fun HomeScreen(
 }
 @Composable
 fun HomeContent(
-    movies: List<Movie>,
-    movie: Movie,
-    onMovieClick: (Int) -> Unit,
+    state: HomeScreenState.Success,
+    onMovieClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     onSearchSubmit: (String) -> Unit,
 ) {
@@ -77,13 +89,10 @@ fun HomeContent(
     var searchQuery by remember { mutableStateOf("") }
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState),
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.Start,
-
     ) {
-        Spacer(modifier.height(KinoSpacing.extraSmall))
+        Spacer(modifier = Modifier.height(KinoSpacing.large))
 
         KinoSearchBar(
             query = searchQuery,
@@ -92,25 +101,42 @@ fun HomeContent(
             modifier = Modifier.padding(horizontal = KinoSpacing.medium)
         )
 
-        Spacer(modifier.height(KinoSpacing.medium))
+        Spacer(modifier = Modifier.height(KinoSpacing.large))
 
-        WatchlistSection(movies = movies, onMovieClick = onMovieClick)
+        if (state.watchlistMovies.isEmpty() && state.justWatchedMovies.isEmpty() && state.lastSeenMovie == null) {
 
-        Spacer(modifier.height(KinoSpacing.extraLarge))
+            WelcomeEmptyState()
 
-        LastSeenSection(movie = movie, onMovieClick = onMovieClick)
+        } else {
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .weight(1f)
+                    .verticalScroll(scrollState),
+                horizontalAlignment = Alignment.Start,
 
-        Spacer(modifier.height(KinoSpacing.extraLarge))
+                ) {
 
-        JustWatchedSection(movies = movies, onMovieClick = onMovieClick)
+                WatchlistSection(movieCards = state.watchlistMovies, onMovieClick = onMovieClick)
+
+                Spacer(modifier.height(KinoSpacing.extraLarge))
+
+                LastSeenSection(movieCard = state.lastSeenMovie, onMovieClick = onMovieClick)
+
+                Spacer(modifier.height(KinoSpacing.extraLarge))
+
+                JustWatchedSection(movieCards = state.justWatchedMovies, onMovieClick = onMovieClick)
+
+                Spacer(modifier = Modifier.height(KinoSpacing.medium))
+            }
+        }
     }
 }
-
 @Composable
 fun WatchlistSection(
     modifier: Modifier = Modifier,
-    movies: List<Movie>,
-    onMovieClick: (Int) -> Unit
+    movieCards: List<MovieCard>,
+    onMovieClick: (Long) -> Unit
 ) {
     Column {
         Text(
@@ -131,25 +157,36 @@ fun WatchlistSection(
 
         Spacer(modifier.height(KinoSpacing.mediumSmall))
 
-        LazyRow(
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(movies) { movie ->
-                KinoPosterCard(
-                    movie = movie,
-                    onClick = { id -> onMovieClick(id)}
-                )
+        if (movieCards.isEmpty()) {
+            LazyRow(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(4) {
+                    KinoSkeletonPosterCard()
+                }
             }
-        }
+        } else {
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(movieCards) { movieCard ->
+                        KinoPosterCard(
+                            movieCard = movieCard,
+                            onClick = { id -> onMovieClick(id) }
+                        )
+                    }
+                }
+            }
     }
 }
 
 @Composable
 fun LastSeenSection(
     modifier: Modifier = Modifier,
-    movie: Movie,
-    onMovieClick: (Int) -> Unit
+    movieCard: MovieCard?,
+    onMovieClick: (Long) -> Unit
 ) {
     Column {
         Text(
@@ -169,14 +206,32 @@ fun LastSeenSection(
 
         Spacer(modifier.height(KinoSpacing.mediumSmall))
 
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            KinoLastSeenCard(
-                movie = movie,
-                onClick = { id -> onMovieClick(id)}
-            )
+        if (movieCard == null) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 165.dp)
+                    .padding(horizontal = 32.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "No reviews yet. Use the search bar above to find a movie and share your thoughts!",
+                    color = KinoGray,
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
+        } else {
+
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                KinoLastSeenCard(
+                    movieCard = movieCard,
+                    onClick = { id -> onMovieClick(id) }
+                )
+            }
         }
     }
 }
@@ -184,8 +239,8 @@ fun LastSeenSection(
 @Composable
 fun JustWatchedSection(
     modifier: Modifier = Modifier,
-    movies: List<Movie>,
-    onMovieClick: (Int) -> Unit
+    movieCards: List<MovieCard>,
+    onMovieClick: (Long) -> Unit
 ) {
     Column {
         Text(
@@ -206,17 +261,65 @@ fun JustWatchedSection(
 
         Spacer(modifier.height(KinoSpacing.mediumSmall))
 
-        LazyRow(
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(movies) { movie ->
-                KinoPosterCard(
-                    movie = movie,
-                    onClick = { id -> onMovieClick(id)}
-                )
+        if (movieCards.isEmpty()) {
+            LazyRow(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(4) {
+                    KinoSkeletonPosterCard()
+                }
             }
-        }
+        } else {
+
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(movieCards) { movieCards ->
+                        KinoPosterCard(
+                            movieCard = movieCards,
+                            onClick = { id -> onMovieClick(id) }
+                        )
+                    }
+                }
+            }
+    }
+}
+
+@Composable
+fun WelcomeEmptyState() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(KinoSpacing.large),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+
+        Icon(
+            imageVector = Icons.Default.ConfirmationNumber,
+            contentDescription = null,
+            tint = KinoYellow,
+            modifier = Modifier.size(100.dp)
+        )
+        Spacer(modifier = Modifier.height(KinoSpacing.medium))
+
+        Text(
+            text = "Welcome to KinoStats!",
+            color = KinoWhite,
+            fontWeight = FontWeight.Bold,
+            fontSize = 32.sp,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(KinoSpacing.small))
+
+        Text(
+            text = "Use the search bar above to find your first movie and start building your lists!",
+            color = KinoGray,
+            fontSize = 18.sp,
+            textAlign = TextAlign.Center
+        )
     }
 }
 

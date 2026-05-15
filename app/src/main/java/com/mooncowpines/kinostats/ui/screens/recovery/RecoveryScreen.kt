@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.font.FontWeight
@@ -28,11 +29,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoButton
+import com.mooncowpines.kinostats.ui.components.KinoErrorText
 import com.mooncowpines.kinostats.ui.components.KinoTextField
 import com.mooncowpines.kinostats.ui.components.KinoFrame
 import com.mooncowpines.kinostats.ui.theme.KinoSpacing
@@ -47,18 +48,17 @@ fun RecoveryScreen(
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
 
-    if (state.success) {
-        Toast.makeText(context, "Recovery email sent!", Toast.LENGTH_LONG).show()
-        onNavigateBack()
+    LaunchedEffect(state.success) {
+        if (state.success) {
+            Toast.makeText(context, "Recovery email sent!", Toast.LENGTH_LONG).show()
+            onNavigateBack()
+        }
     }
 
     Box(Modifier.fillMaxSize().padding(30.dp)) {
-        Recovery(
+        RecoveryContent(
             modifier = Modifier.align(Alignment.Center),
-            emailValue = state.email,
-            emailError = state.emailError,
-            isSubmitting = state.isSubmitting,
-            errorMsg = state.errorMsg,
+            state = state,
             onEmailChange = { viewModel.onEmailChange(it) },
             onRecoveryClick = { viewModel.recovery() },
             onCancelClick = onNavigateBack
@@ -67,12 +67,9 @@ fun RecoveryScreen(
 }
 
 @Composable
-fun Recovery(
+fun RecoveryContent(
     modifier: Modifier,
-    emailValue: String,
-    emailError: String?,
-    isSubmitting: Boolean,
-    errorMsg: String?,
+    state: RecoveryScreenState,
     onEmailChange: (String) -> Unit,
     onRecoveryClick: () -> Unit,
     onCancelClick: () -> Unit
@@ -106,34 +103,20 @@ fun Recovery(
                         bottom = KinoSpacing.small)
                 )
                 KinoTextField(
-                    textValue = emailValue,
+                    textValue = state.email,
                     onTextChange = onEmailChange,
                     placeholderText = "example@gmail.com",
                     modifier = Modifier.fillMaxWidth()
                 )
-                if (emailError != null) {
-                    Text(
-                        text = emailError,
-                        color = Color.Red,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(bottom = KinoSpacing.small)
-                    )
-                }
+
+                state.emailError?.let { KinoErrorText(message = it) }
             }
 
             Spacer(modifier = Modifier.height(KinoSpacing.medium))
 
-
             Column {
                 //General error message
-                if (errorMsg != null) {
-                    Text(
-                        text = errorMsg,
-                        color = Color.Red,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(bottom = KinoSpacing.small)
-                    )
-                }
+                state.errorMsg?.let { KinoErrorText(message = it) }
 
                 //Buttons section
                 Row(
@@ -141,7 +124,7 @@ fun Recovery(
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(KinoSpacing.medium)
                 ) {
-                    if (isSubmitting) {
+                    if (state.isSubmitting) {
                         Box(
                             modifier = Modifier
                                 .weight(1f)
@@ -159,7 +142,7 @@ fun Recovery(
                         text = "Cancel",
                         onClick = onCancelClick,
                         modifier = Modifier.weight(1f),
-                        enabled = !isSubmitting
+                        enabled = !state.isSubmitting
                     )
 
 
