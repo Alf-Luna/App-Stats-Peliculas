@@ -1,4 +1,4 @@
-package com.mooncowpines.kinostats.ui.screens.review
+package com.mooncowpines.kinostats.ui.screens.logDetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,35 +13,60 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.mooncowpines.kinostats.domain.repository.AuthRepository
 import com.mooncowpines.kinostats.domain.repository.MovieRepository
-import com.mooncowpines.kinostats.domain.repository.ReviewRepository
+import com.mooncowpines.kinostats.domain.repository.LogRepository
 
 import com.mooncowpines.kinostats.utils.*
 import javax.inject.Inject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @HiltViewModel
-class ReviewScreenViewModel @Inject constructor(
+class LogDetailScreenViewModel @Inject constructor(
     private val movieRepository: MovieRepository,
-    private val reviewRepository: ReviewRepository,
+    private val logRepository: LogRepository,
     private val authRepository: AuthRepository,
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
-    private val _state = MutableStateFlow(ReviewScreenState())
-    val state: StateFlow<ReviewScreenState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(LogDetailScreenState())
+    val state: StateFlow<LogDetailScreenState> = _state.asStateFlow()
 
     private val movieId: Long = checkNotNull(savedStateHandle["movieId"])
+    private val logId: String? = savedStateHandle["logId"]
+
+    private val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.getDefault())
 
     init {
-        loadMovie()
+        loadData()
     }
 
-    private fun loadMovie() {
+    private fun loadData() {
         viewModelScope.launch {
-            val fetchedMovie = movieRepository.getMovieById(movieId)
-            if (fetchedMovie != null) {
-                _state.update { it.copy(isLoadingMovie = false, movie = fetchedMovie) }
+            _state.update { it.copy(isLoadingMovie = true) }
+
+            val movie = movieRepository.getMovieById(movieId)
+
+            if (logId != null) {
+                val existingLog = logRepository.getLogById(logId.toLong())
+
+                if (existingLog != null) {
+                    _state.update { it.copy(
+                        movie = movie,
+                        isLoadingMovie = false,
+                        rating = existingLog.rating,
+                        logText = existingLog.logText,
+                        watchDate = existingLog.watchDate,
+                        formattedWatchDate = existingLog.watchDate?.format(dateFormatter) ?: "Select date"
+                    )}
+                } else {
+                    _state.update { it.copy(
+                        movie = movie,
+                        isLoadingMovie = false,
+                        errorMsg = "The log failed to load"
+                    )}
+                }
             } else {
-                _state.update { it.copy(isLoadingMovie = false, errorMsg = "Movie not found") }
+                _state.update { it.copy(movie = movie, isLoadingMovie = false) }
             }
         }
     }
@@ -55,10 +80,12 @@ class ReviewScreenViewModel @Inject constructor(
     fun onWatchDateSelected(timestamp: Long?) {
         if (timestamp != null) {
             val localDate = Instant.ofEpochMilli(timestamp).atZone(ZoneId.of("UTC")).toLocalDate()
+            val formattedDate = localDate.format(dateFormatter)
 
             _state.update {
                 it.copy(
                     watchDate = localDate,
+                    formattedWatchDate = formattedDate,
                     watchDateError = null,
                     errorMsg = null,
                     showCalendar = false
@@ -69,14 +96,13 @@ class ReviewScreenViewModel @Inject constructor(
         }
     }
 
-
     //Functions to track text field value
     fun onRatingChange(newRating: Float) {
         _state.update { it.copy(rating = newRating, ratingError = null, errorMsg = null ) }
     }
 
-    fun reviewTextChange(newReviewText: String) {
-        _state.update { it.copy(reviewText = newReviewText, reviewTextError = null, errorMsg = null)}
+    fun logTextChange(newReviewText: String) {
+        _state.update { it.copy(logText = newReviewText, logTextError = null, errorMsg = null)}
     }
 
     //Triggers a save attempt
@@ -87,14 +113,14 @@ class ReviewScreenViewModel @Inject constructor(
         //Local validation for the text fields
         val ratingErrorResult = getRatingError(currentState.rating)
         val watchDateErrorResult = getWatchDateError(currentState.watchDate)
-        val textReviewErrorResult = getTextReviewError(currentState.reviewText)
+        val textReviewErrorResult = getTextLogError(currentState.logText)
 
         if (ratingErrorResult != null || watchDateErrorResult != null || textReviewErrorResult != null) {
             _state.update {
                 it.copy(
                     ratingError = ratingErrorResult,
                     watchDateError = watchDateErrorResult,
-                    reviewTextError = textReviewErrorResult,
+                    logTextError = textReviewErrorResult,
                     errorMsg = "Please check the required fields") }
             return
 
@@ -102,18 +128,28 @@ class ReviewScreenViewModel @Inject constructor(
 
         //Tries to save the review
         viewModelScope.launch {
-            _state.update { it.copy(isSubmitting = true, errorMsg = null, ratingError = null, watchDateError = null, reviewTextError = null) }
+            _state.update { it.copy(isSubmitting = true, errorMsg = null, ratingError = null, watchDateError = null, logTextError = null) }
 
             val currentUser = authRepository.getCurrentUser()
 
-            val isSuccess = reviewRepository.saveReview(
-                newMovieId = movieId,
-                newUserId = currentUser?.id,
-                newRating = currentState.rating,
-                newWatchDate = currentState.watchDate,
-                newReviewText = currentState.reviewText
-            )
-
+            val isSuccess = if (logId != null) {
+                logRepository.updateLog(
+                    logId = logId.toLong(),
+                    newMovieId = movieId,
+                    newUserId = currentUser?.id,
+                    newRating = currentState.rating,
+                    newWatchDate = currentState.watchDate,
+                    newReviewText = currentState.logText
+                )
+            } else {
+                logRepository.saveLog(
+                    newMovieId = movieId,
+                    newUserId = currentUser?.id,
+                    newRating = currentState.rating,
+                    newWatchDate = currentState.watchDate,
+                    newReviewText = currentState.logText
+                )
+            }
 
             if (isSuccess) {
                 Log.d("Session User (Review)", "The current logged user is: $currentUser")

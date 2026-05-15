@@ -1,6 +1,5 @@
-package com.mooncowpines.kinostats.ui.screens.review
+package com.mooncowpines.kinostats.ui.screens.logDetail
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,13 +24,15 @@ import com.mooncowpines.kinostats.ui.theme.KinoGray
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import com.mooncowpines.kinostats.ui.components.KinoErrorText
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
-fun ReviewScreen(
+fun LogDetailScreen(
     modifier: Modifier = Modifier,
-    viewModel: ReviewScreenViewModel = hiltViewModel(),
+    viewModel: LogDetailScreenViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
@@ -45,30 +45,31 @@ fun ReviewScreen(
         Box(modifier = modifier.fillMaxSize().background(KinoBlack), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(color = KinoYellow)
         }
-    } else if (state.movie != null) {
-        ReviewContent(
-            state = state,
-            movie = state.movie!!,
-            onNavigateBack = onNavigateBack,
-            onSaveReview = { viewModel.saveReview() },
-            onRatingChange = { viewModel.onRatingChange(it) },
-            onReviewTextChange = { viewModel.reviewTextChange(it) },
-            onShowCalendar = { viewModel.setShowCalendar(it) },
-            onDateSelected = { viewModel.onWatchDateSelected(it) },
-            modifier = modifier
-        )
     } else {
+        state.movie?.let { safeMovie ->
+            LogDetailContent(
+                state = state,
+                movie = safeMovie,
+                onNavigateBack = onNavigateBack,
+                onSaveReview = { viewModel.saveReview() },
+                onRatingChange = { viewModel.onRatingChange(it) },
+                onReviewTextChange = { viewModel.logTextChange(it) },
+                onShowCalendar = { viewModel.setShowCalendar(it) },
+                onDateSelected = { viewModel.onWatchDateSelected(it) },
+                modifier = modifier
+            )
+        } ?: run {
         Box(modifier = modifier.fillMaxSize().background(KinoBlack), contentAlignment = Alignment.Center) {
-            Text("Error al cargar la película", color = Color.Red)
+            Text(state.errorMsg ?: "Error al cargar la película", color = Color.Red)
+        }
         }
     }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReviewContent(
-    state: ReviewScreenState,
+fun LogDetailContent(
+    state: LogDetailScreenState,
     movie: Movie,
     onNavigateBack: () -> Unit,
     onSaveReview: () -> Unit,
@@ -113,13 +114,7 @@ fun ReviewContent(
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp)
         ) {
-            if (state.errorMsg != null) {
-                Text(
-                    text = state.errorMsg!!,
-                    color = Color.Red,
-                    modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth()
-                )
-            }
+            state.errorMsg?.let { KinoErrorText(it) }
 
             Spacer(modifier = Modifier.height(8.dp))
             MovieHeaderInfo(movie)
@@ -131,11 +126,8 @@ fun ReviewContent(
             Text(text = "Specify the date you watched it", color = KinoGray, fontSize = 14.sp)
             Spacer(modifier = Modifier.height(8.dp))
 
-            val dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.getDefault())
-            val dateText = state.watchDate?.format(dateFormatter) ?: "Tap to select a date..."
-
             Text(
-                text = dateText,
+                text = state.formattedWatchDate,
                 color = if (state.watchDate == null) Color.DarkGray else KinoWhite,
                 fontSize = 18.sp,
                 modifier = Modifier
@@ -146,9 +138,7 @@ fun ReviewContent(
                     .padding(vertical = 8.dp)
             )
 
-            if (state.watchDateError != null) {
-                Text(text = state.watchDateError!!, color = Color.Red, fontSize = 12.sp)
-            }
+            state.watchDateError?.let { KinoErrorText(it) }
 
             if (state.showCalendar) {
                 KinoCalendar(
@@ -169,9 +159,7 @@ fun ReviewContent(
                 onRatingChange = onRatingChange
             )
 
-            if (state.ratingError != null) {
-                Text(text = state.ratingError!!, color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
-            }
+            state.ratingError?.let { KinoErrorText(it) }
 
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider(color = Color.DarkGray.copy(alpha = 0.5f), thickness = 1.dp)
@@ -180,7 +168,7 @@ fun ReviewContent(
             Text(text = "Review", color = Color.Gray, fontSize = 14.sp, modifier = Modifier.padding(top = 16.dp))
 
             TextField(
-                value = state.reviewText,
+                value = state.logText,
                 onValueChange = onReviewTextChange,
                 modifier = Modifier.fillMaxWidth().heightIn(min = 150.dp),
                 placeholder = { Text("Write a review...", color = Color.DarkGray) },
@@ -197,9 +185,7 @@ fun ReviewContent(
                 textStyle = androidx.compose.ui.text.TextStyle(fontSize = 16.sp)
             )
 
-            if (state.reviewTextError != null) {
-                Text(text = state.reviewTextError!!, color = Color.Red, fontSize = 12.sp)
-            }
+            state.logTextError?.let { KinoErrorText(it) }
         }
     }
 }
@@ -214,8 +200,8 @@ private fun MovieHeaderInfo(movie: Movie) {
             modifier = Modifier.width(64.dp).height(96.dp)
                 .clip(RoundedCornerShape(4.dp)).background(Color.DarkGray)
         ) {
-            Image(
-                painter = painterResource(id = movie.posterUrl),
+            AsyncImage(
+                model = movie.posterUrl,
                 contentDescription = "Poster",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
@@ -225,7 +211,7 @@ private fun MovieHeaderInfo(movie: Movie) {
         Column {
             Text(text = movie.title, color = KinoWhite, fontSize = 24.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = movie.releaseYear, color = Color.Gray, fontSize = 16.sp)
+            Text(text = movie.releaseDate, color = Color.Gray, fontSize = 16.sp)
         }
     }
 }

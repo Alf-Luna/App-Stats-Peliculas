@@ -4,21 +4,17 @@ import com.mooncowpines.kinostats.data.local.SessionManager
 import com.mooncowpines.kinostats.data.remote.AuthApi
 import com.mooncowpines.kinostats.data.remote.ListApi
 import com.mooncowpines.kinostats.data.remote.MovieApi
-import com.mooncowpines.kinostats.data.remote.ReviewApi
+import com.mooncowpines.kinostats.data.remote.LogApi
 import com.mooncowpines.kinostats.data.remote.StatsApi
 import com.mooncowpines.kinostats.data.repositoryImpl.AuthRepositoryImpl
 import com.mooncowpines.kinostats.data.repositoryImpl.ListRepositoryImpl
-import com.mooncowpines.kinostats.data.repositoryImpl.MockAuthRepositoryImpl
-import com.mooncowpines.kinostats.data.repositoryImpl.MockMovieRepositoryImpl
-import com.mooncowpines.kinostats.data.repositoryImpl.MockReviewRepositoryImpl
-import com.mooncowpines.kinostats.data.repositoryImpl.MockStatsRepositoryImpl
 import com.mooncowpines.kinostats.data.repositoryImpl.MovieRepositoryImpl
-import com.mooncowpines.kinostats.data.repositoryImpl.ReviewRepositoryImpl
+import com.mooncowpines.kinostats.data.repositoryImpl.LogRepositoryImpl
 import com.mooncowpines.kinostats.data.repositoryImpl.StatsRepositoryImpl
 import com.mooncowpines.kinostats.domain.repository.AuthRepository
 import com.mooncowpines.kinostats.domain.repository.ListRepository
 import com.mooncowpines.kinostats.domain.repository.MovieRepository
-import com.mooncowpines.kinostats.domain.repository.ReviewRepository
+import com.mooncowpines.kinostats.domain.repository.LogRepository
 import com.mooncowpines.kinostats.domain.repository.StatsRepository
 import dagger.Module
 import dagger.Provides
@@ -33,11 +29,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
-    private const val USE_MOCKS_USERS = false
-    private const val USE_MOCKS_MOVIES = true
-    private const val USE_MOCKS_REVIEWS = true
-    private const val USE_MOCKS_STATS = true
 
     @Provides
     @Singleton
@@ -65,7 +56,7 @@ object AppModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080/")
+            .baseUrl("")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
@@ -85,8 +76,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideReviewApi(retrofit: Retrofit): ReviewApi {
-        return retrofit.create(ReviewApi::class.java)
+    fun provideLogApi(retrofit: Retrofit): LogApi {
+        return retrofit.create(LogApi::class.java)
     }
 
     @Provides
@@ -104,44 +95,26 @@ object AppModule {
     @Provides
     @Singleton
     fun provideAuthRepository(api: AuthApi, sessionManager: SessionManager): AuthRepository {
-        return if (USE_MOCKS_USERS) {
-            MockAuthRepositoryImpl()
-        } else {
-            AuthRepositoryImpl(api, sessionManager)
-        }
+        return AuthRepositoryImpl(api, sessionManager)
     }
 
 
     @Provides
     @Singleton
     fun provideMovieRepository(api: MovieApi): MovieRepository {
-        return if (USE_MOCKS_MOVIES) {
-            MockMovieRepositoryImpl()
-        } else {
-            MovieRepositoryImpl(api)
-        }
+        return MovieRepositoryImpl(api)
     }
 
     @Provides
     @Singleton
-    fun provideReviewRepository(api: ReviewApi): ReviewRepository {
-        return if (USE_MOCKS_REVIEWS)
-        {
-            MockReviewRepositoryImpl()
-        } else {
-            ReviewRepositoryImpl(api)
-        }
+    fun provideLogRepository(api: LogApi): LogRepository {
+        return LogRepositoryImpl(api)
     }
 
     @Provides
     @Singleton
     fun provideStatsRepository(api: StatsApi): StatsRepository {
-        return if (USE_MOCKS_STATS)
-        {
-            MockStatsRepositoryImpl()
-        } else {
-            StatsRepositoryImpl(api)
-        }
+        return StatsRepositoryImpl(api)
     }
 
     @Provides

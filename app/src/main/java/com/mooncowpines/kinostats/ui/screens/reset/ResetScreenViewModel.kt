@@ -10,8 +10,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 import com.mooncowpines.kinostats.utils.*
+import javax.inject.Inject
 
-class ResetScreenViewModel : ViewModel(){
+class ResetScreenViewModel @Inject constructor() : ViewModel(
+    // private val authRepository: AuthRepository
+){
     private val _state = MutableStateFlow(ResetScreenState())
     val state: StateFlow<ResetScreenState> = _state.asStateFlow()
 

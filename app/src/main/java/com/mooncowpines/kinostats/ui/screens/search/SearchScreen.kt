@@ -21,7 +21,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.mooncowpines.kinostats.ui.components.KinoLastSeenCard
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import com.mooncowpines.kinostats.ui.components.KinoPosterCard
 import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
@@ -39,7 +43,8 @@ fun SearchScreen(
         state = state,
         onMovieClick = onMovieClick,
         onBackClick = onBackClick,
-        onQueryChange = { viewModel.updateQueryAndSearch(it) },
+        onQueryChange = { viewModel.updateQuery(it) },
+        onSearchSubmit = { viewModel.submitSearch() },
         modifier = modifier
     )
 }
@@ -51,6 +56,7 @@ fun SearchContent(
     onMovieClick: (Long) -> Unit,
     onBackClick: () -> Unit,
     onQueryChange: (String) -> Unit,
+    onSearchSubmit: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
@@ -81,7 +87,11 @@ fun SearchContent(
                 placeholder = { Text("Search movies, actors...", color = Color.Gray) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() }),
+                keyboardActions = KeyboardActions(
+                    onSearch = {
+                        onSearchSubmit()
+                        focusManager.clearFocus()
+                    }                ),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = KinoWhite,
                     unfocusedTextColor = KinoWhite,
@@ -119,12 +129,14 @@ fun SearchContent(
                 }
 
                 state.results.isNotEmpty() -> {
-                    LazyColumn(
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(3),
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(bottom = 32.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        item {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
                             Text(
                                 text = "Results for '${state.searchQuery}'",
                                 color = KinoWhite,
@@ -135,9 +147,10 @@ fun SearchContent(
                         }
 
                         items(state.results) { movie ->
-                            KinoLastSeenCard(
-                                movie = movie,
-                                onClick = { onMovieClick(movie.id) }
+                            KinoPosterCard(
+                                movieCard = movie,
+                                onClick = { onMovieClick(movie.id) },
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
                     }

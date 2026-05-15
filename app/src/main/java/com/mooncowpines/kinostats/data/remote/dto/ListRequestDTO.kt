@@ -1,4 +1,4 @@
-package com.mooncowpines.kinostats.domain.model
+package com.mooncowpines.kinostats.data.remote.dto
 
 data class MovieListRequest(
     val userId: Long,

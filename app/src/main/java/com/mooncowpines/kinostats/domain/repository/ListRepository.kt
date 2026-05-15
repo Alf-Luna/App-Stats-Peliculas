@@ -8,5 +8,7 @@ interface ListRepository {
 
     suspend fun createList(userId: Long, name: String): Boolean
     suspend fun addFilmToList(userId: Long, movieListId: Long, filmId: Long): Boolean
+
+    suspend fun deleteList(listId: Long): Boolean
     suspend fun removeFilmFromList(listId: Long, filmId: Long): Boolean
 }

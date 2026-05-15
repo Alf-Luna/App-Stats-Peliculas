@@ -1,9 +1,12 @@
 package com.mooncowpines.kinostats.data.repositoryImpl
 
 import android.util.Log
+import android.util.Log.e
 import com.mooncowpines.kinostats.data.local.SessionManager
+import com.mooncowpines.kinostats.data.mapper.toDomain
 import com.mooncowpines.kinostats.data.remote.AuthApi
 import com.mooncowpines.kinostats.domain.model.User
+import com.mooncowpines.kinostats.data.remote.dto.UserDTO
 import com.mooncowpines.kinostats.domain.repository.AuthRepository
 import retrofit2.HttpException
 import okhttp3.Credentials
@@ -22,11 +25,13 @@ class AuthRepositoryImpl @Inject constructor(
             val response = api.login(authHeader)
 
             if (response.isSuccessful) {
-                val user = response.body()
-                if (user != null) {
+                val userDto = response.body()
+                if (userDto != null) {
+                    val user = userDto.toDomain()
                     currentUser = user
                     sessionManager.saveAuthToken(authHeader)
-                    Log.d("LOGIN", "User logged: ${user.userName} with ID: ${user.id}")
+
+                    Log.d("LOGIN", "User logged: ${userDto.userName} with ID: ${userDto.id}")
                     return true
                 }
             }
@@ -48,13 +53,13 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun register(userName: String, email: String, pass: String): Boolean {
         return try {
-            val newUser = User(
+            val newUserDTO = UserDTO(
                 userName = userName,
                 email = email,
                 pass = pass
             )
 
-            val response = api.register(newUser)
+            val response = api.register(newUserDTO)
 
             if (response.isSuccessful) {
                 Log.d("REGISTER", "User $userName registered with email $email")
@@ -69,38 +74,53 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun changePassword(newPass: String, newPassCheck: String): Boolean {
-        if (newPass != newPassCheck) return false
-
+    override suspend fun updateUser(
+        email: String,
+        userName: String,
+        currentPassword: String,
+        newPassword: String?
+    ): Boolean {
         val userToUpdate = currentUser ?: return false
-
         val userId = userToUpdate.id ?: return false
 
+        val passToSend = newPassword ?: currentPassword
         return try {
-            val updatedUser = userToUpdate.copy(pass = newPass)
+        val updatedUserDTO = UserDTO(
+            id = userId,
+            userName = userName,
+            email = email,
+            pass = passToSend
+        )
 
-            val response = api.updateUser(userId, updatedUser)
+        val response = api.updateUser(userId, updatedUserDTO)
 
-            if (response.isSuccessful) {
-                Log.d("PASSWORD", "Password changed successfully")
-
-                val newAuthHeader = Credentials.basic(userToUpdate.email, newPass)
-                sessionManager.saveAuthToken(newAuthHeader)
-                true
-            } else {
-                false
-            }
-        } catch (e: Exception) {
-            Log.e("PASSWORD", "Error changing password: ", e)
+        if (response.isSuccessful) {
+            val newAuthHeader = Credentials.basic(email, passToSend)
+            sessionManager.saveAuthToken(newAuthHeader)
+            currentUser = userToUpdate.copy(
+                userName = userName,
+                email = email,
+                pass = passToSend
+            )
+            true
+        } else {
+            Log.e("UPDATE", "Server rejected the update: ${response.code()}")
             false
         }
+    } catch (e: Exception)
+    {
+        Log.e("UPDATE", "Error updating account: ", e)
+        false
     }
+}
+
+
 
     override suspend fun getUserById(userId: Long): User? {
         return try {
             val response = api.getUserById(userId)
             if (response.isSuccessful) {
-                response.body()
+                response.body()?.toDomain()
             } else {
                 null
             }
@@ -113,7 +133,6 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun sendRecoveryEmail(email: String): Boolean {
         TODO()
-        return true
     }
 
 }

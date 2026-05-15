@@ -32,9 +32,9 @@ fun getUserNameError(userName: String): String? {
         return null
 }
 
-fun getTextReviewError(textReview: String): String?{
-    if (textReview.isBlank()) {
-        return "The review text cannot be empty"
+fun getTextLogError(textLog: String): String?{
+    if (textLog.isBlank()) {
+        return "The log text cannot be empty"
     }
 
     return null
@@ -42,14 +42,14 @@ fun getTextReviewError(textReview: String): String?{
 
 fun getRatingError(rating: Float): String?{
     if (rating == 0f) {
-        return "The review rating cannot be 0"
+        return "The log rating cannot be 0"
     }
     return null
 }
 
 fun getWatchDateError(watchDate: LocalDate?): String? {
     if (watchDate == null) {
-        return "The review must have a date"
+        return "The log must have a date"
     }
     return null
 }

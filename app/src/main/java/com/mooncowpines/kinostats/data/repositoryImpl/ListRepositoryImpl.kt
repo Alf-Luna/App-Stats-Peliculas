@@ -2,10 +2,11 @@ package com.mooncowpines.kinostats.data.repositoryImpl
 
 
 import android.util.Log
+import com.mooncowpines.kinostats.data.mapper.toDomain
 import com.mooncowpines.kinostats.data.remote.ListApi
 import com.mooncowpines.kinostats.domain.model.MovieList
-import com.mooncowpines.kinostats.domain.model.MovieListAddRequest
-import com.mooncowpines.kinostats.domain.model.MovieListRequest
+import com.mooncowpines.kinostats.data.remote.dto.MovieListAddRequest
+import com.mooncowpines.kinostats.data.remote.dto.MovieListRequest
 import com.mooncowpines.kinostats.domain.repository.ListRepository
 import javax.inject.Inject
 
@@ -17,7 +18,7 @@ class ListRepositoryImpl @Inject constructor(
         return try {
             val response = api.getListsByUser(userId)
             if (response.isSuccessful) {
-                response.body()
+                response.body()?.map { it.toDomain() }
             } else {
                 Log.e("ListRepository", "Error al obtener las listas: ${response.code()}")
                 null
@@ -32,7 +33,7 @@ class ListRepositoryImpl @Inject constructor(
         return try {
             val response = api.getListById(listId)
             if (response.isSuccessful) {
-                response.body()
+                response.body()?.toDomain()
             } else {
                 Log.e("ListRepository", "Error al obtener la lista $listId: ${response.code()}")
                 null
@@ -72,6 +73,15 @@ class ListRepositoryImpl @Inject constructor(
             response.isSuccessful
         } catch (e: Exception) {
             Log.e("ListRepository", "Error de red al añadir película", e)
+            false
+        }
+    }
+
+    override suspend fun deleteList(listId: Long): Boolean {
+        return try {
+            val response = api.deleteList(listId)
+            response.isSuccessful
+        } catch (e: Exception) {
             false
         }
     }

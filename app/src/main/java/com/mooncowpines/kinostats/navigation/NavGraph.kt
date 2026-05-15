@@ -17,7 +17,8 @@ import com.mooncowpines.kinostats.ui.screens.profile.ProfileScreen
 import com.mooncowpines.kinostats.ui.screens.change.ChangeScreen
 import com.mooncowpines.kinostats.ui.screens.listDetail.ListDetailScreen
 import com.mooncowpines.kinostats.ui.screens.lists.ListsScreen
-import com.mooncowpines.kinostats.ui.screens.review.ReviewScreen
+import com.mooncowpines.kinostats.ui.screens.log.LogScreen
+import com.mooncowpines.kinostats.ui.screens.logDetail.LogDetailScreen
 import com.mooncowpines.kinostats.ui.screens.stats.StatsScreen
 import com.mooncowpines.kinostats.ui.screens.movieDetail.MovieDetailScreen
 import com.mooncowpines.kinostats.ui.screens.search.SearchScreen
@@ -41,7 +42,6 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
                     }
                 },
                 onNavigateToRecover = { navController.navigate(Route.Recovery.path)},
-                onNavigateToReset = { navController.navigate(Route.Reset.path)},
             )
         }
 
@@ -84,8 +84,13 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
             )
         }
 
-        composable(Route.Home.path) {
+        composable(Route.Home.path) { backStackEntry ->
+            val shouldRefresh = backStackEntry.savedStateHandle.get<Boolean>("refresh_home") ?: false
             HomeScreen(
+                shouldRefresh = shouldRefresh,
+                onRefreshDone = {
+                    backStackEntry.savedStateHandle.set("refresh_home", false)
+                },
                 onMovieClick = { movieId ->
                     navController.navigate(Route.MovieDetail.createRoute(movieId))
                 },
@@ -116,6 +121,14 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
             )
         }
 
+        composable(Route.Logs.path) {
+            LogScreen(
+                onNavigateToLogDetail = { movieId, logId ->
+                    navController.navigate(Route.LogDetail.createRoute(movieId, logId))
+                }
+            )
+        }
+
         composable(
             route = Route.MovieDetail.path,
             arguments = listOf(navArgument("movieId") { type = NavType.IntType })
@@ -123,17 +136,23 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
                 MovieDetailScreen(
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateToLog = { id ->
-                        navController.navigate(Route.Review.createRoute(id))
+                        navController.navigate(Route.LogDetail.createRoute(id))
+                    },
+                    onDataModified = {
+                        val homeEntry = try {
+                            navController.getBackStackEntry(Route.Home.path)
+                        } catch(e: Exception) { null }
+                        homeEntry?.savedStateHandle?.set("refresh_home", true)
                     }
                 )
         }
 
 
         composable(
-            route = Route.Review.path,
+            route = Route.LogDetail.path,
             arguments = listOf(navArgument("movieId") { type = NavType.IntType })
         ) {
-                ReviewScreen(
+                LogDetailScreen(
                     onNavigateBack = { navController.popBackStack() },
 
                 )
@@ -169,10 +188,16 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
                 onNavigateBack = { navController.popBackStack() },
                 onMovieClick = { movieId ->
                     navController.navigate(Route.MovieDetail.createRoute(movieId))
+                },
+                onDataModified = {
+                    val homeEntry = try {
+                        navController.getBackStackEntry(Route.Home.path)
+                    } catch (e: Exception) { null }
+
+                    homeEntry?.savedStateHandle?.set("refresh_home", true)
                 }
             )
         }
-
 
         }
     }

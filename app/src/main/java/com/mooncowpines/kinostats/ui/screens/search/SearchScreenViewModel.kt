@@ -35,17 +35,17 @@ class SearchScreenViewModel @Inject constructor(
         }
     }
 
-    fun updateQueryAndSearch(newQuery: String) {
+    fun updateQuery(newQuery: String) {
         _state.update { it.copy(searchQuery = newQuery) }
+        if (newQuery.isBlank()) {
+            _state.update { it.copy(results = emptyList(), errorMsg = null) }
+        }
+    }
 
-        searchJob?.cancel()
-        searchJob = viewModelScope.launch {
-            delay(500)
-            if (newQuery.isNotBlank()) {
-                performSearch(newQuery)
-            } else {
-                _state.update { it.copy(results = emptyList(), isLoading = false, errorMsg = null) }
-            }
+    fun submitSearch() {
+        val currentQuery = _state.value.searchQuery
+        if (currentQuery.isNotBlank()) {
+            performSearch(currentQuery)
         }
     }
 

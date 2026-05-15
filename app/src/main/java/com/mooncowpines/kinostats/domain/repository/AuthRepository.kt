@@ -9,7 +9,7 @@ interface AuthRepository {
 
     //register functions
     suspend fun register(userName: String, email: String, pass: String): Boolean
-    suspend fun changePassword(newPass: String, newPassCheck: String): Boolean
+    suspend fun updateUser(email: String, userName: String, currentPassword: String, newPassword: String?): Boolean
     suspend fun getUserById(userId: Long): User?
 
     //recovery functions

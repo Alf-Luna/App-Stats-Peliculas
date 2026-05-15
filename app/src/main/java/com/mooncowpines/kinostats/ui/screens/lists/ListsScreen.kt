@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -34,6 +33,19 @@ fun ListsScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
+    ListsContent(
+        state = state,
+        onNavigateToListDetail = onNavigateToListDetail,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun ListsContent(
+    state: ListsScreenState,
+    onNavigateToListDetail: (Long) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -56,7 +68,7 @@ fun ListsScreen(
             }
             state.errorMsg != null -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = state.errorMsg!!, color = Color.Red)
+                    Text(text = state.errorMsg, color = Color.Red)
                 }
             }
             state.lists.isEmpty() -> {
@@ -79,6 +91,7 @@ fun ListsScreen(
             }
         }
     }
+
 }
 
 @Composable

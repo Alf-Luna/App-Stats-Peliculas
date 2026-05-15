@@ -47,7 +47,15 @@ class ListDetailViewModel @Inject constructor(
                 val success = listRepository.removeFilmFromList(listId, filmId)
 
                 if (success) {
-                    loadListContent()
+                    val result = listRepository.getListById(listId)
+                    if (result != null) {
+                        _state.value = ListDetailState.Success(
+                            movieList = result,
+                            actionMessage = "Movie removed successfully"
+                        )
+                    } else {
+                        _state.value = ListDetailState.Error("Could not load list details")
+                    }
                 } else {
                     _state.value = currentState.copy(
                         isDeleting = false,
