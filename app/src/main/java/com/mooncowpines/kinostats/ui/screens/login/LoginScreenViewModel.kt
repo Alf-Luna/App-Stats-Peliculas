@@ -1,6 +1,5 @@
 package com.mooncowpines.kinostats.ui.screens.login
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,7 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 import com.mooncowpines.kinostats.domain.repository.AuthRepository
-import com.mooncowpines.kinostats.utils.getEmailError
+import com.mooncowpines.kinostats.utils.getUserNameError
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -22,8 +21,8 @@ class LoginScreenViewModel @Inject constructor(
     val state: StateFlow<LoginScreenState> = _state.asStateFlow()
 
     //Functions to track text field value
-    fun onEmailChange(newEmail: String) {
-        _state.update { it.copy(email = newEmail, errorMsg = null) }
+    fun onUsernameChange(newUsername: String) {
+        _state.update { it.copy(username = newUsername, errorMsg = null) }
     }
     fun onPassChange(newPass: String) {
         _state.update { it.copy(pass = newPass, errorMsg = null) }
@@ -35,10 +34,10 @@ class LoginScreenViewModel @Inject constructor(
         if (currentState.isSubmitting) return
 
         //Local validation for the text fields
-        val emailErrorResult = getEmailError(currentState.email)
+        val usernameErrorResult = getUserNameError(currentState.username)
         val isPassBlank = currentState.pass.isBlank()
 
-        if (emailErrorResult != null || isPassBlank) {
+        if (usernameErrorResult != null || isPassBlank) {
             _state.update { it.copy(errorMsg = "Invalid email or password") }
             return
         }
@@ -48,7 +47,7 @@ class LoginScreenViewModel @Inject constructor(
             _state.update { it.copy(isSubmitting = true, errorMsg = null) }
 
             val isSuccess = authRepository.login(
-                email = currentState.email,
+                username = currentState.username,
                 pass = currentState.pass
             )
 

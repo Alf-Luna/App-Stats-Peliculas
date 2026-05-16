@@ -2,16 +2,19 @@ package com.mooncowpines.kinostats.di
 
 import com.mooncowpines.kinostats.data.local.SessionManager
 import com.mooncowpines.kinostats.data.remote.AuthApi
+import com.mooncowpines.kinostats.data.remote.HomeApi
 import com.mooncowpines.kinostats.data.remote.ListApi
 import com.mooncowpines.kinostats.data.remote.MovieApi
 import com.mooncowpines.kinostats.data.remote.LogApi
 import com.mooncowpines.kinostats.data.remote.StatsApi
+import com.mooncowpines.kinostats.data.repository.HomeRepositoryImpl
 import com.mooncowpines.kinostats.data.repositoryImpl.AuthRepositoryImpl
 import com.mooncowpines.kinostats.data.repositoryImpl.ListRepositoryImpl
 import com.mooncowpines.kinostats.data.repositoryImpl.MovieRepositoryImpl
 import com.mooncowpines.kinostats.data.repositoryImpl.LogRepositoryImpl
 import com.mooncowpines.kinostats.data.repositoryImpl.StatsRepositoryImpl
 import com.mooncowpines.kinostats.domain.repository.AuthRepository
+import com.mooncowpines.kinostats.domain.repository.HomeRepository
 import com.mooncowpines.kinostats.domain.repository.ListRepository
 import com.mooncowpines.kinostats.domain.repository.MovieRepository
 import com.mooncowpines.kinostats.domain.repository.LogRepository
@@ -70,6 +73,12 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideHomeApi(retrofit: Retrofit): HomeApi {
+        return retrofit.create(HomeApi::class.java)
+    }
+
+    @Provides
+    @Singleton
     fun provideMovieApi(retrofit: Retrofit): MovieApi {
         return retrofit.create(MovieApi::class.java)
     }
@@ -98,6 +107,11 @@ object AppModule {
         return AuthRepositoryImpl(api, sessionManager)
     }
 
+    @Provides
+    @Singleton
+    fun provideHomeRepository(api: HomeApi): HomeRepository {
+        return HomeRepositoryImpl(api)
+    }
 
     @Provides
     @Singleton

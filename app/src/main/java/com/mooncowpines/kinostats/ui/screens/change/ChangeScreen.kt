@@ -37,6 +37,7 @@ import com.mooncowpines.kinostats.ui.components.PasswordRequirementsFeedback
 import com.mooncowpines.kinostats.ui.components.PasswordMatchFeedback
 import com.mooncowpines.kinostats.ui.components.KinoErrorText
 import com.mooncowpines.kinostats.ui.theme.KinoSpacing
+import com.mooncowpines.kinostats.ui.theme.KinoWhite
 
 @Composable
 fun ChangeScreen(
@@ -49,22 +50,23 @@ fun ChangeScreen(
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
 
-    LaunchedEffect(state.success) {
-        if (state.success) {
+    LaunchedEffect(state.profileSuccess, state.passwordSuccess) {
+        if (state.profileSuccess) {
+            Toast.makeText(context, "Profile updated successfully!", Toast.LENGTH_LONG).show()
+            viewModel.resetSuccessFlags()
+            onNavigateBack()
+        }
+        if (state.passwordSuccess) {
             Toast.makeText(context, "Password changed successfully!", Toast.LENGTH_LONG).show()
-            onNavigateToHome()
+            viewModel.resetSuccessFlags()
+            onNavigateBack()
         }
     }
 
     Box(Modifier.fillMaxSize().padding(30.dp)) {
         ChangeContent(
             state = state,
-            onEmailChange = { viewModel.onEmailChange(it) },
-            onUserNameChange = { viewModel.onUserNameChange(it) },
-            onCurrentPassChange = { viewModel.onCurrentPassChange(it)},
-            onNewPassChange = { viewModel.onNewPassChange(it) },
-            onNewPassCheckChange = { viewModel.onNewPassCheckChange(it) },
-            onChangeClick = { viewModel.change() },
+            viewModel = viewModel,
             onCancelClick = onNavigateBack,
             modifier = Modifier.align(Alignment.Center)
         )
@@ -74,180 +76,66 @@ fun ChangeScreen(
 @Composable
 fun ChangeContent(
     state: ChangeScreenState,
-    onEmailChange: (String) -> Unit,
-    onUserNameChange: (String) -> Unit,
-    onCurrentPassChange: (String) -> Unit,
-    onNewPassChange: (String) -> Unit,
-    onNewPassCheckChange: (String) -> Unit,
-    onChangeClick: () -> Unit,
+    viewModel: ChangeScreenViewModel,
     onCancelClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
 
     Column(modifier = modifier.verticalScroll(scrollState), horizontalAlignment = Alignment.CenterHorizontally) {
-        //Header banner
-        Text(
-            text = "Please Enter Your New Data",
-            color = KinoYellow,
-            fontSize = 30.sp,
-            fontStyle = FontStyle.Italic,
-            fontWeight = FontWeight.Bold
-        )
+        Text("Update Your Info", color = KinoYellow, fontSize = 30.sp, fontStyle = FontStyle.Italic, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
+
+        KinoFrame {
+            Text("Profile Information", color = KinoWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(KinoSpacing.medium))
+
+            KinoTextField(textValue = state.userName, onTextChange = { viewModel.onUserNameChange(it) }, placeholderText = "Username", modifier = Modifier.fillMaxWidth())
+            state.userNameError?.let { KinoErrorText(it) }
+            Spacer(modifier = Modifier.height(KinoSpacing.small))
+
+            KinoTextField(textValue = state.email, onTextChange = { viewModel.onEmailChange(it) }, placeholderText = "Email", modifier = Modifier.fillMaxWidth())
+            state.emailError?.let { KinoErrorText(it) }
+            Spacer(modifier = Modifier.height(KinoSpacing.small))
+
+            KinoTextField(textValue = state.passForProfile, onTextChange = { viewModel.onPassForProfileChange(it) }, placeholderText = "Current Password to verify", isPassword = true, modifier = Modifier.fillMaxWidth())
+            state.passForProfileError?.let { KinoErrorText(it) }
+            Spacer(modifier = Modifier.height(KinoSpacing.medium))
+
+            if (state.isSubmittingProfile) {
+                CircularProgressIndicator(color = KinoYellow)
+            } else {
+                KinoButton(text = "Update Profile", onClick = { viewModel.changeProfile() }, modifier = Modifier.fillMaxWidth())
+            }
+        }
 
         Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
 
-        //Frame to wrap the form
         KinoFrame {
-            //Current password text field
-            Column {
-                Text("Username:", color = KinoYellow)
-                HorizontalDivider(
-                    color = KinoYellow, thickness = 1.dp,
-                    modifier = Modifier.padding(top = KinoSpacing.micro, bottom = KinoSpacing.small)
-                )
-                KinoTextField(
-                    textValue = state.userName,
-                    onTextChange = onUserNameChange,
-                    placeholderText = "New Username",
-                    modifier = Modifier.fillMaxWidth()
-                )
-                state.userNameError?.let { KinoErrorText(it) }
-            }
-
+            Text("Change Password", color = KinoWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(KinoSpacing.medium))
 
-            Column {
-                Text("Email:", color = KinoYellow)
-                HorizontalDivider(
-                    color = KinoYellow, thickness = 1.dp,
-                    modifier = Modifier.padding(top = KinoSpacing.micro, bottom = KinoSpacing.small)
-                )
-                KinoTextField(
-                    textValue = state.email,
-                    onTextChange = onEmailChange,
-                    placeholderText = "New Email",
-                    modifier = Modifier.fillMaxWidth()
-                )
-                state.emailError?.let { KinoErrorText(it) }
-            }
+            KinoTextField(textValue = state.newPass, onTextChange = { viewModel.onNewPassChange(it) }, placeholderText = "New Password", isPassword = true, modifier = Modifier.fillMaxWidth())
+            PasswordRequirementsFeedback(state.newPass)
+            Spacer(modifier = Modifier.height(KinoSpacing.small))
 
-            Spacer(modifier = Modifier.height(KinoSpacing.medium))
-            HorizontalDivider(color = Color.DarkGray, thickness = 2.dp)
+            KinoTextField(textValue = state.newPassCheck, onTextChange = { viewModel.onNewPassCheckChange(it) }, placeholderText = "Confirm New Password", isPassword = true, modifier = Modifier.fillMaxWidth())
+            PasswordMatchFeedback(state.newPass, state.newPassCheck)
+            Spacer(modifier = Modifier.height(KinoSpacing.small))
+
+            KinoTextField(textValue = state.passForPassword, onTextChange = { viewModel.onPassForPasswordChange(it) }, placeholderText = "Current Password to verify", isPassword = true, modifier = Modifier.fillMaxWidth())
+            state.passForPasswordError?.let { KinoErrorText(it) }
             Spacer(modifier = Modifier.height(KinoSpacing.medium))
 
-            Column {
-                Text(
-                    text = "Current Password:",
-                    color = KinoYellow,
-                )
-                HorizontalDivider(
-                    color = KinoYellow,
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(
-                        top = KinoSpacing.micro,
-                        bottom = KinoSpacing.small)
-                )
-                KinoTextField(
-                    textValue = state.currentPass,
-                    onTextChange = onCurrentPassChange,
-                    placeholderText = "Current Password",
-                    isPassword = true,
-                    modifier = Modifier.fillMaxWidth())
-
-                //Visual feedback to password errors
-                state.currentPassError?.let { KinoErrorText(it) }
-            }
-
-            Spacer(modifier = Modifier.height(KinoSpacing.medium))
-
-            //Password text field
-            Column {
-                Text(
-                    text = "New Password:",
-                    color = KinoYellow,
-                )
-                HorizontalDivider(
-                    color = KinoYellow,
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(
-                        top = KinoSpacing.micro,
-                        bottom = KinoSpacing.small)
-                )
-                KinoTextField(
-                    textValue = state.newPass,
-                    onTextChange = onNewPassChange,
-                    placeholderText = "New Password",
-                    isPassword = true,
-                    modifier = Modifier.fillMaxWidth())
-                //Visual feedback to password requirements
-                PasswordRequirementsFeedback(state.newPass)
-            }
-
-            Spacer(modifier = Modifier.height(KinoSpacing.medium))
-            //Password check test field
-            Column {
-                Text(
-                    text = "Confirm New Password:",
-                    color = KinoYellow,
-                )
-                HorizontalDivider(
-                    color = KinoYellow,
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(
-                        top = KinoSpacing.micro,
-                        bottom = KinoSpacing.small)
-                )
-                KinoTextField(
-                    textValue = state.newPassCheck,
-                    onTextChange = onNewPassCheckChange,
-                    placeholderText = "Confirm Password",
-                    isPassword = true,
-                    modifier = Modifier.fillMaxWidth())
-                //Visual feedback for password match
-                PasswordMatchFeedback(state.newPass, state.newPassCheck)
-            }
-
-            Spacer(modifier = Modifier.height(KinoSpacing.medium))
-
-
-            Column {
-                //General error message
-                state.errorMsg?.let { error ->
-                    Text(
-                        text = error,
-                        color = Color.Red,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(bottom = KinoSpacing.small)
-                    )
-                }
-
-                //Buttons section
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(KinoSpacing.medium)
-                ) {
-                    if (state.isSubmitting) {
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(48.dp),
-                            contentAlignment = Alignment.Center
-                        ) { CircularProgressIndicator(color = KinoYellow) }
-                    } else {
-                        KinoButton(
-                            text = "Change",
-                            onClick = onChangeClick,
-                            modifier = Modifier.weight(1.5f)
-                        )
-                    }
-
-                    KinoButton(
-                        text = "Cancel",
-                        onClick = onCancelClick,
-                        modifier = Modifier.weight(1f),
-                        enabled = !state.isSubmitting)
-                    }
-                }
+            if (state.isSubmittingPassword) {
+                CircularProgressIndicator(color = KinoYellow)
+            } else {
+                KinoButton(text = "Change Password", onClick = { viewModel.changePassword() }, modifier = Modifier.fillMaxWidth())
             }
         }
+
+        state.errorMsg?.let { KinoErrorText(it) }
+        Spacer(modifier = Modifier.height(KinoSpacing.large))
+        KinoButton(text = "Cancel", onClick = onCancelClick, modifier = Modifier.fillMaxWidth(0.5f))
     }
+}

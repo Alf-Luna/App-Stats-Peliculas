@@ -11,10 +11,10 @@ fun StatsResponseDTO.toDomain(): UserStats {
             Pair("Hours", this.hoursWatched.toFloat()),
             Pair("Minutes", this.minutesWatched.toFloat())
         ),
-        genres = this.moviesWatchedByGenre.map { StatItem(it.type, it.count) },
-        countries = this.moviesWatchedByCountry.map { StatItem(it.type, it.count) },
-        topActors = this.topActors.map { StatItem(it.type, it.count) },
-        topDirectors = this.topDirectors.map { StatItem(it.type, it.count) },
+        genres = this.moviesWatchedByGenre.map { StatItem(it.type ?: "Unknown", it.count) },
+        countries = this.moviesWatchedByCountry.map { StatItem(it.type ?: "Unknown", it.count) },
+        topActors = this.topActors.map { StatItem(it.type ?: "Unknown", it.count) },
+        topDirectors = this.topDirectors.map { StatItem(it.type?: "Unknown", it.count) },
         ratings = this.ratingsCount.map { StatItem(it.rating, it.count) },
         decades = this.moviesWatchedByDecade.map { StatItem(it.decade, it.count) }
     )

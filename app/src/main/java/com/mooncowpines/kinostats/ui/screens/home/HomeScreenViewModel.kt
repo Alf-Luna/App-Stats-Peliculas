@@ -7,6 +7,7 @@ import com.mooncowpines.kinostats.domain.repository.AuthRepository
 import com.mooncowpines.kinostats.domain.repository.MovieRepository
 import com.mooncowpines.kinostats.domain.repository.ListRepository
 import com.mooncowpines.kinostats.domain.repository.LogRepository
+import com.mooncowpines.kinostats.domain.repository.HomeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,6 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    private val homeRepository: HomeRepository,
     private val movieRepository: MovieRepository,
     private val listRepository: ListRepository,
     private val logRepository: LogRepository,
@@ -32,30 +34,26 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = HomeScreenState.Loading
             try {
-
                 val currentUser = authRepository.getCurrentUser()
                 val userId = currentUser?.id
 
-                var watchlistFromApi = emptyList<MovieCard>()
-
-                if (userId != null) {
-                    val allLists = listRepository.getListsByUser(userId)
-
-                    val watchlist = allLists?.find { it.name.equals("Watchlist", ignoreCase = true) }
-
-                    if (watchlist != null) {
-                        watchlistFromApi = watchlist.movies
-                    }
+                if (userId == null) {
+                    _state.value = HomeScreenState.Error("User not found.")
+                    return@launch
                 }
 
-                val justWatchedFromApi = emptyList<MovieCard>()
-                val lastSeenFromApi: MovieCard? = null
+                val homeData = homeRepository.getHomeData(userId)
 
-                _state.value = HomeScreenState.Success(
-                    watchlistMovies = watchlistFromApi,
-                    justWatchedMovies = justWatchedFromApi,
-                    lastSeenMovie = lastSeenFromApi
-                )
+                if (homeData != null) {
+                    _state.value = HomeScreenState.Success(
+                        watchlistMovies = homeData.watchlist,
+                        justWatchedMovies = homeData.justWatched,
+                        lastSeenMovie = homeData.lastSeen
+                    )
+                } else {
+                    _state.value = HomeScreenState.Error("Could not load home data.")
+                }
+
             } catch (e: Exception) {
                 _state.value = HomeScreenState.Error("Something went wrong: ${e.message}")
             }

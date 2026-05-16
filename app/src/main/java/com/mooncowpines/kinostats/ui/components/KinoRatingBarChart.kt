@@ -44,14 +44,14 @@ fun KinoRatingBarChart(ratings: List<StatItem<Float, Int>>) {
         .axisLineColor(Color.DarkGray)
         .build()
 
-    val maxCount = barDataList.maxOfOrNull { it.point.y } ?: 0f
-    val ySteps = 5
+    val maxCount = barDataList.maxOfOrNull { it.point.y }?.toInt() ?: 0
+    val ySteps = if (maxCount < 5) maxCount.coerceAtLeast(1) else 5
 
     val yAxisData = AxisData.Builder()
         .steps(ySteps)
         .labelAndAxisLinePadding(15.dp)
         .labelData { i ->
-            val value = (maxCount / ySteps) * i
+            val value = (maxCount.toFloat() / ySteps) * i
             value.toInt().toString()
         }
         .axisLabelColor(KinoWhite)

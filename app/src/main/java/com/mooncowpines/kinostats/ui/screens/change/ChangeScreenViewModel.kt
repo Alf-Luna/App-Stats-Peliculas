@@ -33,23 +33,23 @@ class ChangeScreenViewModel @Inject constructor(
         _state.update { it.copy(userName = userName, errorMsg = null, userNameError = null) }
     }
 
-    fun onCurrentPassChange(currentPass: String) {
-        _state.update { it.copy(currentPass = currentPass, errorMsg = null, currentPassError = null) }
+    fun onPassForProfileChange(pass: String) {
+        _state.update { it.copy(passForProfile = pass, errorMsg = null, passForProfileError = null) }
     }
 
     fun onNewPassChange(newPass: String) {
         _state.update { it.copy(newPass = newPass, errorMsg = null) }
     }
-
     fun onNewPassCheckChange(newPassCheck: String) {
         _state.update { it.copy(newPassCheck = newPassCheck, errorMsg = null) }
+    }
+    fun onPassForPasswordChange(currentPass: String) {
+        _state.update { it.copy(passForPassword = currentPass, errorMsg = null, passForPasswordError = null) }
     }
 
     private fun loadCurrentUser() {
         viewModelScope.launch {
-            val user = authRepository.getCurrentUser()
-
-            user?.let { currentUser ->
+            authRepository.getCurrentUser()?.let { currentUser ->
                 _state.update {
                     it.copy(
                         userName = currentUser.userName ?: "",
@@ -61,53 +61,62 @@ class ChangeScreenViewModel @Inject constructor(
     }
 
     //Triggers a data change attempt
-    fun change() {
+    fun changeProfile() {
         val currentState = _state.value
-        if (currentState.isSubmitting) return
-
-        //Local validation for the text field
+        if (currentState.isSubmittingProfile || currentState.isSubmittingPassword) return
 
         val emailError = getEmailError(currentState.email)
         val userNameError = getUserNameError(currentState.userName)
-        val currentPassError = getCurrentPassError(currentState.currentPass)
+        val currentPassError = getCurrentPassError(currentState.passForProfile)
 
-        val isTryingToChangePass = currentState.newPass.isNotEmpty() || currentState.newPassCheck.isNotEmpty()
-        val isPassValid = isPassValid(currentState.newPass)
-        val isPassCheckValid = isPassMatch(currentState.newPass, currentState.newPassCheck)
-
-        if (emailError != null || userNameError != null || currentPassError != null || !isPassValid || !isPassCheckValid) {
-            val generalError = when {
-                currentState.currentPass == currentState.newPass && isTryingToChangePass -> "You cannot use the same password right away!"
-                !isPassValid || !isPassCheckValid -> "Check the password validations"
-                else -> "Please check the fields in red"
-            }
-
-            _state.update { it.copy(
-                emailError = emailError,
-                userNameError = userNameError,
-                currentPassError = currentPassError,
-                errorMsg = generalError
-            )}
+        if (emailError != null || userNameError != null || currentPassError != null) {
+            _state.update { it.copy(emailError = emailError, userNameError = userNameError, passForProfileError = currentPassError, errorMsg = "Check profile fields") }
             return
         }
 
-        //Tries a password change attempt
         viewModelScope.launch {
-            _state.update { it.copy(isSubmitting = true, errorMsg = null) }
-
+            _state.update { it.copy(isSubmittingProfile = true, errorMsg = null) }
             val isSuccess = authRepository.updateUser(
                 userName = currentState.userName,
                 email = currentState.email,
-                currentPassword = currentState.currentPass,
-                newPassword = if (isTryingToChangePass) currentState.newPass else null
+                currentPassword = currentState.passForProfile,
+                newPassword = null
             )
 
-            if (isSuccess) {
-                _state.update { it.copy(isSubmitting = false, success = true) }
-            } else {
-                _state.update { it.copy(isSubmitting = false, errorMsg = "Could not change password") }
-            }        }
+            if (isSuccess) _state.update { it.copy(isSubmittingProfile = false, profileSuccess = true) }
+            else _state.update { it.copy(isSubmittingProfile = false, errorMsg = "Could not update profile") }
+        }
     }
+
+    fun changePassword() {
+        val currentState = _state.value
+        if (currentState.isSubmittingProfile || currentState.isSubmittingPassword) return
+
+        val currentPassError = getCurrentPassError(currentState.passForPassword)
+        val isPassValid = isPassValid(currentState.newPass)
+        val isPassCheckValid = isPassMatch(currentState.newPass, currentState.newPassCheck)
+
+        if (currentPassError != null || !isPassValid || !isPassCheckValid) {
+            val error = if (currentState.passForPassword == currentState.newPass) "Cannot use the same password" else "Check password fields"
+            _state.update { it.copy(passForPasswordError = currentPassError, errorMsg = error) }
+            return
+        }
+
+        viewModelScope.launch {
+            _state.update { it.copy(isSubmittingPassword = true, errorMsg = null) }
+            val isSuccess = authRepository.updateUser(
+                userName = currentState.userName,
+                email = currentState.email,
+                currentPassword = currentState.passForPassword,
+                newPassword = currentState.newPass
+            )
+
+            if (isSuccess) _state.update { it.copy(isSubmittingPassword = false, passwordSuccess = true) }
+            else _state.update { it.copy(isSubmittingPassword = false, errorMsg = "Could not update password") }
+        }
+    }
+
+    fun resetSuccessFlags() = _state.update { it.copy(profileSuccess = false, passwordSuccess = false) }
 }
 
 

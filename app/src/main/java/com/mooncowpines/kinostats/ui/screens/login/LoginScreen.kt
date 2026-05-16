@@ -2,10 +2,8 @@ package com.mooncowpines.kinostats.ui.screens.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
@@ -27,8 +25,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.layout.imePadding
 import androidx.hilt.navigation.compose.hiltViewModel
 
@@ -64,7 +60,7 @@ fun LoginScreen(
         Login(
             modifier = Modifier.align(Alignment.Center),
             state = state,
-            onEmailChange = { viewModel.onEmailChange(it) },
+            onUsernameChange = { viewModel.onUsernameChange(it) },
             onPassChange = { viewModel.onPassChange(it) },
             onLoginClick = { viewModel.login() },
             onRecoveryClick = onNavigateToRecover,
@@ -77,7 +73,7 @@ fun LoginScreen(
 fun Login(
     modifier: Modifier,
     state: LoginScreenState,
-    onEmailChange: (String) -> Unit,
+    onUsernameChange: (String) -> Unit,
     onPassChange: (String) -> Unit,
     onLoginClick: () -> Unit,
     onRecoveryClick: () -> Unit,
@@ -93,10 +89,10 @@ fun Login(
 
         //Frame to wrap the form
         KinoFrame {
-            //Email field
+            //Username field
             Column{
                 Text(
-                    text = "Email:",
+                    text = "Username:",
                     color = KinoYellow,
                 )
                 HorizontalDivider(
@@ -107,9 +103,9 @@ fun Login(
                         bottom = KinoSpacing.small)
                 )
                 KinoTextField(
-                    textValue = state.email,
-                    onTextChange = onEmailChange,
-                    placeholderText = "example@gmail.com",
+                    textValue = state.username,
+                    onTextChange = onUsernameChange,
+                    placeholderText = "Your username",
                     modifier = Modifier.fillMaxWidth())
             }
 

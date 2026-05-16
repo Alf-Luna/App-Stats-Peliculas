@@ -1,5 +1,7 @@
 package com.mooncowpines.kinostats.data.remote.dto
 
+import com.google.gson.annotations.SerializedName
+
 data class StatsRequestDTO(
     val userId: Long,
     val month: Int?,
@@ -18,6 +20,12 @@ data class StatsResponseDTO(
     val moviesWatchedByDecade: List<DecadeWatchesDTO>
 )
 
-data class TypeWatchesDTO(val type: String, val count: Int)
-data class RatingsCountDTO(val rating: Float, val count: Int)
-data class DecadeWatchesDTO(val decade: Int, val count: Int)
+data class TypeWatchesDTO(
+    @SerializedName("name")val type: String,
+    @SerializedName("watches")val count: Int)
+data class RatingsCountDTO(
+    @SerializedName("rating")val rating: Float,
+    @SerializedName("amount")val count: Int)
+data class DecadeWatchesDTO(
+    @SerializedName("decades")val decade: Int,
+    @SerializedName("watches")val count: Int)
