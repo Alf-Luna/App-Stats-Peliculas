@@ -7,6 +7,8 @@ import com.mooncowpines.kinostats.data.mapper.toDomain
 import com.mooncowpines.kinostats.data.remote.AuthApi
 import com.mooncowpines.kinostats.domain.model.User
 import com.mooncowpines.kinostats.data.remote.dto.UserDTO
+import com.mooncowpines.kinostats.data.remote.dto.UserDetailsUpdateDTO
+import com.mooncowpines.kinostats.data.remote.dto.UserPasswordUpdateDTO
 import com.mooncowpines.kinostats.domain.repository.AuthRepository
 import retrofit2.HttpException
 import okhttp3.Credentials
@@ -87,37 +89,44 @@ class AuthRepositoryImpl @Inject constructor(
         val userToUpdate = currentUser ?: return false
         val userId = userToUpdate.id ?: return false
 
-        val passToSend = newPassword ?: currentPassword
         return try {
-        val updatedUserDTO = UserDTO(
-            id = userId,
-            userName = userName,
-            email = email,
-            pass = passToSend
-        )
+            val isSuccess = if (newPassword == null) {
+                val dto = UserDetailsUpdateDTO(
+                    email = email,
+                    username = userName,
+                    pass = currentPassword
+                )
+                val response = api.updateUserDetails(userId, dto)
+                response.isSuccessful
+            } else {
+                val dto = UserPasswordUpdateDTO(
+                    newPassword = newPassword,
+                    oldPassword = currentPassword
+                )
+                val response = api.updateUserPassword(userId, dto)
+                response.isSuccessful
+            }
 
-        val response = api.updateUser(userId, updatedUserDTO)
+            if (isSuccess) {
+                val passToSave = newPassword ?: currentPassword
+                val newAuthHeader = Credentials.basic(userName, passToSave)
+                sessionManager.saveAuthToken(newAuthHeader)
 
-        if (response.isSuccessful) {
-            val newAuthHeader = Credentials.basic(userName, passToSend)
-            sessionManager.saveAuthToken(newAuthHeader)
-            currentUser = userToUpdate.copy(
-                userName = userName,
-                email = email,
-                pass = passToSend
-            )
-            true
-        } else {
-            Log.e("UPDATE", "Server rejected the update: ${response.code()}")
+                currentUser = userToUpdate.copy(
+                    userName = userName,
+                    email = email,
+                    pass = passToSave
+                )
+                true
+            } else {
+                Log.e("UPDATE", "Server rejected the update")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("UPDATE", "Error updating account: ", e)
             false
         }
-    } catch (e: Exception)
-    {
-        Log.e("UPDATE", "Error updating account: ", e)
-        false
     }
-}
-
 
 
     override suspend fun getUserById(userId: Long): User? {

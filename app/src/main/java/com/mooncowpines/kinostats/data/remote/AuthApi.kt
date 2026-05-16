@@ -2,6 +2,8 @@ package com.mooncowpines.kinostats.data.remote
 
 import com.mooncowpines.kinostats.data.remote.dto.LoginDTO
 import com.mooncowpines.kinostats.data.remote.dto.UserDTO
+import com.mooncowpines.kinostats.data.remote.dto.UserDetailsUpdateDTO
+import com.mooncowpines.kinostats.data.remote.dto.UserPasswordUpdateDTO
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -21,6 +23,9 @@ interface AuthApi {
     @POST("api/v1/users/add")
     suspend fun register(@Body user: UserDTO): Response<UserDTO>
 
-    @PUT("api/v1/users/{id}")
-    suspend fun updateUser(@Path("id") id: Long, @Body user: UserDTO): Response<UserDTO>
+    @PUT("api/v1/users/{id}/details")
+    suspend fun updateUserDetails(@Path("id") id: Long, @Body details: UserDetailsUpdateDTO): Response<Unit>
+
+    @PUT("api/v1/users/{id}/password")
+    suspend fun updateUserPassword(@Path("id") id: Long, @Body passwords: UserPasswordUpdateDTO): Response<Unit>
 }

@@ -56,57 +56,88 @@ fun StatsContent(
     onFilterChange: (Int, Int?) -> Unit,
     modifier: Modifier = Modifier
 ) {
-        val scrollState = rememberScrollState()
+    val scrollState = rememberScrollState()
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+            .padding(horizontal = 16.dp)
+    ) {
+        Spacer(modifier = Modifier.height(KinoSpacing.medium))
 
         Column(
-            modifier = modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp)
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(KinoSpacing.medium))
-
-            Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "Statistics",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = KinoWhite,
-                    modifier = Modifier.padding(bottom = KinoSpacing.medium)
-                )
-            }
-
             Text(
-                text = "Select a year and/or a month",
-                fontSize = 18.sp,
-                color = KinoWhite.copy(alpha = 0.7f),
+                text = "Statistics",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = KinoWhite,
                 modifier = Modifier.padding(bottom = KinoSpacing.medium)
             )
+        }
 
-            KinoDateSelector(
-                selectedYear = state.selectedYear,
-                selectedMonth = state.selectedMonth,
-                onFilterChange = onFilterChange
-            )
+        Text(
+            text = "Select a year and/or a month",
+            fontSize = 18.sp,
+            color = KinoWhite.copy(alpha = 0.7f),
+            modifier = Modifier.padding(bottom = KinoSpacing.medium)
+        )
 
-            Spacer(modifier = Modifier.height(KinoSpacing.medium))
+        KinoDateSelector(
+            selectedYear = state.selectedYear,
+            selectedMonth = state.selectedMonth,
+            onFilterChange = onFilterChange
+        )
 
-            if (state.isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxWidth().padding(top = 100.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = KinoYellow)
-                }
-            } else {
+        Spacer(modifier = Modifier.height(KinoSpacing.medium))
 
-                state.stats?.let { statsData ->
+        if (state.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxWidth().padding(top = 100.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = KinoYellow)
+            }
+        } else {
+
+            state.stats?.let { statsData ->
+
+                val hasData = statsData.genres.isNotEmpty()
+
+                if (!hasData) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 80.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = "🍿",
+                                fontSize = 60.sp,
+                                modifier = Modifier.padding(bottom = KinoSpacing.medium)
+                            )
+                            Text(
+                                text = "No movies watched yet!",
+                                color = KinoWhite,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                } else {
 
                     /*KinoYearlyBarChart(data = statsData.yearlyWatchData, barColor = KinoYellow)*/
 
                     Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
 
-                    KinoGenreBarChart(genres = statsData.genres, maxMovieCount = state.genreMaxMovieCount)
+                    KinoGenreBarChart(
+                        genres = statsData.genres,
+                        maxMovieCount = state.genreMaxMovieCount
+                    )
 
                     Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
 
@@ -132,7 +163,7 @@ fun StatsContent(
                         Spacer(modifier = Modifier.width(16.dp))
                         KinoTopList(
                             title = "Top Directors",
-                            items = statsData.topActors.sortedByDescending { it.value }.take(5),
+                            items = statsData.topDirectors.sortedByDescending { it.value }.take(5),
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -145,9 +176,10 @@ fun StatsContent(
                         ) {
                             Text(text = state.errorMsg, color = Color.Red)
                         }
-                }
+                    }
 
-                Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
+                    Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
+                }
             }
         }
     }

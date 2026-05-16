@@ -40,19 +40,19 @@ fun KinoDecadeLineChart(decades: List<StatItem<Int, Int>>) {
     val xAxisData = AxisData.Builder()
         .axisStepSize(100.dp)
         .steps(points.size - 1)
-        .labelData { i -> sortedDecades[i].label.toString().takeLast(2) + "s" }
+        .labelData { i -> "${sortedDecades[i].label}s" }
         .axisLabelColor(KinoWhite)
         .axisLineColor(Color.DarkGray)
         .build()
 
-    val maxY = points.maxOfOrNull { it.y } ?: 0f
-    val ySteps = 5
+    val maxY = points.maxOfOrNull { it.y }?.toInt() ?: 0
+    val ySteps = if (maxY < 5) maxY.coerceAtLeast(1) else 5
 
     val yAxisData = AxisData.Builder()
         .steps(ySteps)
         .labelAndAxisLinePadding(15.dp)
         .labelData { i ->
-            val value = (maxY / ySteps) * i
+            val value = (maxY.toFloat() / ySteps) * i
             value.toInt().toString()
         }
         .axisLabelColor(KinoWhite)

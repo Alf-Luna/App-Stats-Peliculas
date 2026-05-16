@@ -1,5 +1,6 @@
 package com.mooncowpines.kinostats.ui.screens.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.layout.Column
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.collectAsState
@@ -33,6 +35,7 @@ import com.mooncowpines.kinostats.ui.components.KinoLastSeenCard
 import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 import com.mooncowpines.kinostats.domain.model.MovieCard
 import com.mooncowpines.kinostats.ui.components.KinoSearchBar
+import com.mooncowpines.kinostats.ui.components.KinoSeeMoreCard
 import com.mooncowpines.kinostats.ui.components.KinoSkeletonPosterCard
 import com.mooncowpines.kinostats.ui.theme.KinoGray
 
@@ -43,7 +46,9 @@ fun HomeScreen(
     onMovieClick: (Long) -> Unit,
     onSearchSubmit: (String) -> Unit,
     shouldRefresh: Boolean = false,
-    onRefreshDone: () -> Unit = {}
+    onRefreshDone: () -> Unit = {},
+    onNavigateToWatchlist: () -> Unit,
+    onNavigateToLogs: () -> Unit,
 ) {
     LaunchedEffect(shouldRefresh) {
         if (shouldRefresh) {
@@ -70,7 +75,9 @@ fun HomeScreen(
                 state = currentState,
                 onMovieClick = onMovieClick,
                 onSearchSubmit = onSearchSubmit,
-                modifier = modifier
+                modifier = modifier,
+                onNavigateToWatchlist = onNavigateToWatchlist,
+                onNavigateToLogs = onNavigateToLogs,
             )
         }
     }
@@ -83,6 +90,8 @@ fun HomeContent(
     onMovieClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
     onSearchSubmit: (String) -> Unit,
+    onNavigateToWatchlist: () -> Unit,
+    onNavigateToLogs: () -> Unit,
 ) {
 
     val scrollState = rememberScrollState()
@@ -117,7 +126,7 @@ fun HomeContent(
 
                 ) {
 
-                WatchlistSection(movieCards = state.watchlistMovies, onMovieClick = onMovieClick)
+                WatchlistSection(movieCards = state.watchlistMovies, onMovieClick = onMovieClick, onSeeAllClick = onNavigateToWatchlist)
 
                 Spacer(modifier.height(KinoSpacing.extraLarge))
 
@@ -125,7 +134,7 @@ fun HomeContent(
 
                 Spacer(modifier.height(KinoSpacing.extraLarge))
 
-                JustWatchedSection(movieCards = state.justWatchedMovies, onMovieClick = onMovieClick)
+                JustWatchedSection(movieCards = state.justWatchedMovies, onMovieClick = onMovieClick, onSeeAllClick = onNavigateToLogs)
 
                 Spacer(modifier = Modifier.height(KinoSpacing.medium))
             }
@@ -136,15 +145,20 @@ fun HomeContent(
 fun WatchlistSection(
     modifier: Modifier = Modifier,
     movieCards: List<MovieCard>,
-    onMovieClick: (Long) -> Unit
+    onMovieClick: (Long) -> Unit,
+    onSeeAllClick: () -> Unit
 ) {
+    Column(modifier = modifier) {
+
     Column {
         Text(
             text = "Watchlist...",
             color = KinoWhite,
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp,
-            modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
+            modifier = Modifier
+                .clickable { onSeeAllClick() }
+                .padding(start = 16.dp, bottom = 4.dp)
         )
 
         HorizontalDivider(
@@ -177,9 +191,13 @@ fun WatchlistSection(
                             onClick = { id -> onMovieClick(id) }
                         )
                     }
+                    item {
+                        KinoSeeMoreCard(onClick = onSeeAllClick)
+                    }
                 }
             }
     }
+}
 }
 
 @Composable
@@ -240,37 +258,42 @@ fun LastSeenSection(
 fun JustWatchedSection(
     modifier: Modifier = Modifier,
     movieCards: List<MovieCard>,
-    onMovieClick: (Long) -> Unit
+    onMovieClick: (Long) -> Unit,
+    onSeeAllClick: () -> Unit
 ) {
-    Column {
-        Text(
-            text = "Just Watched...",
-            color = KinoWhite,
-            fontWeight = FontWeight.Bold,
-            fontSize = 24.sp,
-            modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
-        )
 
-        HorizontalDivider(
-            modifier = Modifier
-                .padding(start = 16.dp)
-                .width(150.dp),
-            color = KinoYellow,
-            thickness = 2.dp
-        )
+    Column(modifier = modifier) {
+        Column {
+                Text(
+                    text = "Just Watched...",
+                    color = KinoWhite,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp,
+                    modifier = Modifier
+                        .clickable { onSeeAllClick() }
+                        .padding(start = 16.dp, bottom = 4.dp)
+                )
 
-        Spacer(modifier.height(KinoSpacing.mediumSmall))
+                HorizontalDivider(
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .width(150.dp),
+                    color = KinoYellow,
+                    thickness = 2.dp
+                )
 
-        if (movieCards.isEmpty()) {
-            LazyRow(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(4) {
-                    KinoSkeletonPosterCard()
+            Spacer(modifier.height(KinoSpacing.mediumSmall))
+
+            if (movieCards.isEmpty()) {
+                LazyRow(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(4) {
+                        KinoSkeletonPosterCard()
+                    }
                 }
-            }
-        } else {
+            } else {
 
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
@@ -282,8 +305,13 @@ fun JustWatchedSection(
                             onClick = { id -> onMovieClick(id) }
                         )
                     }
+
+                    item {
+                        KinoSeeMoreCard(onClick = onSeeAllClick)
+                    }
                 }
             }
+        }
     }
 }
 

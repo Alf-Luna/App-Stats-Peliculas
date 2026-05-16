@@ -24,7 +24,7 @@ class ProfileScreenViewModel @Inject constructor(
         loadUser()
     }
 
-    private fun loadUser() {
+    fun loadUser() {
         viewModelScope.launch {
 
             val user = authRepository.getCurrentUser()
