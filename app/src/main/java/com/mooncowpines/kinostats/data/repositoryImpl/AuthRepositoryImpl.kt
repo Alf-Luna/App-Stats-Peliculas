@@ -19,19 +19,23 @@ class AuthRepositoryImpl @Inject constructor(
 
     private var currentUser: User? = null
 
-    override suspend fun login(email: String, pass: String): Boolean {
+    override suspend fun login(username: String, pass: String): Boolean {
         return try {
-            val authHeader = Credentials.basic(email, pass)
+            val authHeader = Credentials.basic(username, pass)
             val response = api.login(authHeader)
 
             if (response.isSuccessful) {
-                val userDto = response.body()
-                if (userDto != null) {
-                    val user = userDto.toDomain()
+                val loginResponse = response.body()
+                if (loginResponse != null) {
+                    val user = User(
+                        id = loginResponse.userId,
+                        userName = loginResponse.username,
+                        email = loginResponse.email,
+                        pass = pass
+                    )
                     currentUser = user
                     sessionManager.saveAuthToken(authHeader)
 
-                    Log.d("LOGIN", "User logged: ${userDto.userName} with ID: ${userDto.id}")
                     return true
                 }
             }
@@ -63,7 +67,7 @@ class AuthRepositoryImpl @Inject constructor(
 
             if (response.isSuccessful) {
                 Log.d("REGISTER", "User $userName registered with email $email")
-                login(email, pass)
+                login(userName, pass)
             } else {
                 Log.e("REGISTER", "Server error: ${response.errorBody()?.string()}")
                 false
@@ -95,7 +99,7 @@ class AuthRepositoryImpl @Inject constructor(
         val response = api.updateUser(userId, updatedUserDTO)
 
         if (response.isSuccessful) {
-            val newAuthHeader = Credentials.basic(email, passToSend)
+            val newAuthHeader = Credentials.basic(userName, passToSend)
             sessionManager.saveAuthToken(newAuthHeader)
             currentUser = userToUpdate.copy(
                 userName = userName,

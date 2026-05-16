@@ -6,6 +6,7 @@ import com.mooncowpines.kinostats.domain.model.UserStats
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface StatsApi {
@@ -15,6 +16,6 @@ interface StatsApi {
     @GET("stats/{id}")
     suspend fun getStatsById(@Path("id") id: Int): UserStats
 
-    @GET("api/v1/stats/get")
+    @POST("api/v1/stats/get")
     suspend fun getStats(@Body request: StatsRequestDTO): Response<StatsResponseDTO>
 }

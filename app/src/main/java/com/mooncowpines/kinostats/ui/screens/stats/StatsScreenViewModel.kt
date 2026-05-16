@@ -45,7 +45,7 @@ class StatsScreenViewModel @Inject constructor(
                 return@launch
             }
 
-            _state.update { it.copy(isLoading = true, errorMsg = null) }
+            _state.update { it.copy(isLoading = true, errorMsg = null, stats = null) }
 
             try {
                 val fetchedStats = statsRepository.getUserStats(
@@ -65,7 +65,7 @@ class StatsScreenViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, errorMsg = "Error loading stats") }
+                _state.update { it.copy(isLoading = false, errorMsg = "Error loading stats", stats = null) }
             }
         }
     }

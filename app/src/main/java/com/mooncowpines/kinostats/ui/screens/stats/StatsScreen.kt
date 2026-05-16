@@ -102,7 +102,7 @@ fun StatsContent(
 
                 state.stats?.let { statsData ->
 
-                    KinoYearlyBarChart(data = statsData.yearlyWatchData, barColor = KinoYellow)
+                    /*KinoYearlyBarChart(data = statsData.yearlyWatchData, barColor = KinoYellow)*/
 
                     Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
 
