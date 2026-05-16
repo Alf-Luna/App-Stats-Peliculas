@@ -2,6 +2,7 @@ package com.mooncowpines.kinostats.ui.screens.lists
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mooncowpines.kinostats.domain.model.MovieList
 import com.mooncowpines.kinostats.domain.repository.AuthRepository
 import com.mooncowpines.kinostats.domain.repository.ListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,6 +44,36 @@ class ListsScreenViewModel @Inject constructor(
                 _state.update { it.copy(isLoading = false, lists = userLists) }
             } else {
                 _state.update { it.copy(isLoading = false, errorMsg = "Failed to load lists.") }
+            }
+        }
+    }
+
+    fun onConfirmDeleteIntent(movieList: MovieList) {
+        _state.update { it.copy(listToDelete = movieList) }
+    }
+
+    fun onDismissDeleteDialog() {
+        _state.update { it.copy(listToDelete = null) }
+    }
+
+    fun deleteList() {
+        val listId = _state.value.listToDelete?.id ?: return
+
+        viewModelScope.launch {
+            _state.update { it.copy(isDeleting = true) }
+            val success = listRepository.deleteList(listId)
+
+            if (success) {
+                _state.update { it.copy(listToDelete = null, isDeleting = false) }
+                loadLists()
+            } else {
+                _state.update {
+                    it.copy(
+                        isDeleting = false,
+                        errorMsg = "Could not delete list",
+                        listToDelete = null
+                    )
+                }
             }
         }
     }

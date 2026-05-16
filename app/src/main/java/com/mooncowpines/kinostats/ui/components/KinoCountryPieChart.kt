@@ -39,7 +39,7 @@ fun KinoCountryPieChart(countries: List<StatItem<String, Int>>) {
 
     val pieSlices = countries.mapIndexed { index, country ->
         PieChartData.Slice(
-            label = country.label,
+            label = country.label ?: "Unknown",
             value = country.value.toFloat(),
             color = dynamicColors[index]
         )

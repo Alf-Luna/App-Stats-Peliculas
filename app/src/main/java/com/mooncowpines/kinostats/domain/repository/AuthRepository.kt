@@ -3,7 +3,7 @@ package com.mooncowpines.kinostats.domain.repository
 import com.mooncowpines.kinostats.domain.model.User
 interface AuthRepository {
     //login functions
-    suspend fun login(email: String, pass: String): Boolean
+    suspend fun login(username: String, pass: String): Boolean
     suspend fun logout()
     suspend fun getCurrentUser(): User?
 

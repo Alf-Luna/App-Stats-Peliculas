@@ -96,6 +96,12 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
                 },
                 onSearchSubmit = { query ->
                     navController.navigate(Route.Search.createRoute(query))
+                },
+                onNavigateToWatchlist = {
+                    navController.navigate(Route.Lists.path)
+                },
+                onNavigateToLogs = {
+                    navController.navigate(Route.Logs.path)
                 }
             )
         }

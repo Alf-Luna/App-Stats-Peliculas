@@ -7,7 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mooncowpines.kinostats.domain.model.MovieList
+import com.mooncowpines.kinostats.ui.components.KinoDeleteDialog
 import com.mooncowpines.kinostats.ui.theme.KinoBlack
 import com.mooncowpines.kinostats.ui.theme.KinoLighterGray
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
@@ -33,9 +34,19 @@ fun ListsScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
+    state.listToDelete?.let { list ->
+        KinoDeleteDialog(
+            title = "Delete List",
+            message = "Are you sure you want to delete '${list.name}'? All movies inside will be removed from this list.",
+            onDismiss = { viewModel.onDismissDeleteDialog() },
+            onConfirm = { viewModel.deleteList() }
+        )
+    }
+
     ListsContent(
         state = state,
         onNavigateToListDetail = onNavigateToListDetail,
+        onDeleteClick = { list -> viewModel.onConfirmDeleteIntent(list) },
         modifier = modifier
     )
 }
@@ -44,6 +55,7 @@ fun ListsScreen(
 fun ListsContent(
     state: ListsScreenState,
     onNavigateToListDetail: (Long) -> Unit,
+    onDeleteClick: (MovieList) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -84,7 +96,8 @@ fun ListsContent(
                     items(state.lists) { list ->
                         ListCard(
                             movieList = list,
-                            onClick = { onNavigateToListDetail(list.id) }
+                            onClick = { onNavigateToListDetail(list.id) },
+                            onDeleteClick = { onDeleteClick(list) }
                         )
                     }
                 }
@@ -97,7 +110,8 @@ fun ListsContent(
 @Composable
 fun ListCard(
     movieList: MovieList,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onDeleteClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -128,11 +142,13 @@ fun ListCard(
                 )
             }
 
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "View list",
-                tint = KinoYellow
-            )
+            IconButton(onClick = onDeleteClick) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete list",
+                    tint = Color.Red.copy(alpha = 0.8f)
+                )
+            }
         }
     }
 }
