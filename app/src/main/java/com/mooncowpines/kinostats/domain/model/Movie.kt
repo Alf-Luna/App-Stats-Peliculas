@@ -12,8 +12,6 @@ data class Movie(
     val posterUrl: String,
     val overview: String,
 
-    // Waiting for the backend to send this data, meanwhile I give them empty values
-    val actors: List<String> = emptyList(),
-    val cinematographer: String = "",
-    val productionCompany: String = "",
+    val actors: String,
+    val productionCompany: String,
 )

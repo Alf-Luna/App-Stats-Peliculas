@@ -113,14 +113,12 @@ class LogDetailScreenViewModel @Inject constructor(
         //Local validation for the text fields
         val ratingErrorResult = getRatingError(currentState.rating)
         val watchDateErrorResult = getWatchDateError(currentState.watchDate)
-        val textReviewErrorResult = getTextLogError(currentState.logText)
 
-        if (ratingErrorResult != null || watchDateErrorResult != null || textReviewErrorResult != null) {
+        if (ratingErrorResult != null || watchDateErrorResult != null) {
             _state.update {
                 it.copy(
                     ratingError = ratingErrorResult,
                     watchDateError = watchDateErrorResult,
-                    logTextError = textReviewErrorResult,
                     errorMsg = "Please check the required fields") }
             return
 

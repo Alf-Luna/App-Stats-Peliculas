@@ -16,6 +16,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import com.mooncowpines.kinostats.domain.model.Movie
 import com.mooncowpines.kinostats.ui.components.KinoCalendar
 import com.mooncowpines.kinostats.ui.components.RatingDropdownSelector
@@ -26,19 +28,20 @@ import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.mooncowpines.kinostats.ui.components.KinoErrorText
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+
 
 @Composable
 fun LogDetailScreen(
     modifier: Modifier = Modifier,
     viewModel: LogDetailScreenViewModel = hiltViewModel(),
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(state.success) {
-        if (state.success) onNavigateBack()
+        if (state.success) {
+            onNavigateBack()
+        }
     }
 
     if (state.isLoadingMovie) {
@@ -108,11 +111,15 @@ fun LogDetailContent(
         }
     ) { paddingValues ->
 
+        val scrollState = rememberScrollState()
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp)
+                .verticalScroll(scrollState)
+                .imePadding()
         ) {
             state.errorMsg?.let { KinoErrorText(it) }
 

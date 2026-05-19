@@ -1,5 +1,6 @@
 package com.mooncowpines.kinostats.ui.screens.profile
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -66,6 +68,7 @@ fun ProfileContent(
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
 
     Column(
         modifier = modifier
@@ -152,8 +155,12 @@ fun ProfileContent(
         ) {
             ProfileOptionItem(
                 icon = Icons.Outlined.Share,
-                text = "Share your statistics",
-                onClick = { /* TODO */ }
+                text = "Upgrade your account",
+                onClick = { Toast.makeText(
+                    context,
+                    "Concept test, payment logic would be implemented here",
+                    Toast.LENGTH_SHORT
+                ).show() }
             )
 
             HorizontalDivider(color = KinoBlack, thickness = 1.dp, modifier = Modifier.padding(horizontal = 16.dp))

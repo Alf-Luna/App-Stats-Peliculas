@@ -57,7 +57,7 @@ class LoginScreenViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isSubmitting = false,
-                        errorMsg = "Invalid Email or Password"
+                        errorMsg = "Invalid User name or Password"
                     )
                 }
             }

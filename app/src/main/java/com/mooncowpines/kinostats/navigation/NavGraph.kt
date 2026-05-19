@@ -58,11 +58,17 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
 
         composable(Route.Recovery.path) {
             RecoveryScreen(
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToReset = { email ->
+                    navController.navigate(Route.Reset.createRoute(email))
+                }
             )
         }
 
-        composable(Route.Reset.path) {
+        composable(
+            Route.Reset.path,
+            arguments = listOf(navArgument("email") { type = NavType.StringType })
+            ) {
             ResetScreen(
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToLogin = {
@@ -85,12 +91,7 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
         }
 
         composable(Route.Home.path) { backStackEntry ->
-            val shouldRefresh = backStackEntry.savedStateHandle.get<Boolean>("refresh_home") ?: false
             HomeScreen(
-                shouldRefresh = shouldRefresh,
-                onRefreshDone = {
-                    backStackEntry.savedStateHandle.set("refresh_home", false)
-                },
                 onMovieClick = { movieId ->
                     navController.navigate(Route.MovieDetail.createRoute(movieId))
                 },
@@ -131,7 +132,7 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
             LogScreen(
                 onNavigateToLogDetail = { movieId, logId ->
                     navController.navigate(Route.LogDetail.createRoute(movieId, logId))
-                }
+                },
             )
         }
 
@@ -144,12 +145,6 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
                     onNavigateToLog = { id ->
                         navController.navigate(Route.LogDetail.createRoute(id))
                     },
-                    onDataModified = {
-                        val homeEntry = try {
-                            navController.getBackStackEntry(Route.Home.path)
-                        } catch(e: Exception) { null }
-                        homeEntry?.savedStateHandle?.set("refresh_home", true)
-                    }
                 )
         }
 
@@ -159,8 +154,7 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
             arguments = listOf(navArgument("movieId") { type = NavType.IntType })
         ) {
                 LogDetailScreen(
-                    onNavigateBack = { navController.popBackStack() },
-
+                    onNavigateBack = { navController.popBackStack() }
                 )
             }
 
@@ -194,13 +188,6 @@ fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
                 onNavigateBack = { navController.popBackStack() },
                 onMovieClick = { movieId ->
                     navController.navigate(Route.MovieDetail.createRoute(movieId))
-                },
-                onDataModified = {
-                    val homeEntry = try {
-                        navController.getBackStackEntry(Route.Home.path)
-                    } catch (e: Exception) { null }
-
-                    homeEntry?.savedStateHandle?.set("refresh_home", true)
                 }
             )
         }

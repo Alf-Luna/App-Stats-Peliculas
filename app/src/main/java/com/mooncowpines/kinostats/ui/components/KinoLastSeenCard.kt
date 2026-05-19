@@ -45,20 +45,23 @@ fun KinoLastSeenCard(
     ) {
         Row(
             modifier = Modifier,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.Top
         ) {
             AsyncImage(
                 model = movieCard.posterUrl,
                 contentDescription = movieCard.title,
                 modifier = Modifier
                     .fillMaxWidth(0.30f)
-                    .wrapContentHeight()
+                    .aspectRatio(2f / 3f)
                     .clip(RoundedCornerShape(4.dp))
                     .padding(KinoSpacing.mediumSmall),
                 contentScale = ContentScale.Crop
             )
-            Spacer(modifier = Modifier.width(KinoSpacing.medium))
-            Column {
+            Spacer(modifier = Modifier.width(KinoSpacing.small))
+            Column(
+                modifier = Modifier.padding(top = KinoSpacing.mediumSmall, bottom = KinoSpacing.mediumSmall),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 Text(
                     text = movieCard.title,
                     color = KinoWhite,
@@ -68,21 +71,11 @@ fun KinoLastSeenCard(
                     overflow = TextOverflow.Ellipsis)
 
                 if (!movieCard.releaseDate.isNullOrEmpty()) {
-
                     Text(movieCard.releaseDate, color = KinoGray, fontSize = 14.sp)
-                    Spacer(modifier = Modifier.height(KinoSpacing.medium))
-                }
-
-                if (!movieCard.director.isNullOrEmpty()) {
-
-                    Text(movieCard.director, color = KinoGray, fontSize = 14.sp)
-                    Spacer(modifier = Modifier.height(KinoSpacing.medium))
                 }
 
                 if (movieCard.duration != null && movieCard.duration > 0) {
-
                     Text(text = "${movieCard.duration} min", color = KinoGray, fontSize = 14.sp)
-                    Spacer(modifier = Modifier.height(KinoSpacing.medium))
                 }
 
             }

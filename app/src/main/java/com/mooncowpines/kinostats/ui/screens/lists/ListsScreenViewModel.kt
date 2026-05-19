@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mooncowpines.kinostats.domain.model.MovieList
 import com.mooncowpines.kinostats.domain.repository.AuthRepository
+import com.mooncowpines.kinostats.domain.repository.AuthState
 import com.mooncowpines.kinostats.domain.repository.ListRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,12 +24,22 @@ class ListsScreenViewModel @Inject constructor(
     val state: StateFlow<ListsScreenState> = _state.asStateFlow()
 
     init {
+        viewModelScope.launch {
+            authRepository.authState.collect { authState ->
+                if (authState == AuthState.LOGGED_OUT) {
+                    _state.value = ListsScreenState()
+                }
+            }
+        }
+
         loadLists()
     }
 
     fun loadLists() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, errorMsg = null) }
+            val showLoadingSpinner = _state.value.lists.isEmpty()
+
+            _state.update { it.copy(isLoading = showLoadingSpinner, errorMsg = null) }
 
             val user = authRepository.getCurrentUser()
             val userId = user?.id
@@ -54,6 +65,41 @@ class ListsScreenViewModel @Inject constructor(
 
     fun onDismissDeleteDialog() {
         _state.update { it.copy(listToDelete = null) }
+    }
+
+    fun setShowCreateDialog(show: Boolean) {
+        _state.update { it.copy(showCreateDialog = show, newListName = "", errorMsg = null) }
+    }
+
+    fun onNewListNameChange(name: String) {
+        _state.update { it.copy(newListName = name) }
+    }
+
+    fun createList() {
+        val listName = _state.value.newListName
+        if (listName.isBlank()) return
+
+        viewModelScope.launch {
+            _state.update { it.copy(isCreating = true, errorMsg = null) }
+
+            val user = authRepository.getCurrentUser()
+            val userId = user?.id
+
+            if (userId != null) {
+                val success = listRepository.createList(userId, listName)
+
+                if (success) {
+                    _state.update {
+                        it.copy(isCreating = false, showCreateDialog = false, newListName = "")
+                    }
+                    loadLists()
+                } else {
+                    _state.update { it.copy(isCreating = false, errorMsg = "Failed to create list") }
+                }
+            } else {
+                _state.update { it.copy(isCreating = false, errorMsg = "User not found") }
+            }
+        }
     }
 
     fun deleteList() {

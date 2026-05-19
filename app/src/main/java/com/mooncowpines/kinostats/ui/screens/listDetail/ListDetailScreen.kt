@@ -27,6 +27,7 @@ import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
 import com.mooncowpines.kinostats.domain.model.MovieCard
+import com.mooncowpines.kinostats.ui.components.KinoDeleteDialog
 import com.mooncowpines.kinostats.ui.components.KinoFallBackCoverCard
 import com.mooncowpines.kinostats.ui.theme.KinoBlack
 import com.mooncowpines.kinostats.ui.theme.KinoLighterGray
@@ -40,9 +41,10 @@ fun ListDetailScreen(
     viewModel: ListDetailViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
     onMovieClick: (Long) -> Unit,
-    onDataModified: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
+
     when (state) {
         is ListDetailState.Loading -> {
             Box(
@@ -65,13 +67,28 @@ fun ListDetailScreen(
 
         is ListDetailState.Success -> {
             val successState = state as ListDetailState.Success
+
+            LaunchedEffect(successState.success) {
+                if (successState.success) {
+                    Toast.makeText(context, "Movie removed from list", Toast.LENGTH_SHORT).show()
+                    viewModel.onActionDone()
+                }
+            }
+
+            successState.movieToRemove?.let { movie ->
+                KinoDeleteDialog(
+                    title = "Remove Movie",
+                    message = "Are you sure you want to remove '${movie.title}' from this list?",
+                    onDismiss = { viewModel.onDismissRemoveDialog() },
+                    onConfirm = { viewModel.removeMovieFromList() }
+                )
+            }
+
             ListDetailContent(
                 successState = successState,
                 onNavigateBack = onNavigateBack,
                 onMovieClick = onMovieClick,
-                onDeleteMovie = { movieId -> viewModel.removeMovieFromList(movieId) },
-                onClearMessage = { viewModel.clearMessage() },
-                onDataModified = onDataModified,
+                onDeleteMovieIntent = { movie -> viewModel.onConfirmRemoveIntent(movie) },
                 modifier = modifier
             )
         }
@@ -84,23 +101,10 @@ fun ListDetailContent(
     successState: ListDetailState.Success,
     onNavigateBack: () -> Unit,
     onMovieClick: (Long) -> Unit,
-    onDeleteMovie: (Long) -> Unit,
-    onClearMessage: () -> Unit,
-    onDataModified: () -> Unit,
+    onDeleteMovieIntent: (MovieCard) -> Unit,
     modifier: Modifier = Modifier
 ) {
-
-    val context = LocalContext.current
     val movies = successState.movieList.movies
-
-    LaunchedEffect(successState.actionMessage) {
-        successState.actionMessage?.let { msg ->
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-
-            onDataModified()
-            onClearMessage()
-        }
-    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -140,7 +144,7 @@ fun ListDetailContent(
                         MovieInListCard(
                             movie = movie,
                             onClick = { onMovieClick(movie.id) },
-                            onDelete = { onDeleteMovie(movie.id) }
+                            onDelete = { onDeleteMovieIntent(movie) }
                         )
                     }
                 }
@@ -200,7 +204,7 @@ fun MovieInListCard(
             )
 
             IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Delete, contentDescription = "Remove", tint = Color.Gray)
+                Icon(Icons.Default.Delete, contentDescription = "Remove", tint = Color.Red)
             }
         }
     }

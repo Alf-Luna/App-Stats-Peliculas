@@ -12,5 +12,7 @@ data class MovieDTO(
     @SerializedName("backdropPath") val backdropPath: String?,
     @SerializedName("posterPath") val posterPath: String?,
     @SerializedName("overview") val overview: String?,
-    @SerializedName("director") val director: String?
+    @SerializedName("director") val director: String?,
+    @SerializedName("actors") val actors: String?,
+    @SerializedName("productionCompany") val productionCompany: String?,
 )

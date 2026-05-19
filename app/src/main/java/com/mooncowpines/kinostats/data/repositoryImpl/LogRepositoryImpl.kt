@@ -24,7 +24,7 @@ class LogRepositoryImpl @Inject constructor(
         } catch (e: Exception) { null }
     }
 
-    override suspend fun getLogsByUser(userId: Long): List<com.mooncowpines.kinostats.domain.model.Log>? {
+    override suspend fun getLogsByUser(userId: Long): List<Log>? {
         return try {
             val response = api.getLogsByUserId(userId)
             if (response.isSuccessful) {
@@ -37,7 +37,7 @@ class LogRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getLogsForMovies(movieId: Long): List<com.mooncowpines.kinostats.domain.model.Log> {
+    override suspend fun getLogsForMovies(movieId: Long): List<Log> {
         return emptyList()
     }
 
@@ -104,7 +104,7 @@ class LogRepositoryImpl @Inject constructor(
     override suspend fun deleteLog(logId: Long): Boolean {
         return try {
             val response = api.deleteLog(logId)
-            response.isSuccessful
+            response.isSuccessful || response.code() == 404
         } catch (e: Exception) {
             false
         }

@@ -1,15 +1,20 @@
 package com.mooncowpines.kinostats.data.repositoryImpl
 
 import android.util.Log
-import android.util.Log.e
 import com.mooncowpines.kinostats.data.local.SessionManager
 import com.mooncowpines.kinostats.data.mapper.toDomain
 import com.mooncowpines.kinostats.data.remote.AuthApi
+import com.mooncowpines.kinostats.data.remote.dto.ForgotPasswordDTO
+import com.mooncowpines.kinostats.data.remote.dto.ResetPasswordDTO
 import com.mooncowpines.kinostats.domain.model.User
 import com.mooncowpines.kinostats.data.remote.dto.UserDTO
 import com.mooncowpines.kinostats.data.remote.dto.UserDetailsUpdateDTO
 import com.mooncowpines.kinostats.data.remote.dto.UserPasswordUpdateDTO
 import com.mooncowpines.kinostats.domain.repository.AuthRepository
+import com.mooncowpines.kinostats.domain.repository.AuthState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import retrofit2.HttpException
 import okhttp3.Credentials
 import javax.inject.Inject
@@ -18,6 +23,12 @@ class AuthRepositoryImpl @Inject constructor(
     private val api : AuthApi,
     private val sessionManager: SessionManager
 ) : AuthRepository {
+
+    private val _authState = MutableStateFlow(
+        if (sessionManager.fetchAuthToken() != null) AuthState.LOGGED_IN else AuthState.LOGGED_OUT
+    )
+
+    override val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
     private var currentUser: User? = null
 
@@ -37,6 +48,7 @@ class AuthRepositoryImpl @Inject constructor(
                     )
                     currentUser = user
                     sessionManager.saveAuthToken(authHeader)
+                    _authState.value = AuthState.LOGGED_IN
 
                     return true
                 }
@@ -51,6 +63,7 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun logout() {
         currentUser = null
         sessionManager.clearSession()
+        _authState.value = AuthState.LOGGED_OUT
     }
 
     override suspend fun getCurrentUser(): User? {
@@ -145,7 +158,45 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun sendRecoveryEmail(email: String): Boolean {
-        TODO()
+        return try {
+            val request = ForgotPasswordDTO(email = email)
+
+            val response = api.requestPasswordReset(request)
+
+            if (response.isSuccessful) {
+                Log.d("AuthRepository", "Correo de recuperación enviado con éxito")
+                true
+            } else {
+                Log.e("AuthRepository", "Error del servidor: ${response.code()}")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("AuthRepository", "Error de red al enviar correo", e)
+            false
+        }
+    }
+
+    override suspend fun resetPassword(email: String, code: String, newPass: String): Boolean {
+        return try {
+            val request = ResetPasswordDTO(
+                email = email,
+                code = code,
+                newPassword = newPass
+            )
+
+            val response = api.resetPassword(request)
+
+            if (response.isSuccessful) {
+                Log.d("AuthRepository", "Contraseña reseteada con éxito")
+                true
+            } else {
+                Log.e("AuthRepository", "Error al resetear: Código inválido o expirado")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("AuthRepository", "Error de red al resetear contraseña", e)
+            false
+        }
     }
 
 }

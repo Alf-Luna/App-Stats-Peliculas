@@ -2,7 +2,9 @@ package com.mooncowpines.kinostats.ui.screens.log
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mooncowpines.kinostats.domain.model.Log
 import com.mooncowpines.kinostats.domain.repository.AuthRepository
+import com.mooncowpines.kinostats.domain.repository.AuthState
 import com.mooncowpines.kinostats.domain.repository.LogRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,12 +24,22 @@ class LogScreenViewModel @Inject constructor(
     val state: StateFlow<LogScreenState> = _state.asStateFlow()
 
     init {
+        viewModelScope.launch {
+            authRepository.authState.collect { authState ->
+                if (authState == AuthState.LOGGED_OUT) {
+                    _state.value = LogScreenState()
+                }
+            }
+        }
+
         loadLogs()
     }
 
     fun loadLogs() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, errorMsg = null) }
+            val showLoadingSpinner = _state.value.logs.isEmpty()
+
+            _state.update { it.copy(isLoading = showLoadingSpinner, errorMsg = null) }
 
             val user = authRepository.getCurrentUser()
             val userId = user?.id
@@ -46,13 +58,38 @@ class LogScreenViewModel @Inject constructor(
         }
     }
 
-    fun deleteLog(logId: Long) {
+    fun onConfirmDeleteIntent(log: Log) {
+        _state.update { it.copy(logToDelete = log) }
+    }
+
+    fun onDismissDeleteDialog() {
+        _state.update { it.copy(logToDelete = null) }
+    }
+
+    fun onActionDone() {
+        _state.update { it.copy(success = false) }
+    }
+
+    fun deleteLog() {
+        val logId = _state.value.logToDelete?.id ?: return
+
         viewModelScope.launch {
-            val success = logRepository.deleteLog(logId)
-            if (success) {
+            _state.update { it.copy(isDeleting = true) }
+            val isDeleted = logRepository.deleteLog(logId)
+
+            if (isDeleted) {
+                _state.update {
+                    it.copy(
+                        logToDelete = null,
+                        isDeleting = false,
+                        success = true
+                    )
+                }
                 loadLogs()
             } else {
-                _state.update { it.copy(errorMsg = "Could not delete the log") }
+                _state.update {
+                    it.copy(isDeleting = false, logToDelete = null, errorMsg = "Failed to delete")
+                }
             }
         }
     }

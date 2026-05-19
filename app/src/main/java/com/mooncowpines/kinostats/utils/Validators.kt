@@ -32,18 +32,18 @@ fun getUserNameError(userName: String): String? {
         return null
 }
 
-fun getTextLogError(textLog: String): String?{
-    if (textLog.isBlank()) {
-        return "The log text cannot be empty"
-    }
-
-    return null
-}
-
 fun getRatingError(rating: Float): String?{
     if (rating == 0f) {
         return "The log rating cannot be 0"
     }
+    return null
+}
+
+fun getCodeError(code: String) : String? {
+    if (code.isBlank()) {
+        return "This field cannot be empty"
+    }
+
     return null
 }
 

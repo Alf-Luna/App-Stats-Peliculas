@@ -1,7 +1,16 @@
 package com.mooncowpines.kinostats.domain.repository
 
 import com.mooncowpines.kinostats.domain.model.User
+import kotlinx.coroutines.flow.StateFlow
+
+enum class AuthState {
+    LOGGED_IN,
+    LOGGED_OUT
+}
 interface AuthRepository {
+
+    val authState: StateFlow<AuthState>
+
     //login functions
     suspend fun login(username: String, pass: String): Boolean
     suspend fun logout()
@@ -14,4 +23,6 @@ interface AuthRepository {
 
     //recovery functions
     suspend fun sendRecoveryEmail(email: String): Boolean
+
+    suspend fun resetPassword(email: String, code: String, newPass: String): Boolean
 }

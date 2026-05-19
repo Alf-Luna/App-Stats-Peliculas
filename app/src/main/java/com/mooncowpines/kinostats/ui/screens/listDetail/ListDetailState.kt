@@ -1,5 +1,6 @@
 package com.mooncowpines.kinostats.ui.screens.listDetail
 
+import com.mooncowpines.kinostats.domain.model.MovieCard
 import com.mooncowpines.kinostats.domain.model.MovieList
 
 sealed class ListDetailState {
@@ -8,6 +9,8 @@ sealed class ListDetailState {
     data class Success(
         val movieList: MovieList,
         val isDeleting: Boolean = false,
-        val actionMessage: String? = null
+        val actionMessage: String? = null,
+        val movieToRemove: MovieCard? = null,
+        val success: Boolean = false
     ) : ListDetailState()
 }

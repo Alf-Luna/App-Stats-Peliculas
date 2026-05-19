@@ -37,8 +37,14 @@ object AppModule {
     @Singleton
     fun provideAuthInterceptor(sessionManager: SessionManager): Interceptor {
         return Interceptor { chain ->
-            val requestBuilder = chain.request().newBuilder()
+            val request = chain.request()
+            val path = request.url.encodedPath
 
+            if (path.contains("/login") || path.contains("/users/add")) {
+                return@Interceptor chain.proceed(request)
+            }
+
+            val requestBuilder = request.newBuilder()
             sessionManager.fetchAuthToken()?.let { token ->
                 requestBuilder.addHeader("Authorization", token)
             }
@@ -59,7 +65,7 @@ object AppModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("")
+            .baseUrl("http://3.214.228.214:8080")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

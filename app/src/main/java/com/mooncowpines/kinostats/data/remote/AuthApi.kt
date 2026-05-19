@@ -4,6 +4,8 @@ import com.mooncowpines.kinostats.data.remote.dto.LoginDTO
 import com.mooncowpines.kinostats.data.remote.dto.UserDTO
 import com.mooncowpines.kinostats.data.remote.dto.UserDetailsUpdateDTO
 import com.mooncowpines.kinostats.data.remote.dto.UserPasswordUpdateDTO
+import com.mooncowpines.kinostats.data.remote.dto.ForgotPasswordDTO
+import com.mooncowpines.kinostats.data.remote.dto.ResetPasswordDTO
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -28,4 +30,11 @@ interface AuthApi {
 
     @PUT("api/v1/users/{id}/password")
     suspend fun updateUserPassword(@Path("id") id: Long, @Body passwords: UserPasswordUpdateDTO): Response<Unit>
+
+    @POST("api/auth/forgot-password")
+    suspend fun requestPasswordReset(@Body dto: ForgotPasswordDTO): Response<Void>
+
+    @POST("api/auth/reset-password")
+    suspend fun resetPassword(@Body dto: ResetPasswordDTO): Response<Void>
+
 }

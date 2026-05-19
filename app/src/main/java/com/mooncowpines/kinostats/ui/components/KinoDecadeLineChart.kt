@@ -31,22 +31,41 @@ import com.mooncowpines.kinostats.ui.theme.KinoYellow
 @Composable
 fun KinoDecadeLineChart(decades: List<StatItem<Int, Int>>) {
     Text("Movies By Decade", color = KinoWhite, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-    val sortedDecades = decades.sortedBy { it.label }
 
-    val points = sortedDecades.mapIndexed { index, item ->
+    if (decades.isEmpty()) {
+        Box(modifier = Modifier.fillMaxWidth().height(400.dp), contentAlignment = Alignment.Center) {
+            Text("Not enough data to draw chart", color = KinoWhite.copy(alpha = 0.5f))
+        }
+        return
+    }
+
+    val minDecade = decades.minOf { it.label }
+    val maxDecade = decades.maxOf { it.label }
+
+    val startDecade = minDecade - 10
+    val endDecade = maxDecade + 10
+
+    val completeDecades = mutableListOf<StatItem<Int, Int>>()
+    for (year in startDecade..endDecade step 10) {
+        val count = decades.find { it.label == year }?.value ?: 0
+        completeDecades.add(StatItem(year, count))
+    }
+
+    val points = completeDecades.mapIndexed { index, item ->
         Point(index.toFloat(), item.value.toFloat())
     }
 
     val xAxisData = AxisData.Builder()
         .axisStepSize(100.dp)
         .steps(points.size - 1)
-        .labelData { i -> "${sortedDecades[i].label}s" }
+        .labelData { i -> "${completeDecades[i].label}s" }
+        .startDrawPadding(17.dp)
         .axisLabelColor(KinoWhite)
         .axisLineColor(Color.DarkGray)
         .build()
 
-    val maxY = points.maxOfOrNull { it.y }?.toInt() ?: 0
-    val ySteps = if (maxY < 5) maxY.coerceAtLeast(1) else 5
+    val maxY = points.maxOfOrNull { it.y }?.toInt()?.coerceAtLeast(1) ?: 1
+    val ySteps = if (maxY < 5) maxY else 5
 
     val yAxisData = AxisData.Builder()
         .steps(ySteps)
@@ -66,7 +85,8 @@ fun KinoDecadeLineChart(decades: List<StatItem<Int, Int>>) {
                     dataPoints = points,
                     lineStyle = LineStyle(
                         color = KinoYellow,
-                        style = Stroke(width = 3f)),
+                        style = Stroke(width = 3f)
+                    ),
                     intersectionPoint = IntersectionPoint(color = KinoWhite, radius = 4.dp),
                     selectionHighlightPoint = SelectionHighlightPoint(color = KinoYellow),
                     shadowUnderLine = ShadowUnderLine(
@@ -84,11 +104,12 @@ fun KinoDecadeLineChart(decades: List<StatItem<Int, Int>>) {
         backgroundColor = KinoBlack
     )
 
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally) {
-
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -118,5 +139,6 @@ fun KinoDecadeLineChart(decades: List<StatItem<Int, Int>>) {
             color = KinoWhite.copy(alpha = 0.5f),
             fontSize = 12.sp,
             modifier = Modifier.padding(top = 4.dp)
-        ) }
+        )
+    }
 }
