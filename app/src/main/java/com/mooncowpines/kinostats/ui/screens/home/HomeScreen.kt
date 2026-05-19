@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.collectAsState
@@ -19,15 +18,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoPosterCard
@@ -38,6 +42,8 @@ import com.mooncowpines.kinostats.ui.components.KinoSearchBar
 import com.mooncowpines.kinostats.ui.components.KinoSeeMoreCard
 import com.mooncowpines.kinostats.ui.components.KinoSkeletonPosterCard
 import com.mooncowpines.kinostats.ui.theme.KinoGray
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -45,16 +51,13 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onMovieClick: (Long) -> Unit,
     onSearchSubmit: (String) -> Unit,
-    shouldRefresh: Boolean = false,
-    onRefreshDone: () -> Unit = {},
     onNavigateToWatchlist: () -> Unit,
     onNavigateToLogs: () -> Unit,
+
 ) {
-    LaunchedEffect(shouldRefresh) {
-        if (shouldRefresh) {
-            viewModel.loadHomeData()
-            onRefreshDone()
-        }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.loadHomeData()
     }
 
     val state by viewModel.state.collectAsState()
@@ -78,6 +81,7 @@ fun HomeScreen(
                 modifier = modifier,
                 onNavigateToWatchlist = onNavigateToWatchlist,
                 onNavigateToLogs = onNavigateToLogs,
+                onRefresh = { viewModel.loadHomeData() }
             )
         }
     }
@@ -92,10 +96,29 @@ fun HomeContent(
     onSearchSubmit: (String) -> Unit,
     onNavigateToWatchlist: () -> Unit,
     onNavigateToLogs: () -> Unit,
+    onRefresh: () -> Unit
 ) {
 
     val scrollState = rememberScrollState()
     var searchQuery by remember { mutableStateOf("") }
+
+    var isRefreshing by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = {
+            coroutineScope.launch {
+                isRefreshing = true
+                onRefresh()
+
+                delay(1000)
+
+                isRefreshing = false
+            }
+        },
+        modifier = modifier.fillMaxSize()
+    ) {
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -139,6 +162,7 @@ fun HomeContent(
                 Spacer(modifier = Modifier.height(KinoSpacing.medium))
             }
         }
+    }
     }
 }
 @Composable

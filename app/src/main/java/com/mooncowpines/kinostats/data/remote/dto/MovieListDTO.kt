@@ -6,5 +6,6 @@ data class MovieListDTO(
     @SerializedName("movieListId") val movieListId: Long,
     @SerializedName("name") val name: String,
     @SerializedName("movieCount") val movieCount: Int,
-    @SerializedName("movies") val movies: List<MovieCardDTO>?
+    @SerializedName("movies") val movies: List<MovieCardDTO>?,
+    @SerializedName("isWatchlist")val isWatchList: Boolean
 )

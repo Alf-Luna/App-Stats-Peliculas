@@ -6,6 +6,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import com.mooncowpines.kinostats.ui.theme.KinoBlack
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
 import com.mooncowpines.kinostats.ui.theme.KinoGray
 
@@ -20,7 +21,7 @@ fun KinoDeleteDialog(
         onDismissRequest = onDismiss,
         title = { Text(text = title, fontWeight = FontWeight.Bold, color = KinoWhite) },
         text = { Text(text = message, color = KinoWhite.copy(alpha = 0.8f)) },
-        containerColor = KinoGray,
+        containerColor = KinoBlack,
         confirmButton = {
             TextButton(onClick = onConfirm) {
                 Text("Delete", color = Color.Red, fontWeight = FontWeight.Bold)

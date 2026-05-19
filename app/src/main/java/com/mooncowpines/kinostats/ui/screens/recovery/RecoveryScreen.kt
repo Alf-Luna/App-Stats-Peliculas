@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.material3.HorizontalDivider
@@ -42,7 +43,8 @@ import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 fun RecoveryScreen(
     modifier: Modifier = Modifier,
     viewModel: RecoveryScreenViewModel = hiltViewModel(),
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToReset: (String) -> Unit
 ) {
 
     val state by viewModel.state.collectAsState()
@@ -51,7 +53,8 @@ fun RecoveryScreen(
     LaunchedEffect(state.success) {
         if (state.success) {
             Toast.makeText(context, "Recovery email sent!", Toast.LENGTH_LONG).show()
-            onNavigateBack()
+            onNavigateToReset(state.email)
+            viewModel.onNavigationDone()
         }
     }
 
@@ -74,7 +77,7 @@ fun RecoveryContent(
     onRecoveryClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(modifier = modifier.imePadding(), horizontalAlignment = Alignment.CenterHorizontally) {
 
         //Header banner
         Text(
@@ -152,7 +155,7 @@ fun RecoveryContent(
 
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "If your email is associated with an account you will receive a link to change your password ",
+            text = "If your email is registered you will receive a link to change your password, please check your spam folder",
             color = KinoYellow,
             textDecoration = TextDecoration.Underline,
             textAlign = TextAlign.Justify,

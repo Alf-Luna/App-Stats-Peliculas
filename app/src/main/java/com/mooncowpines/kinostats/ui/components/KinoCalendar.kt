@@ -3,6 +3,7 @@ package com.mooncowpines.kinostats.ui.components
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 
@@ -12,8 +13,18 @@ fun KinoCalendar(
     onDismissRequest: () -> Unit,
     onDateSelected: (Long?) -> Unit
 ) {
+    val selectableDates = object : SelectableDates {
+        override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+            return utcTimeMillis <= System.currentTimeMillis()
+        }
 
-    val calendarState = rememberDatePickerState()
+        override fun isSelectableYear(year: Int): Boolean {
+            return year <= java.time.LocalDate.now().year
+        }
+    }
+
+    val calendarState = rememberDatePickerState(
+        selectableDates = selectableDates)
 
     DatePickerDialog(
         onDismissRequest = onDismissRequest,

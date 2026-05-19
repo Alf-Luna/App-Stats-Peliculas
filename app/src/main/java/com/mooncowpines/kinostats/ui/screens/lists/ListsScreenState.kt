@@ -8,5 +8,9 @@ data class ListsScreenState(
     val errorMsg: String? = null,
 
     val listToDelete: MovieList? = null,
-    val isDeleting: Boolean = false
+    val isDeleting: Boolean = false,
+
+    val showCreateDialog: Boolean = false,
+    val newListName: String = "",
+    val isCreating: Boolean = false
 )

@@ -25,6 +25,10 @@ class RecoveryScreenViewModel @Inject constructor(
         _state.update { it.copy(email = newEmail, emailError = null, errorMsg = null) }
     }
 
+    fun onNavigationDone() {
+        _state.update { it.copy(success = false) }
+    }
+
     //Triggers an email recovery attempt
     fun recovery() {
         val currentState = _state.value

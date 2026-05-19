@@ -22,10 +22,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.imePadding
 
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoButton
@@ -39,7 +41,7 @@ import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 @Composable
 fun ResetScreen(
     modifier: Modifier = Modifier,
-    viewModel: ResetScreenViewModel = viewModel(),
+    viewModel: ResetScreenViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
@@ -58,6 +60,7 @@ fun ResetScreen(
         Reset(
             modifier = Modifier.align(Alignment.Center),
             state = state,
+            onCodeChange = { viewModel.onCodeChange(it)},
             onPassChange = { viewModel.onPassChange(it) },
             onPassCheckChange = { viewModel.onPassCheckChange(it) },
             onResetClick = { viewModel.reset() },
@@ -73,11 +76,14 @@ fun Reset(
     state: ResetScreenState,
     onPassChange: (String) -> Unit,
     onPassCheckChange: (String) -> Unit,
+    onCodeChange: (String) -> Unit,
     onResetClick: () -> Unit,
     onCancelClick: () -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+    val scrollState = rememberScrollState()
+
+    Column(modifier = modifier.verticalScroll(scrollState).imePadding(), horizontalAlignment = Alignment.CenterHorizontally) {
 
         //Header banner
         Text(
@@ -93,6 +99,27 @@ fun Reset(
         //Frame to wrap the form
         KinoFrame {
             //Password text field
+            Column {
+                Text(
+                    text = "6-Digit Code:",
+                    color = KinoYellow,
+                )
+                HorizontalDivider(
+                    color = KinoYellow,
+                    thickness = 1.dp,
+                    modifier = Modifier.padding(top = KinoSpacing.micro, bottom = KinoSpacing.small)
+                )
+                KinoTextField(
+                    textValue = state.code,
+                    onTextChange = onCodeChange,
+                    placeholderText = "000000",
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(KinoSpacing.medium))
+
+
             Column {
                 Text(
                     text = "New Password:",

@@ -3,13 +3,16 @@ sealed class Route(val path: String) {
     data object Login    : Route("login")
     data object Register : Route("register")
     data object Recovery : Route("recovery")
-    data object Reset   : Route("reset")
     data object Change  : Route("change")
     data object Home     : Route("home")
     data object Profile  : Route("profile")
     data object Stats  : Route("stats")
     data object Lists : Route("lists")
     data object Logs  : Route("logs")
+
+    data object Reset   : Route("reset/{email}") {
+        fun createRoute(email: String) = "reset/$email"
+    }
 
     data object ListDetail : Route("list_detail/{listId}") {
         fun createRoute(listId: Long) = "list_detail/$listId"

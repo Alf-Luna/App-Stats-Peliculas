@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mooncowpines.kinostats.domain.model.MovieList
 import com.mooncowpines.kinostats.ui.components.KinoFAB
@@ -44,7 +45,6 @@ fun MovieDetailScreen(
     viewModel: MovieDetailViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
     onNavigateToLog: (Long) -> Unit,
-    onDataModified: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -70,7 +70,6 @@ fun MovieDetailScreen(
                 onDismissListSheet = { viewModel.dismissListSheet() },
                 onAddFilmToList = { list -> viewModel.addFilmToList(list) },
                 onClearListMessage = { viewModel.clearListMessage() },
-                onDataModified = onDataModified,
                 modifier = modifier
             )
         }
@@ -87,7 +86,6 @@ fun MovieDetailContent(
     onDismissListSheet: () -> Unit,
     onAddFilmToList: (MovieList) -> Unit,
     onClearListMessage: () -> Unit,
-    onDataModified: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val movie = state.movie
@@ -97,7 +95,6 @@ fun MovieDetailContent(
     LaunchedEffect(state.listActionMessage) {
         state.listActionMessage?.let { msg ->
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-            onDataModified()
             onClearListMessage()
         }
     }
@@ -253,24 +250,24 @@ fun MovieDetailContent(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            /*Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                if (movie.tagLine.isNotEmpty()) {
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+
                     Text(
-                        text = movie.tagLine.uppercase(),
+                        text = "Overview",
                         color = KinoYellow,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                }
+
                 Text(
-                    text = movie.synopsis,
+                    text = movie.overview,
                     color = KinoWhite,
                     fontSize = 15.sp,
                     lineHeight = 22.sp
                 )
-            }*/
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
             HorizontalDivider(thickness = 1.dp, color = Color.DarkGray.copy(alpha = 0.5f))
@@ -287,8 +284,7 @@ fun MovieDetailContent(
 
                 DetailRow(label = "Director", value = movie.director)
                 DetailRow(label = "Country", value = movie.originCountry)
-                DetailRow(label = "Cinematographer", value = movie.cinematographer)
-                DetailRow(label = "Production company", value = movie.productionCompany)
+                DetailRow(label = "Produced by", value = movie.productionCompany)
                 DetailRow(label = "Genres", value = movie.genres.joinToString(separator = ", "))
             }
 
@@ -306,7 +302,7 @@ fun MovieDetailContent(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = movie.actors.joinToString(separator = ", "),
+                    text = movie.actors,
                     color = Color.LightGray,
                     fontSize = 15.sp,
                     lineHeight = 22.sp
@@ -341,6 +337,7 @@ fun DetailRow(label: String, value: String) {
             text = label,
             color = Color.Gray,
             fontSize = 14.sp,
+            maxLines = 1,
             modifier = Modifier.weight(0.35f)
         )
         Text(

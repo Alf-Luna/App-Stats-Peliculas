@@ -13,7 +13,9 @@ fun MovieCardDTO.toDomain(): MovieCard {
         id = this.id,
         title = this.title ?: "Unknown",
         posterUrl = this.posterPath?.let { "https://image.tmdb.org/t/p/w500$it" } ?: "",
-        releaseDate = null
+        releaseDate = this.yearOfRelease?.toString(),
+        duration = this.duration,
+        director = this.director
     )
 }
 
@@ -22,7 +24,9 @@ fun MovieDTO.toCard(): MovieCard {
         id = this.id,
         title = this.title,
         posterUrl = this.posterPath?.let { "https://image.tmdb.org/t/p/w500$it" } ?: "",
-        releaseDate = this.releaseDate ?: "Unknown release date"
+        releaseDate = this.releaseDate ?: "Unknown release date",
+        duration = this.runtime,
+        director = this.director
     )
 }
 
@@ -48,8 +52,10 @@ fun MovieDTO.toDomain(): Movie {
         originCountry = this.productionCountries ?: "Unknown",
         genres = this.genres?.split(", ") ?: emptyList(),
         director = this.director ?: "Unknown",
+        actors = this.actors ?: "No information available",
         backDropUrl = this.backdropPath?.let { "https://image.tmdb.org/t/p/w780$it" } ?: "",
         posterUrl = this.posterPath?.let { "https://image.tmdb.org/t/p/w500$it" } ?: "",
-        overview = this.overview ?: "No overview available."
+        overview = this.overview ?: "No overview available.",
+        productionCompany = this.productionCompany ?: "Unknown"
     )
 }

@@ -3,6 +3,7 @@ package com.mooncowpines.kinostats.ui.screens.stats
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mooncowpines.kinostats.domain.repository.AuthRepository
+import com.mooncowpines.kinostats.domain.repository.AuthState
 import com.mooncowpines.kinostats.domain.repository.StatsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,12 +30,24 @@ class StatsScreenViewModel @Inject constructor(
         loadStatsOnly()
     }
 
+    init {
+        viewModelScope.launch {
+            authRepository.authState.collect { authState ->
+                if (authState == AuthState.LOGGED_OUT) {
+                    _state.value = StatsScreenState()
+                }
+            }
+        }
+
+        loadStatsOnly()
+    }
+
     fun updateFilter(year: Int, month: Int?) {
         _state.update { it.copy(selectedYear = year, selectedMonth = month) }
         loadStatsOnly()
     }
 
-    private fun loadStatsOnly() {
+    fun loadStatsOnly() {
         viewModelScope.launch {
             val currentState = _state.value
 
