@@ -25,7 +25,7 @@ import com.mooncowpines.kinostats.ui.theme.KinoYellow
 
 @Composable
 fun RatingDropdownSelector(
-    rating: Float,
+    rating: Float?,
     onRatingChange: (Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -93,10 +93,11 @@ fun RatingDropdownSelector(
 }
 
 @Composable
-fun StaticStars(rating: Float) {
+fun StaticStars(rating: Float?) {
     Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+        val safeRating = rating ?: 0f
         for (i in 1..5) {
-            val fillAmount = (rating - (i - 1)).coerceIn(0f, 1f)
+            val fillAmount = (safeRating - (i - 1)).coerceIn(0f, 1f)
             Box(modifier = Modifier.size(20.dp), contentAlignment = Alignment.Center) {
                 Icon(Icons.Default.StarBorder, contentDescription = null, tint = Color.DarkGray, modifier = Modifier.fillMaxSize())
                 if (fillAmount > 0f) {

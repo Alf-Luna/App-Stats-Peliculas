@@ -129,9 +129,10 @@ fun StatsContent(
                 }
             } else {
 
-                state.stats?.let { statsData ->
+                val statsData = state.stats
 
-                    val hasData = statsData.genres.isNotEmpty()
+                if (statsData != null) {
+                    val hasData = statsData.totalMovies > 0
 
                     if (!hasData) {
                         Box(
@@ -166,43 +167,51 @@ fun StatsContent(
 
                         Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
 
-                        KinoGenreBarChart(
-                            genres = statsData.genres,
-                            maxMovieCount = state.genreMaxMovieCount
-                        )
+                        if (statsData.genres.isNotEmpty()) {
+                            KinoGenreBarChart(
+                                genres = statsData.genres,
+                                maxMovieCount = state.genreMaxMovieCount
+                            )}
 
                         Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
 
-                        KinoCountryPieChart(countries = statsData.countries)
+                        if (statsData.countries.isNotEmpty()) {
+                        KinoCountryPieChart(countries = statsData.countries)}
 
                         Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
 
-                        KinoRatingBarChart(ratings = statsData.ratings)
+                        if (statsData.ratings.isNotEmpty()) {
+                        KinoRatingBarChart(ratings = statsData.ratings)}
 
                         Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
 
-                        KinoDecadeLineChart(decades = statsData.decades)
+                        if (statsData.decades.isNotEmpty()) {
+                        KinoDecadeLineChart(decades = statsData.decades)}
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
+                            if (statsData.topActors.isNotEmpty()){
                             KinoTopList(
                                 title = "Top Actors",
                                 items = statsData.topActors.sortedByDescending { it.value }.take(5),
                                 modifier = Modifier.weight(1f)
-                            )
+                            )}
+
                             Spacer(modifier = Modifier.width(16.dp))
+
+                            if (statsData.topDirectors.isNotEmpty()) {
                             KinoTopList(
                                 title = "Top Directors",
                                 items = statsData.topDirectors.sortedByDescending { it.value }
                                     .take(5),
                                 modifier = Modifier.weight(1f)
                             )
+                            }
                         }
-
-                    } ?: run {
-                        if (state.errorMsg != null) {
+                    }
+                }else if (state.errorMsg != null) {
                             Box(
                                 modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
                                 contentAlignment = Alignment.Center
@@ -216,5 +225,3 @@ fun StatsContent(
                 }
             }
         }
-    }
-}

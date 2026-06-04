@@ -10,18 +10,18 @@ interface LogRepository {
     suspend fun saveLog(
         newMovieId: Long,
         newUserId: Long?,
-        newRating: Float,
+        newRating: Float?,
         newWatchDate: LocalDate?,
-        newReviewText: String
+        newReviewText: String?
     ): Boolean
 
     suspend fun updateLog(
         logId: Long,
         newMovieId: Long,
         newUserId: Long?,
-        newRating: Float,
+        newRating: Float?,
         newWatchDate: LocalDate?,
-        newReviewText: String
+        newReviewText: String?
     ): Boolean
 
     suspend fun deleteLog(logId: Long): Boolean

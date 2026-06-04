@@ -12,7 +12,7 @@ fun LogDTO.toDomain(): Log {
         userId = this.userId,
         rating = this.rating,
         watchDate = try { LocalDate.parse(this.date, DateTimeFormatter.ISO_LOCAL_DATE) } catch (e: Exception) { null },
-        logText = this.review ?: "",
+        logText = this.review,
         posterUrl = if (this.posterPath != null) "https://image.tmdb.org/t/p/w500${this.posterPath}" else "",
         movieTitle = this.title,
         releaseYear = this.releaseYear ?: 0

@@ -71,9 +71,11 @@ fun KinoRatingCard(
                     log.posterUrl.isEmpty() || asyncImageState is AsyncImagePainter.State.Error -> {
                         KinoFallBackCoverCard(modifier = Modifier.fillMaxSize())
                     }
+
                     asyncImageState is AsyncImagePainter.State.Loading -> {
                         Box(modifier = Modifier.fillMaxSize().background(Color.DarkGray))
                     }
+
                     else -> SubcomposeAsyncImageContent()
                 }
             }
@@ -104,30 +106,34 @@ fun KinoRatingCard(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     val rating = log.rating
-                    for (i in 1..5) {
-                        val icon = when {
-                            rating >= i -> Icons.Filled.Star
-                            rating >= i - 0.5f -> Icons.AutoMirrored.Filled.StarHalf
-                            else -> Icons.Outlined.StarOutline
+
+                    if (rating != null) {
+                        for (i in 1..5) {
+                            val icon = when {
+                                rating >= i -> Icons.Filled.Star
+                                rating >= i - 0.5f -> Icons.AutoMirrored.Filled.StarHalf
+                                else -> Icons.Outlined.StarOutline
+                            }
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = "Star",
+                                tint = KinoYellow,
+                                modifier = Modifier.size(16.dp)
+                            )
                         }
-                        Icon(
-                            imageVector = icon,
-                            contentDescription = "Star",
-                            tint = KinoYellow,
-                            modifier = Modifier.size(16.dp)
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Text(
+                            text = rating.toString(),
+                            color = KinoYellow,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
                         )
                     }
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Text(
-                        text = rating.toString(),
-                        color = KinoYellow,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold
-                    )
                 }
             }
+
 
             IconButton(onClick = onDeleteClick) {
                 Icon(
@@ -137,5 +143,5 @@ fun KinoRatingCard(
                 )
             }
         }
+        }
     }
-}

@@ -7,11 +7,11 @@ data class LogDetailScreenState(
     val isLoadingMovie: Boolean = true,
     val movie: Movie? = null,
 
-    val rating: Float = 0f,
+    val rating: Float? = null,
     val watchDate: LocalDate? = null,
     val formattedWatchDate: String = "Tap to select a date...",
     val showCalendar: Boolean = false,
-    val logText: String = "",
+    val logText: String? = "",
     val ratingError: String? = null,
     val watchDateError: String? = null,
     val logTextError: String? = null,

@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mooncowpines.kinostats.domain.model.MovieList
 import com.mooncowpines.kinostats.ui.components.KinoFAB

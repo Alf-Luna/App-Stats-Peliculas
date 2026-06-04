@@ -20,15 +20,8 @@ class StatsScreenViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(StatsScreenState(
-        selectedYear = LocalDate.now().year,
-        selectedMonth = LocalDate.now().monthValue
-    ))
+    private val _state = MutableStateFlow(StatsScreenState())
     val state: StateFlow<StatsScreenState> = _state.asStateFlow()
-
-    init {
-        loadStatsOnly()
-    }
 
     init {
         viewModelScope.launch {
@@ -38,7 +31,6 @@ class StatsScreenViewModel @Inject constructor(
                 }
             }
         }
-
         loadStatsOnly()
     }
 

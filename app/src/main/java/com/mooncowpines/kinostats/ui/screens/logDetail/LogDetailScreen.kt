@@ -175,7 +175,7 @@ fun LogDetailContent(
             Text(text = "Review", color = Color.Gray, fontSize = 14.sp, modifier = Modifier.padding(top = 16.dp))
 
             TextField(
-                value = state.logText,
+                value = state.logText ?: "",
                 onValueChange = onReviewTextChange,
                 modifier = Modifier.fillMaxWidth().heightIn(min = 150.dp),
                 placeholder = { Text("Write a review...", color = Color.DarkGray) },

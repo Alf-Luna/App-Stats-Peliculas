@@ -44,9 +44,9 @@ class LogRepositoryImpl @Inject constructor(
     override suspend fun saveLog(
         newMovieId: Long,
         newUserId: Long?,
-        newRating: Float,
+        newRating: Float?,
         newWatchDate: LocalDate?,
-        newReviewText: String
+        newReviewText: String?
     ): Boolean {
         if (newUserId == null) {
             return false
@@ -74,9 +74,9 @@ class LogRepositoryImpl @Inject constructor(
         logId: Long,
         newMovieId: Long,
         newUserId: Long?,
-        newRating: Float,
+        newRating: Float?,
         newWatchDate: LocalDate?,
-        newReviewText: String
+        newReviewText: String?
     ): Boolean {
         if (newUserId == null) {
             return false
