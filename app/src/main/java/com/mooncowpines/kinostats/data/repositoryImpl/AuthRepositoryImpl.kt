@@ -13,9 +13,12 @@ import com.mooncowpines.kinostats.data.remote.dto.UserPasswordUpdateDTO
 import com.mooncowpines.kinostats.domain.repository.AuthRepository
 import com.mooncowpines.kinostats.domain.repository.AuthState
 import com.mooncowpines.kinostats.utils.getErrorMessage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import okhttp3.Credentials
 import java.io.IOException
@@ -34,6 +37,17 @@ class AuthRepositoryImpl @Inject constructor(
 
     private var currentUser: User? = null
 
+    init {
+        val token = sessionManager.fetchAuthToken()
+        val savedUserId = sessionManager.fetchUserId()
+
+        if (token != null && savedUserId != null) {
+            _authState.value = AuthState.LOGGED_IN
+        } else {
+            _authState.value = AuthState.LOGGED_OUT
+        }
+    }
+
     override suspend fun login(username: String, pass: String): String? {
         try {
             val authHeader = Credentials.basic(username, pass)
@@ -49,7 +63,10 @@ class AuthRepositoryImpl @Inject constructor(
                         pass = pass
                     )
                     currentUser = user
+
                     sessionManager.saveAuthToken(authHeader)
+                    sessionManager.saveUserId(loginResponse.userId)
+
                     _authState.value = AuthState.LOGGED_IN
 
                     return null
@@ -73,6 +90,16 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getCurrentUser(): User? {
+
+        if (currentUser != null) {
+            return currentUser
+        }
+
+        val savedUserId = sessionManager.fetchUserId()
+
+        if (savedUserId != null) {
+            currentUser = getUserById(savedUserId)
+        }
         return currentUser
     }
 

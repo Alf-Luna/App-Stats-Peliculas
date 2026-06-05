@@ -18,11 +18,24 @@ import com.mooncowpines.kinostats.navigation.Route
 import com.mooncowpines.kinostats.ui.components.KinoBottomBar
 import dagger.hilt.android.AndroidEntryPoint
 
+import com.mooncowpines.kinostats.data.local.SessionManager
+import javax.inject.Inject
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var sessionManager: SessionManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val initialRoute = if (sessionManager.fetchAuthToken() != null) {
+            Route.Home.path
+        } else {
+            Route.Login.path
+        }
 
         setContent {
             KinoStatsTheme {
@@ -51,7 +64,10 @@ class MainActivity : ComponentActivity() {
                             } })
                     } }
                     ){ innerPadding ->
-                    NavGraph(modifier = Modifier.padding(innerPadding), navController = navController)
+                    NavGraph(
+                        modifier = Modifier.padding(innerPadding),
+                        navController = navController,
+                        startDestination = initialRoute)
                 }
             }
         }

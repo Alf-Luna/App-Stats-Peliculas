@@ -25,11 +25,14 @@ import com.mooncowpines.kinostats.ui.screens.search.SearchScreen
 
 
 @Composable
-fun NavGraph(modifier: Modifier = Modifier, navController: NavHostController) {
+fun NavGraph(
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    startDestination: String) {
 
     NavHost(
         navController = navController,
-        startDestination = Route.Login.path,
+        startDestination = startDestination,
         modifier = modifier
     ) {
 

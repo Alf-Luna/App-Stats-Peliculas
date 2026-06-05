@@ -8,23 +8,34 @@ import javax.inject.Singleton
 
 @Singleton
 class SessionManager @Inject constructor(
-    @ApplicationContext context: Context
+    private val prefs: SharedPreferences
 ) {
-    private val prefs: SharedPreferences = context.getSharedPreferences("kinostats_prefs", Context.MODE_PRIVATE)
-
     companion object {
-        const val AUTH_TOKEN = "auth_token"
+        const val AUTH_TOKEN_KEY = "auth_token_key"
+        const val USER_ID_KEY = "user_id_key"
     }
 
     fun saveAuthToken(token: String) {
-        prefs.edit().putString(AUTH_TOKEN, token).apply()
+        prefs.edit().putString(AUTH_TOKEN_KEY, token).apply()
     }
 
     fun fetchAuthToken(): String? {
-        return prefs.getString(AUTH_TOKEN, null)
+        return prefs.getString(AUTH_TOKEN_KEY, null)
+    }
+
+    fun saveUserId(userId: Long) {
+        prefs.edit().putLong(USER_ID_KEY, userId).apply()
+    }
+
+    fun fetchUserId(): Long? {
+        val id = prefs.getLong(USER_ID_KEY, -1L)
+        return if (id != -1L) id else null
     }
 
     fun clearSession() {
-        prefs.edit().remove(AUTH_TOKEN).apply()
+        prefs.edit()
+            .remove(AUTH_TOKEN_KEY)
+            .remove(USER_ID_KEY)
+            .apply()
     }
 }

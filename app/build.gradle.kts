@@ -73,4 +73,5 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
     implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("androidx.security:security-crypto-ktx:1.1.0-alpha06")
 }
