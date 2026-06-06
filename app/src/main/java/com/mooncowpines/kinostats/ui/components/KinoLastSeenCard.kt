@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
@@ -70,8 +69,8 @@ fun KinoLastSeenCard(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis)
 
-                if (!movieCard.releaseDate.isNullOrEmpty()) {
-                    Text(movieCard.releaseDate, color = KinoGray, fontSize = 14.sp)
+                movieCard.releaseDate?.let { date ->
+                    Text(date.year.toString(), color = KinoGray, fontSize = 14.sp)
                 }
 
                 if (movieCard.duration != null && movieCard.duration > 0) {

@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 data class UserDetailsUpdateDTO(
     @SerializedName("email") val email: String,
     @SerializedName("username") val username: String,
-    @SerializedName("password") val pass: String // La contraseña actual para validar
+    @SerializedName("password") val pass: String
 )
 
 data class UserPasswordUpdateDTO(

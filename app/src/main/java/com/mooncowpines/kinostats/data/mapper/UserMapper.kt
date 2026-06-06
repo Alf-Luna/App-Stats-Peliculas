@@ -8,6 +8,5 @@ fun UserDTO.toDomain(): User {
         id = this.id,
         userName = this.userName,
         email = this.email,
-        pass = this.pass
     )
 }

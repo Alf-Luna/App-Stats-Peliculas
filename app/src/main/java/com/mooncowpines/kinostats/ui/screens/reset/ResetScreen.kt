@@ -57,7 +57,7 @@ fun ResetScreen(
     }
 
     Box(Modifier.fillMaxSize().padding(30.dp)) {
-        Reset(
+        ResetContent(
             modifier = Modifier.align(Alignment.Center),
             state = state,
             onCodeChange = { viewModel.onCodeChange(it)},
@@ -71,7 +71,7 @@ fun ResetScreen(
 }
 
 @Composable
-fun Reset(
+fun ResetContent(
     modifier: Modifier,
     state: ResetScreenState,
     onPassChange: (String) -> Unit,

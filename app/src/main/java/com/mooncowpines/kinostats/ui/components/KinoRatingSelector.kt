@@ -44,7 +44,7 @@ fun RatingDropdownSelector(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (rating == 0f) {
+            if (rating == null || rating == 0f) {
                 Text("Tap to rate...", color = Color.Gray, fontSize = 16.sp)
             } else {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -74,9 +74,12 @@ fun RatingDropdownSelector(
                 DropdownMenuItem(
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
+
+                            val isSelected = option == (rating ?: 0f)
+
                             Text(
                                 text = if (option == 0f) "No rating" else option.toString(),
-                                color = if (option == rating) KinoYellow else KinoWhite,
+                                color = if (isSelected) KinoYellow else KinoWhite,
                                 modifier = Modifier.width(70.dp)
                             )
                             if (option > 0f) StaticStars(rating = option)

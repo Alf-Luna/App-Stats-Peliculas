@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.mooncowpines.kinostats.ui.components.ProfileOptionItem
 
 import com.mooncowpines.kinostats.ui.theme.KinoBlack
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
@@ -192,45 +193,3 @@ fun ProfileContent(
     }
 }
 
-@Composable
-fun ProfileOptionItem(
-    icon: ImageVector,
-    text: String,
-    onClick: () -> Unit,
-    isDestructive: Boolean = false
-) {
-    val tintColor = if (isDestructive) Color(0xFFE57373) else KinoWhite
-    val iconBgColor = if (isDestructive) Color(0xFFE57373).copy(alpha = 0.1f) else Color.DarkGray.copy(alpha = 0.3f)
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(vertical = 16.dp, horizontal = 20.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(36.dp)
-                .clip(CircleShape)
-                .background(iconBgColor),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = text,
-                tint = tintColor,
-                modifier = Modifier.size(20.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.width(16.dp))
-
-        Text(
-            text = text,
-            color = tintColor,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
-        )
-    }
-}

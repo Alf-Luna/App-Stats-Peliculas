@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -130,10 +131,16 @@ fun KinoRatingCard(
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
+                    } else {
+                        Text(
+                            text = "Unrated",
+                            color = Color.Gray,
+                            fontSize = 14.sp,
+                            fontStyle = FontStyle.Italic
+                        )
                     }
                 }
             }
-
 
             IconButton(onClick = onDeleteClick) {
                 Icon(

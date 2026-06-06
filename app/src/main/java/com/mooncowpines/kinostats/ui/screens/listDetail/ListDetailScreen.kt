@@ -2,35 +2,24 @@ package com.mooncowpines.kinostats.ui.screens.listDetail
 
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImagePainter
-import coil.compose.SubcomposeAsyncImage
-import coil.compose.SubcomposeAsyncImageContent
-import coil.request.ImageRequest
 import com.mooncowpines.kinostats.domain.model.MovieCard
 import com.mooncowpines.kinostats.ui.components.KinoDeleteDialog
-import com.mooncowpines.kinostats.ui.components.KinoFallBackCoverCard
+import com.mooncowpines.kinostats.ui.components.MovieInListCard
 import com.mooncowpines.kinostats.ui.theme.KinoBlack
-import com.mooncowpines.kinostats.ui.theme.KinoLighterGray
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 
@@ -154,58 +143,3 @@ fun ListDetailContent(
 
 }
 
-@Composable
-fun MovieInListCard(
-    movie: MovieCard,
-    onClick: () -> Unit,
-    onDelete: () -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth().clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = KinoLighterGray)
-    ) {
-        Row(
-            modifier = Modifier.padding(12.dp).fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            SubcomposeAsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(movie.posterUrl)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = "Cover",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(50.dp, 75.dp)
-                    .clip(RoundedCornerShape(4.dp))
-            ) {
-                val state = painter.state
-                when {
-                    movie.posterUrl.isEmpty() || state is AsyncImagePainter.State.Error -> {
-                        KinoFallBackCoverCard(modifier = Modifier.fillMaxSize())
-                    }
-                    state is AsyncImagePainter.State.Loading -> {
-                        Box(modifier = Modifier.fillMaxSize().background(Color.DarkGray))
-                    }
-                    else -> {
-                        SubcomposeAsyncImageContent()
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Text(
-                text = movie.title,
-                color = KinoWhite,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.weight(1f)
-            )
-
-            IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Delete, contentDescription = "Remove", tint = Color.Red)
-            }
-        }
-    }
-}

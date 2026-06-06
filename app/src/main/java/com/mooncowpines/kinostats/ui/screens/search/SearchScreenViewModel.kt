@@ -23,8 +23,6 @@ class SearchScreenViewModel @Inject constructor(
     private val _state = MutableStateFlow(SearchScreenState())
     val state: StateFlow<SearchScreenState> = _state.asStateFlow()
 
-    private var searchJob: Job? = null
-
     init {
         val initialQuery = savedStateHandle.get<String>("query") ?: ""
 

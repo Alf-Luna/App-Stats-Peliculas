@@ -12,6 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 
 import androidx.compose.runtime.collectAsState
@@ -34,6 +39,7 @@ import com.mooncowpines.kinostats.ui.components.KinoGenreBarChart
 import com.mooncowpines.kinostats.ui.components.KinoRatingBarChart
 import com.mooncowpines.kinostats.ui.components.KinoSummaryCards
 import com.mooncowpines.kinostats.ui.components.KinoTopList
+import com.mooncowpines.kinostats.ui.theme.KinoBlack
 import com.mooncowpines.kinostats.ui.theme.KinoSpacing
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
@@ -44,7 +50,8 @@ import kotlinx.coroutines.launch
 fun StatsScreen(
     modifier: Modifier = Modifier,
     viewModel: StatsScreenViewModel = hiltViewModel(),
-    onMovieClick: (Long) -> Unit
+    onMovieClick: (Long) -> Unit,
+    onNavigateToWrapped: (Int, Int?) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -53,7 +60,8 @@ fun StatsScreen(
         onMovieClick = onMovieClick,
         modifier = modifier,
         onRefresh = { viewModel.loadStatsOnly() },
-        onFilterChange = { year, month -> viewModel.updateFilter(year, month) }
+        onFilterChange = { year, month -> viewModel.updateFilter(year, month) },
+        onNavigateToWrapped = onNavigateToWrapped
         )
 }
 
@@ -63,6 +71,7 @@ fun StatsContent(
     onMovieClick: (Long) -> Unit,
     onFilterChange: (Int, Int?) -> Unit,
     onRefresh: () -> Unit,
+    onNavigateToWrapped: (Int, Int?) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -156,6 +165,24 @@ fun StatsContent(
                             }
                         }
                     } else {
+
+                        Button(
+                            onClick = { onNavigateToWrapped(state.selectedYear, state.selectedMonth) },
+                            colors = ButtonDefaults.buttonColors(containerColor = KinoYellow),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                        ) {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            val periodName = if (state.selectedMonth != null) "Month" else "Year"
+                            Text(
+                                text = "See Your Kino Wrapped for this $periodName",
+                                color = KinoBlack,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
+                            )
+                        }
 
                         Spacer(modifier = Modifier.height(KinoSpacing.extraLarge))
 

@@ -3,16 +3,13 @@ package com.mooncowpines.kinostats.ui.screens.logDetail
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,7 +23,8 @@ import com.mooncowpines.kinostats.ui.theme.KinoGray
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
+
+import com.mooncowpines.kinostats.ui.components.MovieHeaderInfo
 import com.mooncowpines.kinostats.ui.components.KinoErrorText
 
 
@@ -63,7 +61,7 @@ fun LogDetailScreen(
             )
         } ?: run {
         Box(modifier = modifier.fillMaxSize().background(KinoBlack), contentAlignment = Alignment.Center) {
-            Text(state.errorMsg ?: "Error al cargar la película", color = Color.Red)
+            Text(state.errorMsg ?: "Error loading movie", color = Color.Red)
         }
         }
     }
@@ -197,28 +195,3 @@ fun LogDetailContent(
     }
 }
 
-@Composable
-private fun MovieHeaderInfo(movie: Movie) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier.width(64.dp).height(96.dp)
-                .clip(RoundedCornerShape(4.dp)).background(Color.DarkGray)
-        ) {
-            AsyncImage(
-                model = movie.posterUrl,
-                contentDescription = "Poster",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-        }
-        Spacer(modifier = Modifier.width(16.dp))
-        Column {
-            Text(text = movie.title, color = KinoWhite, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = movie.releaseDate, color = Color.Gray, fontSize = 16.sp)
-        }
-    }
-}

@@ -12,9 +12,7 @@ class MovieRepositoryImpl @Inject constructor(
     private val api : MovieApi
 ) : MovieRepository {
 
-    override suspend fun getMovies(): List<Movie> {
-        TODO()
-    }
+
     override suspend fun getMovieById(id: Long): Movie? {
         return try {
             val response = api.getMovieDetails(id)

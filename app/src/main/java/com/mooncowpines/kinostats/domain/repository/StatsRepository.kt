@@ -3,4 +3,4 @@ import com.mooncowpines.kinostats.domain.model.UserStats
 
 interface StatsRepository {
 
-    suspend fun getUserStats(userId: Long?, year: Int?, month: Int?): UserStats}
+    suspend fun getUserStats(userId: Long?, year: Int?, month: Int?): UserStats?}

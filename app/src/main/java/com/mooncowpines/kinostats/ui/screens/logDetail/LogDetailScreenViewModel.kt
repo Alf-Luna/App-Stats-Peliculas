@@ -98,7 +98,9 @@ class LogDetailScreenViewModel @Inject constructor(
 
     //Functions to track text field value
     fun onRatingChange(newRating: Float) {
-        _state.update { it.copy(rating = newRating, ratingError = null, errorMsg = null ) }
+        val safeRating = if (newRating < 0.5f) null else newRating
+
+        _state.update { it.copy(rating = safeRating, ratingError = null, errorMsg = null ) }
     }
 
     fun logTextChange(newReviewText: String) {

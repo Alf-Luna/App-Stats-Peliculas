@@ -91,7 +91,7 @@ fun KinoDateSelector(
                 modifier = Modifier.weight(1f)
             ) {
                 val monthLabel = selectedMonth?.let {
-                    Month.of(it).getDisplayName(TextStyle.FULL, Locale.getDefault()).replaceFirstChar { it.uppercase() }
+                    Month.of(it).getDisplayName(TextStyle.FULL, Locale.ENGLISH).replaceFirstChar { it.uppercase() }
                 } ?: "All months"
 
                 OutlinedTextField(
@@ -124,7 +124,7 @@ fun KinoDateSelector(
 
                     months.forEach { month ->
                         DropdownMenuItem(
-                            text = { Text(month.getDisplayName(TextStyle.FULL, Locale.getDefault()).replaceFirstChar { it.uppercase() }) },
+                            text = { Text(month.getDisplayName(TextStyle.FULL, Locale.ENGLISH).replaceFirstChar { it.uppercase() }) },
                             onClick = {
                                 onFilterChange(selectedYear, month.value)
                                 monthExpanded = false

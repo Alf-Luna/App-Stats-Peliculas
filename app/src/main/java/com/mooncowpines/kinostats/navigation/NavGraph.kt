@@ -22,6 +22,7 @@ import com.mooncowpines.kinostats.ui.screens.logDetail.LogDetailScreen
 import com.mooncowpines.kinostats.ui.screens.stats.StatsScreen
 import com.mooncowpines.kinostats.ui.screens.movieDetail.MovieDetailScreen
 import com.mooncowpines.kinostats.ui.screens.search.SearchScreen
+import com.mooncowpines.kinostats.ui.screens.wrapped.WrappedScreen
 
 
 @Composable
@@ -35,7 +36,6 @@ fun NavGraph(
         startDestination = startDestination,
         modifier = modifier
     ) {
-
         composable(Route.Login.path) {
             LoginScreen(
                 onNavigateToRegister = { navController.navigate(Route.Register.path) },
@@ -127,6 +127,9 @@ fun NavGraph(
             StatsScreen(
                onMovieClick =  { movieId ->
                     navController.navigate(Route.MovieDetail.createRoute(movieId))
+                },
+                onNavigateToWrapped = { year, month ->
+                    navController.navigate(Route.Wrapped.createRoute(year, month))
                 }
             )
         }
@@ -192,6 +195,21 @@ fun NavGraph(
                 onMovieClick = { movieId ->
                     navController.navigate(Route.MovieDetail.createRoute(movieId))
                 }
+            )
+        }
+
+        composable(
+            route = Route.Wrapped.path,
+            arguments = listOf(
+                navArgument("year") { type = NavType.IntType },
+                navArgument("month") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )
+        ) {
+            WrappedScreen(
+                onClose = { navController.popBackStack() }
             )
         }
 

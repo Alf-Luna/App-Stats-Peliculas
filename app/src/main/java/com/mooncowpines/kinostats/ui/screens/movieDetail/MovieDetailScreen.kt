@@ -36,6 +36,7 @@ import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
+import com.mooncowpines.kinostats.ui.components.DetailRow
 import com.mooncowpines.kinostats.ui.components.KinoFallBackCoverCard
 
 @Composable
@@ -324,26 +325,3 @@ fun MovieDetailContent(
     }
 }
 
-@Composable
-fun DetailRow(label: String, value: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 12.dp),
-            verticalAlignment = Alignment.Top
-    ) {
-        Text(
-            text = label,
-            color = Color.Gray,
-            fontSize = 14.sp,
-            maxLines = 1,
-            modifier = Modifier.weight(0.35f)
-        )
-        Text(
-            text = value,
-            color = KinoWhite,
-            fontSize = 14.sp,
-            modifier = Modifier.weight(0.65f)
-        )
-    }
-}

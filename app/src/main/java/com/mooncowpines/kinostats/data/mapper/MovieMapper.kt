@@ -4,51 +4,27 @@ import com.mooncowpines.kinostats.data.remote.dto.MovieCardDTO
 import com.mooncowpines.kinostats.data.remote.dto.MovieDTO
 import com.mooncowpines.kinostats.domain.model.Movie
 import com.mooncowpines.kinostats.domain.model.MovieCard
+import com.mooncowpines.kinostats.utils.parseSafely
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-
 
 fun MovieCardDTO.toDomain(): MovieCard {
     return MovieCard(
         id = this.id,
         title = this.title ?: "Unknown",
         posterUrl = this.posterPath?.let { "https://image.tmdb.org/t/p/w500$it" } ?: "",
-        releaseDate = this.yearOfRelease?.toString(),
+        releaseDate = this.yearOfRelease?.let {
+            try { LocalDate.of(it, 1, 1) } catch (e: Exception) { null }
+        },
         duration = this.duration,
-        director = this.director
-    )
-}
-
-fun MovieDTO.toCard(): MovieCard {
-    return MovieCard(
-        id = this.id,
-        title = this.title,
-        posterUrl = this.posterPath?.let { "https://image.tmdb.org/t/p/w500$it" } ?: "",
-        releaseDate = this.releaseDate ?: "Unknown release date",
-        duration = this.runtime,
-        director = this.director
     )
 }
 
 fun MovieDTO.toDomain(): Movie {
-
-    val formattedDate = try {
-        if (!this.releaseDate.isNullOrBlank()) {
-            val date = LocalDate.parse(this.releaseDate)
-            val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
-            date.format(formatter)
-        } else {
-            "Unknown release date"
-        }
-    } catch (e: Exception) {
-        this.releaseDate ?: "Unknown release date"
-    }
-
     return Movie(
         id = this.id,
         title = this.title,
         duration = this.runtime ?: 0,
-        releaseDate = formattedDate,
+        releaseDate = parseSafely(this.releaseDate),
         originCountry = this.productionCountries ?: "Unknown",
         genres = this.genres?.split(", ") ?: emptyList(),
         director = this.director ?: "Unknown",

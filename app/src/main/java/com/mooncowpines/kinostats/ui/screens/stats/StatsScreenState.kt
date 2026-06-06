@@ -5,7 +5,7 @@ import java.time.LocalDate
 
 
 data class StatsScreenState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val errorMsg: String? = null,
 
     val selectedYear: Int = LocalDate.now().year,

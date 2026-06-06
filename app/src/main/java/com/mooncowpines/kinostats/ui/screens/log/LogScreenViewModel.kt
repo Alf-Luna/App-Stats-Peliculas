@@ -31,7 +31,6 @@ class LogScreenViewModel @Inject constructor(
                 }
             }
         }
-
         loadLogs()
     }
 

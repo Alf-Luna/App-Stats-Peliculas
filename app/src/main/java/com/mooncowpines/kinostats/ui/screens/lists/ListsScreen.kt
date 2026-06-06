@@ -29,6 +29,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import com.mooncowpines.kinostats.domain.model.MovieList
 import com.mooncowpines.kinostats.ui.components.KinoDeleteDialog
+import com.mooncowpines.kinostats.ui.components.ListCard
 import com.mooncowpines.kinostats.ui.theme.KinoBlack
 import com.mooncowpines.kinostats.ui.theme.KinoLighterGray
 import com.mooncowpines.kinostats.ui.theme.KinoWhite
@@ -201,49 +202,3 @@ fun ListsContent(
 
 }
 
-@Composable
-fun ListCard(
-    movieList: MovieList,
-    onClick: () -> Unit,
-    onDeleteClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = KinoLighterGray),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = movieList.name,
-                    color = KinoWhite,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "${movieList.movieCount} movies",
-                    color = KinoWhite.copy(alpha = 0.7f),
-                    fontSize = 14.sp
-                )
-            }
-            if (!movieList.isWatchList) {
-            IconButton(onClick = onDeleteClick) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete list",
-                    tint = Color.Red.copy(alpha = 0.8f)
-                )
-            }
-            }
-        }
-    }
-}

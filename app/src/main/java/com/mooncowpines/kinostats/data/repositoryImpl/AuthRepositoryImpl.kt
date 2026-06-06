@@ -13,12 +13,9 @@ import com.mooncowpines.kinostats.data.remote.dto.UserPasswordUpdateDTO
 import com.mooncowpines.kinostats.domain.repository.AuthRepository
 import com.mooncowpines.kinostats.domain.repository.AuthState
 import com.mooncowpines.kinostats.utils.getErrorMessage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import okhttp3.Credentials
 import java.io.IOException
@@ -60,7 +57,6 @@ class AuthRepositoryImpl @Inject constructor(
                         id = loginResponse.userId,
                         userName = loginResponse.username,
                         email = loginResponse.email,
-                        pass = pass
                     )
                     currentUser = user
 
@@ -153,7 +149,6 @@ class AuthRepositoryImpl @Inject constructor(
                 currentUser = userToUpdate.copy(
                     userName = userName,
                     email = email,
-                    pass = passToSave
                 )
                 null
             } else {

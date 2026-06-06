@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,7 +40,7 @@ class StatsScreenViewModel @Inject constructor(
 
     fun loadStatsOnly() {
         viewModelScope.launch {
-            val currentState = _state.value
+            _state.update { it.copy(isLoading = true, errorMsg = null, stats = null) }
 
             val user = authRepository.getCurrentUser()
 
@@ -50,15 +49,16 @@ class StatsScreenViewModel @Inject constructor(
                 return@launch
             }
 
-            _state.update { it.copy(isLoading = true, errorMsg = null, stats = null) }
+            val currentYear = _state.value.selectedYear
+            val currentMonth = _state.value.selectedMonth
 
-            try {
-                val fetchedStats = statsRepository.getUserStats(
-                    userId = user.id,
-                    year = currentState.selectedYear,
-                    month = currentState.selectedMonth
-                )
+            val fetchedStats = statsRepository.getUserStats(
+                userId = user.id,
+                year = currentYear,
+                month = currentMonth
+            )
 
+            if (fetchedStats != null) {
                 val maxMovieCount = fetchedStats.genres.maxOfOrNull { it.value } ?: 0
 
                 _state.update {
@@ -69,7 +69,7 @@ class StatsScreenViewModel @Inject constructor(
                         errorMsg = null
                     )
                 }
-            } catch (e: Exception) {
+            } else {
                 _state.update { it.copy(isLoading = false, errorMsg = "Error loading stats", stats = null) }
             }
         }
