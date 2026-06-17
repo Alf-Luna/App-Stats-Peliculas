@@ -109,7 +109,7 @@ fun ResetContent(
                     thickness = 1.dp,
                     modifier = Modifier.padding(top = KinoSpacing.micro, bottom = KinoSpacing.small)
                 )
-                KinoTextField(
+                 KinoTextField(
                     textValue = state.code,
                     onTextChange = onCodeChange,
                     placeholderText = "000000",

@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontStyle
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.platform.testTag
 
 import com.mooncowpines.kinostats.ui.theme.KinoYellow
 import com.mooncowpines.kinostats.ui.components.KinoButton
@@ -115,7 +116,9 @@ fun Register(
                     textValue = state.userName,
                     onTextChange = onUserNameChange,
                     placeholderText = "User Name",
-                    modifier = Modifier.fillMaxWidth())
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("user_name_input"))
 
                 state.userNameError?.let { KinoErrorText(message = it) }
             }
@@ -139,7 +142,9 @@ fun Register(
                     textValue = state.email,
                     onTextChange = onEmailChange,
                     placeholderText = "example@gmail.com",
-                    modifier = Modifier.fillMaxWidth())
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("email_input"))
 
                 state.emailError?.let { KinoErrorText(message = it) }
             }
@@ -164,7 +169,9 @@ fun Register(
                     onTextChange = onPassChange,
                     placeholderText = "Password",
                     isPassword = true,
-                    modifier = Modifier.fillMaxWidth())
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("password_input"))
 
                 //Visual feedback to password requirements
                 PasswordRequirementsFeedback(state.pass)
@@ -190,7 +197,9 @@ fun Register(
                     onTextChange = onPassCheckChange,
                     placeholderText = "Confirm Password",
                     isPassword = true,
-                    modifier = Modifier.fillMaxWidth())
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("password_check_input"))
 
                 //Visual feedback for password match
                 PasswordMatchFeedback(state.pass, state.passCheck)

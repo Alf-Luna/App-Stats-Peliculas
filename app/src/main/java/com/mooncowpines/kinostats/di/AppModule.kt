@@ -32,6 +32,7 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.File
 import javax.inject.Singleton
 
 @Module
@@ -45,14 +46,39 @@ object AppModule {
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
             .build()
 
-        return EncryptedSharedPreferences.create(
-            context,
-            "kinostats_prefs",
-            masterKey,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
+        val prefName = "kinostats_prefs"
+
+        return try {
+            EncryptedSharedPreferences.create(
+                context,
+                prefName,
+                masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+        } catch (e: Exception) {
+
+            context.getSharedPreferences(prefName, Context.MODE_PRIVATE)
+                .edit()
+                .clear()
+                .apply()
+
+            val dir = File(context.applicationInfo.dataDir, "shared_prefs")
+            val prefFile = File(dir, "$prefName.xml")
+            if (prefFile.exists()) {
+                prefFile.delete()
+            }
+
+            EncryptedSharedPreferences.create(
+                context,
+                prefName,
+                masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+        }
     }
+
 
     @Provides
     @Singleton
