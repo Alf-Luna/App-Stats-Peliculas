@@ -14,7 +14,10 @@ fun getEmailError(email: String): String? {
     if (email.isBlank()) {
         return "Email cannot be empty"
     }
-    if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+
+    val emailRegex = """^[A-Za-z0-9+_.-]+@([A-Za-z0-9-]+\.)+[A-Za-z]{2,}$""".toRegex()
+
+    if (!emailRegex.matches(email)) {
         return "Invalid email format"
     }
     return null
