@@ -19,3 +19,5 @@ local.properties
 
 /.idea/tasks.xml
 /.idea/userPackages.xml
+
+/.kotlin
